@@ -1,0 +1,13 @@
+Reimplement:
+
+glLineWidth
+
+glRasterPos3f
+
+glutBitmapCharacter
+
+-
+
+todo: 
+-then strip everything not supported by DS
+-port to DS
