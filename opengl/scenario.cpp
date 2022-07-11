@@ -46,7 +46,7 @@ void Scenario::change_food_pos()
 }
 void Scenario::draw_axis()
 {
-    glLineWidth(1.0f);
+    //glLineWidth(1.0f);
     glNormal3f(0.0, 1.0, 0.0);
     // eixo X - Red
     glColor3f(1.0f, 0.0f, 0.0f);
@@ -129,7 +129,7 @@ void Scenario::draw_food()
         glRotatef(a, 0.0, 1.0, 0.0);
 
         glColor3f(0.2f, 0.4f, 0.0f);
-        glLineWidth(3.5f);
+        //glLineWidth(3.5f);
         glBegin(GL_LINE_STRIP);
             glVertex3f(0, 0, 0);
             glVertex3f(0, 0, 0);
