@@ -1,33 +1,30 @@
-SnakeGL
-=======
+Demo:
+![ToolchainGenericDS](img/pointsDemo.png)
 
-Snake 3D game built using OpenGL and C++
+C++ Visual Studio 2012 source code of Open GL 1.x points demo using GLUT, FreeGlut: Points Demo
 
-## Requirements
+------------------------------------------------------------------------------------
 
-- OpenGL (GL, GLU, GLUT)
-- SOIL
+![ToolchainGenericDS](img/neheDisplayListsLesson12.png)
 
-## Controls
+C++ Visual Studio 2012 source code of Open GL 1.x points demo using GLUT, FreeGlut: Open GL Display Lists / OpenGL Call Lists execution (both refer to the same thing)
 
-- Space - Change Camera
-- P     - Pause
-- S     - Start
-- R     - Reset
-- Q     - Menu
-- Esc   - Quit
+/
 
-#### Screenshots
+Notes:
 
-![screen][1]
+Link against static libraries:
 
-![screen][2]
+Configuration Properties:
+->Linker->General:Additional Library Directories
+C:\github_clone\openglutvs2012project\glewglut\freeglut\lib
+C:\github_clone\openglutvs2012project\glewglut\glew-1.11.0\lib
 
-![screen][3]
+->Linker->Input: Additional Dependencies
+freeglut.lib
+glew32.lib
 
-![screen][4]
+->C++: (Include Directories, header references):
+C:\github_clone\openglutvs2012project\glewglut\freeglut\include
+C:\github_clone\openglutvs2012project\glewglut\glew-1.11.0\include
 
-  [1]: http://i.imgur.com/6rohrIe.png
-  [2]: http://i.imgur.com/RyzJjU9.png
-  [3]: http://i.imgur.com/TrheaFP.png
-  [4]: http://i.imgur.com/PhWfYWh.png
