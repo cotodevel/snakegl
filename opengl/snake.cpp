@@ -53,7 +53,7 @@ void Snake::draw()
     glColor3f(1.0, 1.0, 0.6);
     glPushMatrix();
         glTranslatef(h.x, h.y, h.z);
-        glutSolidCube(0.5f);
+        glut2SolidCube(0.5f);
     glPopMatrix();
 
     enable_2D_texture();
@@ -65,7 +65,7 @@ void Snake::draw()
 
         glPushMatrix();
             glTranslatef(p.x, p.y, p.z);
-            glut2SolidCube(0.5f);
+            glut2SolidCube(0.5f); //so far
         glPopMatrix();
     }
 
