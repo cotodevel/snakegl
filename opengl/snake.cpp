@@ -65,7 +65,7 @@ void Snake::draw()
 
         glPushMatrix();
             glTranslatef(p.x, p.y, p.z);
-            glut2SolidCube(0.5f); //so far
+            glut2SolidCube(0.5f);
         glPopMatrix();
     }
 
@@ -280,10 +280,12 @@ void unload_resources()
     glDeleteTextures(TEXTURE_COUNT, textures);
 }
 
+//Todo DS: use WoopsiSDK instead
 void draw_text(string s, Point p, float r, float g, float b)
 {
     glDisable(GL_LIGHTING);
 
+	#ifdef WIN32
     int len, i;
     glColor3f(r, g, b);
     glRasterPos3f(p.x, p.y,p.z);
@@ -293,11 +295,10 @@ void draw_text(string s, Point p, float r, float g, float b)
     {
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, s[i]);
     }
-
-    glEnable(GL_LIGHTING);
+	#endif
+    
+	glEnable(GL_LIGHTING);
 }
-
-//
 
 void drawBox(GLfloat size, GLenum type)
 {
