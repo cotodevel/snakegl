@@ -372,12 +372,12 @@ void drawSphere(double r, int lats, int longs)
             double x = cos(lng);
             double y = sin(lng);
 			//texture coords are wrong
-            glNormal3f(x * zr0, y * zr0, z0);
-			glTexCoord2f(x * z0, -y * z0/ lng);
+            glNormal3f( y, x, 0);
+			glTexCoord2f(y, -x * z0);
             glVertex3f(r * x * zr0, r * y * zr0, r * z0);
-            glNormal3f(x * zr1, y * zr1, z1);
+            glNormal3f(y, x, 0);
 			
-			glTexCoord2f(x * z1, -y * z1/ lng);
+			glTexCoord2f(y, -x * z1);
             glVertex3f(r * x * zr1, r * y * zr1, r * z1);
         }
         glEnd();

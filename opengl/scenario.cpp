@@ -124,23 +124,20 @@ void Scenario::draw_food()
     //draw_sphere(0.25f, p, FOOD_TEXTURE);
 
     // "leaf"
-    glPushMatrix();
+	glPushMatrix();
         glTranslatef(p.x + 0.05, p.y + m + 0.25, p.z);
         glRotatef(a, 0.0, 1.0, 0.0);
 
         glColor3f(0.2f, 0.4f, 0.0f);
-        //glLineWidth(3.5f);
-        glBegin(GL_LINE_STRIP);
-            glVertex3f(0, 0, 0);
-            glVertex3f(0, 0, 0);
-            glVertex3f(0.1, -0.01, 0);
-            glVertex3f(0.1, -0.01, 0);
-            glVertex3f(0.15, -0.02, 0);
-            glVertex3f(0.15, -0.02, 0);
-            glVertex3f(0.20, -0.03, 0);
-            glVertex3f(0.20, -0.03, 0);
-            glVertex3f(0.25, -0.04, 0);
-            glVertex3f(0.25, -0.04, 0);
+         glBegin(GL_TRIANGLE_STRIP);
+            glVertex3f(0, 0, 0.1);
+            glVertex3f(0, 0, 0.2);
+            glVertex3f(0.1, -0.01, 0.3);
+
+            glVertex3f(0.1, -0.01, 0.4);
+            glVertex3f(0.15, -0.02, 0.4);
+            glVertex3f(0.15, -0.02, 0.4);
+            
         glEnd();
     glPopMatrix();
 
@@ -150,7 +147,7 @@ void Scenario::draw_food()
         glBindTexture(GL_TEXTURE_2D, textures[FOOD_TEXTURE]);
         glTranslatef(p.x, p.y + m, p.z);
         glRotatef(a, 0.0, 1.0, 0.0);
-        drawSphere(0.25f, 100.0f, 100.0f); //glut2SolidSphere(0.25f, 100.0f, 100.0f); 
+        drawSphere(0.25f, 50.0f, 50.0f); //glut2SolidSphere(0.25f, 100.0f, 100.0f); 
     glPopMatrix();
 
     disable_2D_texture();
