@@ -208,10 +208,6 @@ void Game::display()
         }
 
         scenario->draw_objects();
-
-        glColor3f(0.0f, 0.0f, 0.0f);
-        glRectf(0,0, 0.75f, -0.1f);
-
         scenario->camera_mode = 3;
         scenario->set_camera();
 

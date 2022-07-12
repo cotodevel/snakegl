@@ -44,36 +44,13 @@ void Scenario::change_food_pos()
 
     food = p;
 }
-void Scenario::draw_axis()
-{
-    //glLineWidth(1.0f);
-    glNormal3f(0.0, 1.0, 0.0);
-    // eixo X - Red
-    glColor3f(1.0f, 0.0f, 0.0f);
-    glBegin(GL_LINES);
-    glVertex3f(0.0f, 0.0f, 0.0f);
-    glVertex3f(100.0f, 0.0f, 0.0f);
-    glEnd();
-    // eixo Y - Green
-    glColor3f(0.0f, 0.8f, 0.0f);
-    glBegin(GL_LINES);
-    glVertex3f(0.0f, 0.0f, 0.0f);
-    glVertex3f(0.0f, 100.0f, 0.0f);
-    glEnd();
-    // eixo Z - Blue
-    glColor3f(0.0f, 0.0f, 1.0f);
-    glBegin(GL_LINES);
-    glVertex3f(0.0f, 0.0f, 0.0f);
-    glVertex3f(0.0f, 0.0f, 100.0f);
-    glEnd();
-}
 
 void Scenario::draw_board()
 {
     enable_2D_texture();
     glPushMatrix();
         glBindTexture(GL_TEXTURE_2D, textures[GROUND_TEXTURE]);
-        glBegin(GL_POLYGON);
+		glBegin(GL_QUADS);
             //glColor3f(0.0f, 1.0f, 0.0f);
             glNormal3f(0.0, 1.0, 0.0);
             glTexCoord2f(0, 0);
@@ -85,7 +62,7 @@ void Scenario::draw_board()
             glTexCoord2f(0, 1);
             glVertex3f(-BOARD_SIZE, 0.0f, -BOARD_SIZE);
         glEnd();
-
+		
         Point p;
         float size = -BOARD_SIZE - 0.1f;
         // Draw bordes. TODO: It's better use a rectangle.
@@ -164,9 +141,6 @@ void Scenario::draw_barrier()
 
 void Scenario::draw_objects()
 {
-#ifdef DEBUG
-    draw_axis();
-#endif
     draw_board();
     draw_food();
     draw_barrier();

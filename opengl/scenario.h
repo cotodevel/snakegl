@@ -11,7 +11,6 @@ private:
     Point food;
     vector<Point> barriers;
     Camera camera;
-    void draw_axis();
     void draw_food();
     void draw_barrier();
     void draw_background();
