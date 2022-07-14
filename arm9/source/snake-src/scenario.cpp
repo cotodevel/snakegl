@@ -49,7 +49,7 @@ void Scenario::draw_board()
 {
     enable_2D_texture();
     glPushMatrix();
-        glBindTexture(GL_TEXTURE_2D, textures[GROUND_TEXTURE]);
+        glBindTexture(GL_TEXTURE_2D, texturesSnakeGL[GROUND_TEXTURE]);
 		glBegin(GL_QUADS);
             //glColor3f(0.0f, 1.0f, 0.0f);
             glNormal3f(0.0, 1.0, 0.0);
@@ -91,7 +91,7 @@ void Scenario::draw_board()
             size += 0.25f;
         }
 
-    glPopMatrix();
+    glPopMatrix(1);
     disable_2D_texture();
 }
 
@@ -116,16 +116,16 @@ void Scenario::draw_food()
             glVertex3f(0.15, -0.02, 0.4);
             
         glEnd();
-    glPopMatrix();
+    glPopMatrix(1);
 
     enable_2D_texture();
 
     glPushMatrix();
-        glBindTexture(GL_TEXTURE_2D, textures[FOOD_TEXTURE]);
+        glBindTexture(GL_TEXTURE_2D, texturesSnakeGL[FOOD_TEXTURE]);
         glTranslatef(p.x, p.y + m, p.z);
         glRotatef(a, 0.0, 1.0, 0.0);
         drawSphere(0.25f, 50.0f, 50.0f); //glut2SolidSphere(0.25f, 100.0f, 100.0f); 
-    glPopMatrix();
+    glPopMatrix(1);
 
     disable_2D_texture();
 }

@@ -82,6 +82,7 @@ extern float rotateX;
 extern float rotateY;
 
 extern int textureArrayNDS[2];
+extern int mainSnakeGL(int argc, char** argv);
 
 #ifdef __cplusplus
 }

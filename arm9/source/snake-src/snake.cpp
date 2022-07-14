@@ -54,10 +54,10 @@ void Snake::draw()
     glPushMatrix();
         glTranslatef(h.x, h.y, h.z);
         glut2SolidCube(0.5f);
-    glPopMatrix();
+    glPopMatrix(1);
 
     enable_2D_texture();
-    glBindTexture(GL_TEXTURE_2D, textures[SNAKE_TEXTURE]);
+    glBindTexture(GL_TEXTURE_2D, texturesSnakeGL[SNAKE_TEXTURE]);
 
     for (size_t i = 1; i < points.size(); ++i)
     {
@@ -66,7 +66,7 @@ void Snake::draw()
         glPushMatrix();
             glTranslatef(p.x, p.y, p.z);
             glut2SolidCube(0.5f);
-        glPopMatrix();
+        glPopMatrix(1);
     }
 
     disable_2D_texture();
@@ -160,14 +160,18 @@ Point random_point()
 
 void load_image(const char* filename)
 {
-    int width, height;
+    #if defined(WIN32)
+	int width, height;
     unsigned char* image = SOIL_load_image(filename, &width, &height, 0, SOIL_LOAD_RGB);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
     SOIL_free_image_data(image);
+	#endif
 }
 
 void enable_2D_texture()
 {
+	//Todo: ARM9
+	#if defined(WIN32)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -192,12 +196,15 @@ void enable_2D_texture()
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   mat_diffuse);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  mat_specular);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, high_shininess);
-
+	#endif
+	
     glEnable(GL_TEXTURE_2D);
 }
 
 void disable_2D_texture()
 {
+	//Todo: ARM9
+	#if defined(WIN32)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -222,7 +229,8 @@ void disable_2D_texture()
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   mat_diffuse);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  mat_specular);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, high_shininess);
-
+	#endif
+	
     glDisable(GL_TEXTURE_2D);
 }
 
@@ -231,10 +239,10 @@ void draw_cube(float size, Point p, int res_id)
     enable_2D_texture();
 
     glPushMatrix();
-        glBindTexture(GL_TEXTURE_2D, textures[res_id]);
+        glBindTexture(GL_TEXTURE_2D, texturesSnakeGL[res_id]);
         glTranslatef(p.x, p.y, p.z);
         glut2SolidCube(size);
-    glPopMatrix();
+    glPopMatrix(1);
 
     disable_2D_texture();
 }
@@ -244,40 +252,44 @@ void draw_sphere(float size, Point p, int res_id)
     enable_2D_texture();
 
     glPushMatrix();
-        glBindTexture(GL_TEXTURE_2D, textures[res_id]);
+        glBindTexture(GL_TEXTURE_2D, texturesSnakeGL[res_id]);
         glTranslatef(p.x, p.y, p.z); 
 		drawSphere(size, 100.0f, 100.0f); //glut2SolidSphere(size, 100.0f, 100.0f);
-	glPopMatrix();
+	glPopMatrix(1);
 
     disable_2D_texture();
 }
 
 void load_resources()
 {
-    glGenTextures(TEXTURE_COUNT, textures);
+	#if defined(WIN32)
+    glGenTextures(TEXTURE_COUNT, texturesSnakeGL);
 
-    glBindTexture(GL_TEXTURE_2D, textures[GROUND_TEXTURE]);
+    glBindTexture(GL_TEXTURE_2D, texturesSnakeGL[GROUND_TEXTURE]);
     load_image("./resources/grass.png");
 
-    glBindTexture(GL_TEXTURE_2D, textures[FOOD_TEXTURE]);
+    glBindTexture(GL_TEXTURE_2D, texturesSnakeGL[FOOD_TEXTURE]);
     load_image("./resources/apple.png");
 
-    glBindTexture(GL_TEXTURE_2D, textures[BARRIER_TEXTURE]);
+    glBindTexture(GL_TEXTURE_2D, texturesSnakeGL[BARRIER_TEXTURE]);
     load_image("./resources/box.png");
 
-    glBindTexture(GL_TEXTURE_2D, textures[SNAKE_TEXTURE]);
+    glBindTexture(GL_TEXTURE_2D, texturesSnakeGL[SNAKE_TEXTURE]);
     load_image("./resources/snake.png");
 
-    glBindTexture(GL_TEXTURE_2D, textures[MENU_TEXTURE]);
+    glBindTexture(GL_TEXTURE_2D, texturesSnakeGL[MENU_TEXTURE]);
     load_image("./resources/menu.png");
 
-    glBindTexture(GL_TEXTURE_2D, textures[BRICK_TEXTURE]);
+    glBindTexture(GL_TEXTURE_2D, texturesSnakeGL[BRICK_TEXTURE]);
     load_image("./resources/brick.png");
+	#endif
 }
 
 void unload_resources()
 {
-    glDeleteTextures(TEXTURE_COUNT, textures);
+    #if defined(WIN32)
+	glDeleteTextures(TEXTURE_COUNT, texturesSnakeGL);
+	#endif
 }
 
 //Todo DS: use WoopsiSDK instead
@@ -333,15 +345,17 @@ void drawBox(GLfloat size, GLenum type)
     for (i = 5; i >= 0; i--)
     {
         glBegin(type);
-            glNormal3fv(&n[i][0]);
+            #if defined(WIN32)
+			glNormal3fv(&n[i][0]);
             glTexCoord2f(0, 0);
-            glVertex3fv(&v[faces[i][0]][0]);
+			glVertex3fv(&v[faces[i][0]][0]);
             glTexCoord2f(1, 0);
             glVertex3fv(&v[faces[i][1]][0]);
             glTexCoord2f(1, 1);
             glVertex3fv(&v[faces[i][2]][0]);
             glTexCoord2f(0, 1);
             glVertex3fv(&v[faces[i][3]][0]);
+			#endif
         glEnd();
     }
 }

@@ -1,8 +1,8 @@
 //disable _CRT_SECURE_NO_WARNINGS message to build this in VC++
 #pragma warning(disable:4996)
 
-
 #include "game.h"
+#include "timerTGDS.h"
 
 float to_fps(float fps, int value)
 {
@@ -76,7 +76,7 @@ void Game::draw_menu()
 {
     enable_2D_texture();
     glPushMatrix();
-        glBindTexture(GL_TEXTURE_2D, textures[MENU_TEXTURE]);
+        glBindTexture(GL_TEXTURE_2D, texturesSnakeGL[MENU_TEXTURE]);
         glBegin(GL_QUADS);
             glNormal3f(0.0, 1.0, 0.0);
             glTexCoord2f(0, 1);
@@ -88,7 +88,7 @@ void Game::draw_menu()
             glTexCoord2f(0, 0);
             glVertex3f(-8, 0.0f, -8);
         glEnd();
-    glPopMatrix();
+    glPopMatrix(1);
     disable_2D_texture();
 
     Point p;
@@ -319,38 +319,38 @@ void Game::on_key_pressed(int key)
 {
     switch (key)
     {
-        case KEY_CAMERA:
+        case SNAKEGL_KEY_CAMERA:
             if (!is_running) return;
             scenario->change_camera_pos();
         break;
-        case KEY_PAUSE:
+        case SNAKEGL_KEY_PAUSE:
             if (!is_running) return;
             pause();
         break;
-        case KEY_QUIT:
+        case SNAKEGL_KEY_QUIT:
             exit(0);
         break;
-        case KEY_SELECT:
+        case SNAKEGL_KEY_SELECT:
             reset();
         break;
-        case KEY_START:
+        case SNAKEGL_KEY_START:
             if (!paused) return;
             start();
         break;
-        case KEY_STOP:
+        case SNAKEGL_KEY_STOP:
             if (!is_running) return;
             stop();
         break;
-        case KEY_RESET:
+        case SNAKEGL_KEY_RESET:
             if (!is_running) return;
             reset();
         break;
-        case KEY_LEFT:
+        case SNAKEGL_KEY_LEFT:
             if (!is_running || key_pressed) return;
             scenario->snake.set_direction(LEFT);
             key_pressed = true;
         break;
-        case KEY_UP:
+        case SNAKEGL_KEY_UP:
             if (!is_running && !is_game_over)
             {
                 level--;
@@ -360,12 +360,12 @@ void Game::on_key_pressed(int key)
             scenario->snake.set_direction(UP);
             key_pressed = true;
         break;
-        case KEY_RIGHT:
+        case SNAKEGL_KEY_RIGHT:
             if (!is_running || key_pressed) return;
             scenario->snake.set_direction(RIGHT);
             key_pressed = true;
         break;
-        case KEY_DOWN:
+        case SNAKEGL_KEY_DOWN:
             if (!is_running && !is_game_over)
             {
                 level++;
@@ -401,11 +401,18 @@ void Game::calculateFPS(void)
 {
     //  Increase frame count
     frameCount++;
-
+	
+	#if defined(WIN32)
     //  Get the number of milliseconds since glutInit called
     //  (or first call to glutGet(GLUT ELAPSED TIME)).
     currentTime = glutGet(GLUT_ELAPSED_TIME);
-
+	#endif
+	
+	
+	#if defined(ARM9)
+    currentTime = getTimerCounter();
+	#endif
+	
     //  Calculate time passed
     int timeInterval = currentTime - previousTime;
 

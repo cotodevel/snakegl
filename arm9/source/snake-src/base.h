@@ -10,21 +10,19 @@
     #include <GL/gl.h>
     #include <GL/glut.h>
     //#include <GL/glext.h>
+	#include "soil.h"
 #else
-    #include <GL/gl.h>
-    #include <GL/glx.h>
-    #include <GL/glut.h>
+    #include "videoTGDS.h"
+	#include "VideoGL.h"
 #endif
 
-//#include "glut_shapes.h"
+#include "keypadTGDS.h"
 
 #include <deque>
 #include <iostream>
 #include <stdlib.h>
 #include <string.h>
 #include <vector>
-
-#include "soil.h"
 
 using namespace std;
 
@@ -54,17 +52,17 @@ using namespace std;
 #define TEXTURE_COUNT   6
 
 /* Key mappings. */
-#define KEY_CAMERA      32  // space
-#define KEY_PAUSE       112 // p
-#define KEY_QUIT        27  // esc
-#define KEY_SELECT      13  // enter
-#define KEY_START       115 // s
-#define KEY_STOP        113 // q
-#define KEY_RESET       114 // r
-#define KEY_UP          GLUT_KEY_UP
-#define KEY_DOWN        GLUT_KEY_DOWN
-#define KEY_RIGHT       GLUT_KEY_RIGHT
-#define KEY_LEFT        GLUT_KEY_LEFT
+#define SNAKEGL_KEY_CAMERA      KEY_R  // space
+#define SNAKEGL_KEY_PAUSE       KEY_Y // p
+#define SNAKEGL_KEY_QUIT        KEY_L  // esc
+#define SNAKEGL_KEY_SELECT      KEY_SELECT  // enter
+#define SNAKEGL_KEY_START       KEY_START // s
+#define SNAKEGL_KEY_STOP        KEY_X // q
+#define SNAKEGL_KEY_RESET       KEY_A // r
+#define SNAKEGL_KEY_UP          KEY_UP
+#define SNAKEGL_KEY_DOWN        KEY_DOWN
+#define SNAKEGL_KEY_RIGHT       KEY_RIGHT
+#define SNAKEGL_KEY_LEFT        KEY_LEFT
 
 
 enum Direction
@@ -116,6 +114,6 @@ struct Camera
 };
 
 extern void setVSync(bool sync);
-extern GLuint textures[TEXTURE_COUNT];
+extern GLuint texturesSnakeGL[TEXTURE_COUNT];
 
 #endif

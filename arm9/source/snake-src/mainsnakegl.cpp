@@ -5,6 +5,8 @@
 #include <string.h>
 #include <assert.h>
 #include <time.h>
+#include "timerTGDS.h"
+#include "keypadTGDS.h"
 
 #if defined(MSDOS) || defined(OS2) || defined(WIN32) || defined(__CYGWIN__)
 #  include <fcntl.h>
@@ -25,17 +27,16 @@ using namespace std;
  *		Visit My Site At nehe.gamedev.net
  */
 
+#ifdef WIN32
 #include <windows.h>		// Header File For Windows
-#include <stdio.h>			// Header File For Standard Input/Output
 #include <gl\glu.h>			// Header File For The GLu32 Library
 #include <gl\glut.h>		// Header File For The Glaux Library
 #include <gl\gl.h>			// Header File For The OpenGL32 Library
-#ifndef BASE_H
-    #define BASE_H
-    #include "base.h"
 #endif
 
+#include "base.h"
 #include "game.h"
+#include "main.h"
 
 int width  = 640,
     height = 640;
@@ -48,46 +49,19 @@ Game* game = NULL;
 void keyboard(unsigned char key, int x, int y)
 {
     game->on_key_pressed((int)key);
-    glutPostRedisplay();
+    
+	#if defined(WIN32)
+	glutPostRedisplay();
+	#endif
 }
 
 void keyboardSpecial(int key, int x, int y)
 {
     game->on_key_pressed((int)key);
-    glutPostRedisplay();
-}
-
-void init()
-{
-    // Init GL before call this. Otherwise don't work.
-    setVSync(true);
-
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-    float pos_light[4] = { 5.0f, 5.0f, 10.0f, 0.0f };
-    glLightfv(GL_LIGHT0, GL_POSITION, pos_light);
-    glEnable(GL_LIGHT0);
-
-#ifdef DEBUG
-    glDisable(GL_CULL_FACE);
-#else
-    glEnable(GL_CULL_FACE);
-#endif
-
-    glEnable(GL_DEPTH_TEST);
-
-    glEnable(GL_NORMALIZE);
-    glEnable(GL_COLOR_MATERIAL);
-#ifdef USE_BUFFERS
-    glEnable(GL_LIGHTING);
-#else
-    glDisable(GL_LIGHTING);
-#endif
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-
-    load_resources();
-
-    game = new Game();
+    
+	#if defined(WIN32)
+	glutPostRedisplay();
+	#endif
 }
 
 void display()
@@ -100,11 +74,11 @@ void display()
 
     game->display();
 
-#ifdef USE_BUFFERS
-    glutSwapBuffers();
-#else
-    glFlush();
-#endif
+	#ifdef USE_BUFFERS
+		glutSwapBuffers();
+	#else
+		glFlush();
+	#endif
 }
 
 void resize(int w, int h)
@@ -112,21 +86,23 @@ void resize(int w, int h)
     /*glViewport(0.0f, 0.0f, w, h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();*/
-    glutPostRedisplay();
+    #if defined(WIN32)
+		glutPostRedisplay();
+	#endif
 }
 
-GLuint textures[TEXTURE_COUNT];
+GLuint texturesSnakeGL[TEXTURE_COUNT];
 
 
-int main(int argc, char** argv)
-{
-    glutInit(&argc, argv);
+int mainSnakeGL(int argc, char** argv){
+    #if defined(WIN32)
+	glutInit(&argc, argv);
 
-#ifdef USE_BUFFERS
-    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
-#else
-    glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE);
-#endif
+		#ifdef USE_BUFFERS
+			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
+		#else
+			glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE);
+		#endif
 
     glutInitWindowSize(width, height);
     glutInitWindowPosition(100, 100);
@@ -136,9 +112,87 @@ int main(int argc, char** argv)
     glutReshapeFunc(resize);
     glutKeyboardFunc(keyboard);
     glutSpecialFunc(keyboardSpecial);
-    init();
-    glutMainLoop();
+    #endif
+	
 
+
+
+
+
+
+
+
+
+
+
+
+    InitGL();
+
+    // Init GL before call this. Otherwise don't work.
+    setVSync(true);
+	
+	#if defined(ARM9)
+	glClearColor(0.0f, 0.0f, 0.0f);
+	#endif
+	
+    #if defined(WIN32)
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	#endif
+	
+//todo: ARM9
+#if defined(WIN32)
+    float pos_light[4] = { 5.0f, 5.0f, 10.0f, 0.0f };
+    glLightfv(GL_LIGHT0, GL_POSITION, pos_light);
+	glEnable(GL_LIGHT0);
+	
+	#ifdef DEBUG
+		glDisable(GL_CULL_FACE);
+	#else
+		glEnable(GL_CULL_FACE);
+	#endif
+
+    glEnable(GL_DEPTH_TEST);
+
+    glEnable(GL_NORMALIZE);
+    glEnable(GL_COLOR_MATERIAL);
+	#ifdef USE_BUFFERS
+		glEnable(GL_LIGHTING);
+	#else
+		glDisable(GL_LIGHTING);
+	#endif
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+#endif
+
+    load_resources();
+
+    #if defined(ARM9)
+    startTimerCounter(tUnitsMilliseconds);
+    #endif
+
+    game = new Game();
+
+
+
+
+
+
+
+
+	#if defined(WIN32)
+	glutMainLoop();
+	#endif
+	
+	#ifdef ARM9
+	while(1==1){
+		scanKeys();
+		//Handle keypress
+		//keyboard(unsigned char key, int x, int y)
+		
+		//Handle Display
+		display();
+	}
+	#endif
+	
     return 0;
 }
 
@@ -171,7 +225,9 @@ void setVSync(bool sync)
             cout << "Can't enable vSync.\n";
         }
     }
-#else
+#endif
+
+#if defined(_MACOSX)
     glewGetProcAddress((const GLubyte*)"glXSwapIntervalEXT");
     PFNGLXSWAPINTERVALEXTPROC glXSwapIntervalEXT = 0;
 
@@ -191,4 +247,5 @@ void setVSync(bool sync)
         cout << "Can't enable vSync.\n";
     }
 #endif
+
 }

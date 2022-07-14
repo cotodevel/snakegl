@@ -66,7 +66,7 @@ USA
 #include "brick.h"
 #include "grass.h"
 #include "menu.h"
-#include "snake.h"
+#include "snakegfx.h"
 #include "Texture_Cube.h"
 
 char curChosenBrowseFile[MAX_TGDSFILENAME_LENGTH];
@@ -311,13 +311,7 @@ int main(int argc, char **argv) {
 	}
 	*/
 	
-	InitGL();
-	
-	while (1){
-		scanKeys();
-		
-	}
-	
+	return mainSnakeGL(argc, argv);
 	return 0;
 }
 
@@ -411,7 +405,7 @@ int InitGL()										// All Setup For OpenGL Goes Here
 	arrayOfTextures[2] = (u32)&brick; //2: brick.bmp  
 	arrayOfTextures[3] = (u32)&grass; //3: grass.bmp
 	arrayOfTextures[4] = (u32)&menu; //4: menu.bmp
-	arrayOfTextures[5] = (u32)&snake; //5: snake.bmp
+	arrayOfTextures[5] = (u32)&snakegfx; //5: snakegfx.bmp
 	arrayOfTextures[6] = (u32)&Texture_Cube; //6: Texture_Cube.bmp
 	int texturesInSlot = LoadLotsOfGLTextures((u32*)&arrayOfTextures, (int*)&textureArrayNDS, 7); //Implements both glBindTexture and glTexImage2D 
 	int i = 0;
