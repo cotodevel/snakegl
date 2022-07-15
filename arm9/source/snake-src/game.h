@@ -15,7 +15,6 @@ private:
     bool      key_pressed;
     int       m, m2;
     int       frameCount;
-    int       currentTime;
     int       previousTime;
     int       score;
     int       tick;
@@ -31,7 +30,8 @@ private:
     void      run();
     void      draw_menu();
 public:
-    Game();
+    int       currentTime;
+	Game();
     ~Game();
     void display();
     void pause();
@@ -43,4 +43,14 @@ public:
 
 
 extern float to_fps(float fps, int value);
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern Game* game;
+
+#ifdef __cplusplus
+}
 #endif

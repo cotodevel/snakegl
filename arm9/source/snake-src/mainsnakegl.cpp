@@ -7,6 +7,7 @@
 #include <time.h>
 #include "timerTGDS.h"
 #include "keypadTGDS.h"
+#include "biosTGDS.h"
 
 #if defined(MSDOS) || defined(OS2) || defined(WIN32) || defined(__CYGWIN__)
 #  include <fcntl.h>
@@ -67,9 +68,10 @@ void display()
 {
     /*glViewport(width / 4, height / 4, 200, 200);
     glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();*/
-
+    glLoadIdentity();
+    
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    */
 
     game->display();
 
@@ -78,6 +80,9 @@ void display()
 	#else
 		glFlush();
 	#endif
+
+    handleARM9SVC();	/* Do not remove, handles TGDS services */
+	IRQVBlankWait();
 }
 
 void resize(int w, int h)

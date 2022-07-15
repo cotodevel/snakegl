@@ -1,6 +1,10 @@
 {
     "terminal.integrated.defaultProfile.windows": "msys2",
     "files.associations": {
-        "typedefstgds.h": "c"
+        "typedefstgds.h": "c",
+        "*.tcc": "cpp",
+        "deque": "cpp",
+        "string": "cpp",
+        "vector": "cpp"
     },
 }

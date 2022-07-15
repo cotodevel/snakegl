@@ -247,7 +247,7 @@ void Game::display()
     }
     else
     {
-        draw_menu();
+        //draw_menu();
     }
 
     scenario->camera_mode = old_cam;

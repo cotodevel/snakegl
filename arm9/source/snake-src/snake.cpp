@@ -1,5 +1,6 @@
 #include "snake.h"
-
+#include "debugNocash.h"
+#include "game.h"
 
 //
 // Snake implementation
@@ -308,6 +309,11 @@ void draw_text(string s, Point p, float r, float g, float b)
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, s[i]);
     }
 	#endif
+    
+    char debugBuf[64];
+    //sprintf(debugBuf, "currentTime:%d", game->currentTime);
+    sprintf(debugBuf, "%s", s.c_str());
+    nocashMessage(debugBuf);
     
 	glEnable(GL_LIGHTING);
 }
