@@ -46,10 +46,9 @@ bool is_game_over = false,
 
 Game* game = NULL;
 
-void keyboard(unsigned char key, int x, int y)
+void keyboard(unsigned int key, int x, int y)
 {
-    game->on_key_pressed((int)key);
-    
+    bool pressed = game->on_key_pressed((int)key);
 	#if defined(WIN32)
 	glutPostRedisplay();
 	#endif
@@ -186,7 +185,7 @@ int mainSnakeGL(int argc, char** argv){
 	while(1==1){
 		scanKeys();
 		//Handle keypress
-		//keyboard(unsigned char key, int x, int y)
+		keyboard(keysDown(), 0, 0);
 		
 		//Handle Display
 		display();
@@ -209,8 +208,8 @@ void setVSync(bool sync)
 
     if(extensions && strstr( extensions, "WGL_EXT_swap_control" ) == 0 )
     {
-        cout << "Can't enable vSync.\n";
-        return;
+        printf("Can't enable vSync.");
+		return;
     }
     else
     {
@@ -222,7 +221,7 @@ void setVSync(bool sync)
         }
         else
         {
-            cout << "Can't enable vSync.\n";
+            printf("Can't enable vSync.");
         }
     }
 #endif
@@ -244,7 +243,7 @@ void setVSync(bool sync)
     }
     else
     {
-        cout << "Can't enable vSync.\n";
+        printf("Can't enable vSync.");
     }
 #endif
 

@@ -312,6 +312,13 @@ int main(int argc, char **argv) {
 	*/
 	
 	mainSnakeGL(argc, argv);
+	clrscr();
+	printf("----");
+	printf("----");
+	printf("----");
+	printf("----");
+	printf("----");
+	
 	return 0;
 }
 

@@ -327,8 +327,9 @@ bool Game::on_key_pressed(unsigned int key)
             if (!is_running) return false;
             pause();
         break;
-        case SNAKEGL_KEY_QUIT:
-            exit(0);
+        case SNAKEGL_KEY_QUIT:{
+            //exit(0);
+		}
         break;
         case SNAKEGL_KEY_SELECT:
             reset();
@@ -375,8 +376,9 @@ bool Game::on_key_pressed(unsigned int key)
             scenario->snake.set_direction(DOWN);
             key_pressed = true;
         break;
-        default:
-            cout << "key = " << key << "\n";
+        default:{
+            //printf("key = %d", key);
+        }
         break;
     }
 	return true;
