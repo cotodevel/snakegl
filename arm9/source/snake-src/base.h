@@ -42,13 +42,12 @@ using namespace std;
 // Y axis difference. Ground to Objects.
 #define GROUND_DIFF     0.25f
 
-#define GROUND_TEXTURE  0
-#define FOOD_TEXTURE    1
-#define BARRIER_TEXTURE 2
-#define SNAKE_TEXTURE   3
+#define FOOD_TEXTURE    0
+#define BARRIER_TEXTURE 1
+#define BRICK_TEXTURE   2
+#define GROUND_TEXTURE  3
 #define MENU_TEXTURE    4
-#define BRICK_TEXTURE   5
-
+#define SNAKE_TEXTURE   5
 #define TEXTURE_COUNT   6
 
 /* Key mappings. */

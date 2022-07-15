@@ -49,7 +49,7 @@ Game* game = NULL;
 
 void keyboard(unsigned int key, int x, int y)
 {
-    bool pressed = game->on_key_pressed((int)key);
+    bool pressed = game->on_key_pressed(key);
 	#if defined(WIN32)
 	glutPostRedisplay();
 	#endif
@@ -57,7 +57,7 @@ void keyboard(unsigned int key, int x, int y)
 
 void keyboardSpecial(int key, int x, int y)
 {
-    game->on_key_pressed((int)key);
+    game->on_key_pressed((unsigned int)key);
     
 	#if defined(WIN32)
 	glutPostRedisplay();
