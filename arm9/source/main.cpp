@@ -311,7 +311,7 @@ int main(int argc, char **argv) {
 	}
 	*/
 	
-	return mainSnakeGL(argc, argv);
+	mainSnakeGL(argc, argv);
 	return 0;
 }
 

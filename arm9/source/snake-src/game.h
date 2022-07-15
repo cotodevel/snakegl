@@ -38,7 +38,7 @@ public:
     void start();
     void stop();
     void reset();
-    void on_key_pressed(int key);
+    bool on_key_pressed(unsigned int key);
 };
 
 

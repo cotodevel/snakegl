@@ -315,16 +315,16 @@ void Game::run()
     }
 }
 
-void Game::on_key_pressed(int key)
+bool Game::on_key_pressed(unsigned int key)
 {
     switch (key)
     {
         case SNAKEGL_KEY_CAMERA:
-            if (!is_running) return;
+            if (!is_running) return false;
             scenario->change_camera_pos();
         break;
         case SNAKEGL_KEY_PAUSE:
-            if (!is_running) return;
+            if (!is_running) return false;
             pause();
         break;
         case SNAKEGL_KEY_QUIT:
@@ -334,19 +334,19 @@ void Game::on_key_pressed(int key)
             reset();
         break;
         case SNAKEGL_KEY_START:
-            if (!paused) return;
+            if (!paused) return false;
             start();
         break;
         case SNAKEGL_KEY_STOP:
-            if (!is_running) return;
+            if (!is_running) return false;
             stop();
         break;
         case SNAKEGL_KEY_RESET:
-            if (!is_running) return;
+            if (!is_running) return false;
             reset();
         break;
         case SNAKEGL_KEY_LEFT:
-            if (!is_running || key_pressed) return;
+            if (!is_running || key_pressed) return false;
             scenario->snake.set_direction(LEFT);
             key_pressed = true;
         break;
@@ -356,12 +356,12 @@ void Game::on_key_pressed(int key)
                 level--;
                 if (level < 1) level = 4;
             }
-            if (!is_running || key_pressed) return;
+            if (!is_running || key_pressed) return false;
             scenario->snake.set_direction(UP);
             key_pressed = true;
         break;
         case SNAKEGL_KEY_RIGHT:
-            if (!is_running || key_pressed) return;
+            if (!is_running || key_pressed) return false;
             scenario->snake.set_direction(RIGHT);
             key_pressed = true;
         break;
@@ -371,7 +371,7 @@ void Game::on_key_pressed(int key)
                 level++;
                 if (level > 4) level = 1;
             }
-            if (!is_running || key_pressed) return;
+            if (!is_running || key_pressed) return false;
             scenario->snake.set_direction(DOWN);
             key_pressed = true;
         break;
@@ -379,6 +379,7 @@ void Game::on_key_pressed(int key)
             cout << "key = " << key << "\n";
         break;
     }
+	return true;
 }
 
 bool Game::wait()
