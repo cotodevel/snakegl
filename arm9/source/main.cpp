@@ -394,7 +394,7 @@ GLvoid ReSizeGLScene(GLsizei width, GLsizei height)		// Resize And Initialize Th
 	glLoadIdentity();									// Reset The Modelview Matrix
 }
 
-int textureArrayNDS[2]; //0 : Cube tex 
+int textureArrayNDS[7];  
 static float camMov = -1.0;
 int InitGL()										// All Setup For OpenGL Goes Here
 {

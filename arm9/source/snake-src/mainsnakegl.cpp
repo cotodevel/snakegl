@@ -99,73 +99,18 @@ GLuint texturesSnakeGL[TEXTURE_COUNT];
 
 
 int mainSnakeGL(int argc, char** argv){
-    #if defined(WIN32)
-	glutInit(&argc, argv);
-
-		#ifdef USE_BUFFERS
-			glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
-		#else
-			glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE);
-		#endif
-
-    glutInitWindowSize(width, height);
-    glutInitWindowPosition(100, 100);
-    glutCreateWindow("SnakeGL");
-    glutDisplayFunc(display);
-    glutIdleFunc(display);
-    glutReshapeFunc(resize);
-    glutKeyboardFunc(keyboard);
-    glutSpecialFunc(keyboardSpecial);
-    #endif
-	
-
-
-
-
-
-
-
-
-
-
-
-
     InitGL();
 
     // Init GL before call this. Otherwise don't work.
     setVSync(true);
 	
-	#if defined(ARM9)
 	glClearColor(0.0f, 0.0f, 0.0f);
-	#endif
-	
-    #if defined(WIN32)
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	#endif
-	
-//todo: ARM9
-#if defined(WIN32)
     float pos_light[4] = { 5.0f, 5.0f, 10.0f, 0.0f };
     glLightfv(GL_LIGHT0, GL_POSITION, pos_light);
-	glEnable(GL_LIGHT0);
-	
-	#ifdef DEBUG
-		glDisable(GL_CULL_FACE);
-	#else
-		glEnable(GL_CULL_FACE);
-	#endif
-
-    glEnable(GL_DEPTH_TEST);
-
-    glEnable(GL_NORMALIZE);
-    glEnable(GL_COLOR_MATERIAL);
-	#ifdef USE_BUFFERS
-		glEnable(GL_LIGHTING);
-	#else
-		glDisable(GL_LIGHTING);
-	#endif
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-#endif
+    glClearColor(1.0f, 1.0f, 1.0f);
+	//glEnable(GL_LIGHT0); //todo: add per polygon attr, also lights are enabled per polygon, thus glEnable(GL_LIGHTING); / glDisable(GL_LIGHTING); is still unimplemented
+	//glEnable(GL_CULL_FACE); //todo: add per polygon attr
+	//glEnable(GL_DEPTH_TEST); //todo: add per polygon attr
 
     load_resources();
 

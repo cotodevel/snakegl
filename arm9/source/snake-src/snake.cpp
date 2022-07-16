@@ -171,9 +171,7 @@ void load_image(const char* filename)
 
 void enable_2D_texture()
 {
-	//Todo: ARM9
-	#if defined(WIN32)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -197,16 +195,13 @@ void enable_2D_texture()
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   mat_diffuse);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  mat_specular);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, high_shininess);
-	#endif
 	
     glEnable(GL_TEXTURE_2D);
 }
 
 void disable_2D_texture()
 {
-	//Todo: ARM9
-	#if defined(WIN32)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -230,7 +225,6 @@ void disable_2D_texture()
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   mat_diffuse);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  mat_specular);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, high_shininess);
-	#endif
 	
     glDisable(GL_TEXTURE_2D);
 }
@@ -255,7 +249,7 @@ void draw_sphere(float size, Point p, int res_id)
     glPushMatrix();
         glBindTexture(GL_TEXTURE_2D, texturesSnakeGL[res_id]);
         glTranslatef(p.x, p.y, p.z); 
-		drawSphere(size, 100.0f, 100.0f); //glut2SolidSphere(size, 100.0f, 100.0f);
+		drawSphere(size, 100.0f, 100.0f);
 	glPopMatrix(1);
 
     disable_2D_texture();
@@ -351,8 +345,7 @@ void drawBox(GLfloat size, GLenum type)
     for (i = 5; i >= 0; i--)
     {
         glBegin(type);
-            #if defined(WIN32)
-			glNormal3fv(&n[i][0]);
+            glNormal3fv(&n[i][0]);
             glTexCoord2f(0, 0);
 			glVertex3fv(&v[faces[i][0]][0]);
             glTexCoord2f(1, 0);
@@ -361,7 +354,6 @@ void drawBox(GLfloat size, GLenum type)
             glVertex3fv(&v[faces[i][2]][0]);
             glTexCoord2f(0, 1);
             glVertex3fv(&v[faces[i][3]][0]);
-			#endif
         glEnd();
     }
 }

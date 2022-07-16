@@ -81,7 +81,7 @@ extern bool get_pen_delta( int *dx, int *dy );
 extern float rotateX;
 extern float rotateY;
 
-extern int textureArrayNDS[2];
+extern int textureArrayNDS[7];
 extern int mainSnakeGL(int argc, char** argv);
 
 #ifdef __cplusplus
