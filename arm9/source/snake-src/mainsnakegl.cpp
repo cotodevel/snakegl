@@ -115,7 +115,7 @@ int mainSnakeGL(int argc, char** argv){
     load_resources();
 
     #if defined(ARM9)
-    startTimerCounter(tUnitsMilliseconds);
+    startTimerCounter(tUnitsMilliseconds, 1);
     #endif
 
     game = new Game();
