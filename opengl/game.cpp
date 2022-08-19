@@ -190,7 +190,7 @@ void Game::display()
         scenario->camera_mode = old_cam;
         scenario->set_camera();
 
-        if (clock2())
+        if (clock2()) //todo: use 1==1 in DS build
         {
             if (scenario->a > 360)
             {
@@ -211,7 +211,7 @@ void Game::display()
         scenario->camera_mode = 3;
         scenario->set_camera();
 
-        if (clock())
+        if (clock()) //todo: use 1==1 in DS build
         {
             run();
         }
