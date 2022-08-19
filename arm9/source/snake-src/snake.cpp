@@ -1,6 +1,7 @@
 #include "snake.h"
 #include "debugNocash.h"
 #include "game.h"
+#include "timerTGDS.h"
 
 //
 // Snake implementation
@@ -306,7 +307,7 @@ void draw_text(string s, Point p, float r, float g, float b)
     
     char debugBuf[64];
     //sprintf(debugBuf, "currentTime:%d", game->currentTime);
-    sprintf(debugBuf, "%s", s.c_str());
+    sprintf(debugBuf, "%s--timer:%d", s.c_str(), getTimerCounter());
     nocashMessage(debugBuf);
     
 	glEnable(GL_LIGHTING);

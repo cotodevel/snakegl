@@ -190,7 +190,7 @@ void Game::display()
         scenario->camera_mode = old_cam;
         scenario->set_camera();
 
-        if (clock2()) //todo: use 1==1 in DS build
+        if (1==1) //todo: use 1==1 in DS build
         {
             if (scenario->a > 360)
             {
@@ -211,7 +211,7 @@ void Game::display()
         scenario->camera_mode = 3;
         scenario->set_camera();
 
-        if (clock()) //todo: use 1==1 in DS build
+        if (1==1) //todo: use 1==1 in DS build
         {
             run();
         }
@@ -419,10 +419,10 @@ void Game::calculateFPS(void)
     //  Calculate time passed
     int timeInterval = currentTime - previousTime;
 
-    if(timeInterval > 1000)
+    if(timeInterval > 10)
     {
         //  calculate the number of frames per second
-        fps = frameCount / (timeInterval / 1000.0f);
+        fps = frameCount / (timeInterval / 10);
         //  Set time
         previousTime = currentTime;
         //  Reset frame count
