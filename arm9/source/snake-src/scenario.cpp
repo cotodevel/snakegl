@@ -51,22 +51,21 @@ void Scenario::draw_board()
     glPushMatrix();
         glBindTexture(GL_TEXTURE_2D, texturesSnakeGL[GROUND_TEXTURE]);
 		glBegin(GL_QUADS);
-            //glColor3f(0.0f, 1.0f, 0.0f);
-            glNormal3f(0.0, 1.0, 0.0);
+            glNormal3i(0.0, 1.0, 0.0);
             glTexCoord2f(0, 0);
-            glVertex3f(-BOARD_SIZE, 0.0f,  BOARD_SIZE);
+            glVertex3f(-BOARD_SIZE, 0,  BOARD_SIZE);
             glTexCoord2f(1, 0);
-            glVertex3f( BOARD_SIZE, 0.0f,  BOARD_SIZE);
+            glVertex3f( BOARD_SIZE, 0,  BOARD_SIZE);
             glTexCoord2f(1, 1);
-            glVertex3f( BOARD_SIZE, 0.0f, -BOARD_SIZE);
+            glVertex3f( BOARD_SIZE, 0, -BOARD_SIZE);
             glTexCoord2f(0, 1);
-            glVertex3f(-BOARD_SIZE, 0.0f, -BOARD_SIZE);
+            glVertex3f(-BOARD_SIZE, 0, -BOARD_SIZE);
         glEnd();
 		
         Point p;
-        float size = -BOARD_SIZE - 0.1f;
+        double size = -BOARD_SIZE - 0.1;
         // Draw bordes. TODO: It's better use a rectangle.
-        while (size < BOARD_SIZE + 0.1f)
+        while (size < BOARD_SIZE + 0.1)
         {
             p.x = size;
             p.y = 0.125f;

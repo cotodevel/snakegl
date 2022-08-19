@@ -38,7 +38,7 @@ using namespace std;
 #endif
 
 // Objects can navigate from -5.0f to 5.0f.
-#define BOARD_SIZE      5.25f
+#define BOARD_SIZE      5
 // Y axis difference. Ground to Objects.
 #define GROUND_DIFF     0.25f
 
