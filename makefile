@@ -89,6 +89,7 @@ export DIRS_ARM9_HEADER = data/	\
 			include/	\
 			source/gui/	\
 			source/TGDSMemoryAllocator/	\
+			source/snake-src/	\
 			../common/	\
 			../common/templateCode/source/	\
 			../common/templateCode/data/arm9/	\

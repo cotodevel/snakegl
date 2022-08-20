@@ -18,32 +18,6 @@ USA
 
 */
 
-//disable _CRT_SECURE_NO_WARNINGS message to build this in VC++
-#pragma warning(disable:4996)
-
-#if defined(_MSC_VER) && defined(WIN32)
-#include <GL\glew.h>
-#include <GL\freeglut.h>
-#include <gl\gl.h>			// Header File For The OpenGL32 Library
-#include <gl\glu.h>			// Header File For The GLu32 Library
-#include <gl\glut.h>		// Header File For The Glaux Library
-#include <windows.h>		// Header File For Windows
-#include <stdio.h>			// Header File For Standard Input/Output
-
-#include <stdio.h>
-#include <string.h>
-#include <assert.h>
-#if defined(MSDOS) || defined(OS2) || defined(WIN32) || defined(__CYGWIN__)
-#  include <fcntl.h>
-#  include <io.h>
-#  define SET_BINARY_MODE(file) setmode(fileno(file), O_BINARY)
-#else
-#  define SET_BINARY_MODE(file)
-#endif
-
-
-#endif
-
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
@@ -59,8 +33,20 @@ USA
 #include "TGDSMemoryAllocator.h"
 #include "TGDSLogoLZSSCompressed.h"
 #include "VideoGL.h"
-#include "imagepcx.h"
 #include "ndsDisplayListUtils.h"
+#include "Texture_Cube.h"
+#include "imagepcx.h"
+#include "spitscTGDS.h"
+#include "timerTGDS.h"
+#include "keypadTGDS.h"
+#include "biosTGDS.h"
+
+//snake GL
+#include "base.h"
+#include "game.h"
+#include "snake.h"
+#include "scenario.h"
+
 #include "apple.h"
 #include "boxbitmap.h"
 #include "brick.h"
@@ -69,8 +55,42 @@ USA
 #include "snakegfx.h"
 #include "Texture_Cube.h"
 
+/////////////////////////////// Snake GL defs ///////////////////////////////////////
+int width  = 640,
+    height = 640;
+
+bool is_game_over = false,
+     is_running   = false;
+
+Game* game = NULL;
+
+GLuint texturesSnakeGL[TEXTURE_COUNT];
+
+/////////////////////////////////////////////////////////////////////////////////////
 char curChosenBrowseFile[MAX_TGDSFILENAME_LENGTH];
 bool pendingPlay = false;
+
+GLuint	texture[1];			// Storage For 1 Texture
+GLuint	box;				// Storage For The Box Display List
+GLuint	top;				// Storage For The Top Display List
+GLuint	xloop;				// Loop For X Axis
+GLuint	yloop;				// Loop For Y Axis
+
+int	xrot;				// Rotates Cube On The X Axis
+int	yrot;				// Rotates Cube On The Y Axis
+
+GLfloat boxcol[5][3]=
+{
+	{1.0f,0.0f,0.0f},{1.0f,0.5f,0.0f},{1.0f,1.0f,0.0f},{0.0f,1.0f,0.0f},{0.0f,1.0f,1.0f}
+};
+
+GLfloat topcol[5][3]=
+{
+	{.5f,0.0f,0.0f},{0.5f,0.25f,0.0f},{0.5f,0.5f,0.0f},{0.0f,0.5f,0.0f},{0.0f,0.5f,0.5f} 
+};
+
+float rotateX = 0.0;
+float rotateY = 0.0;
 
 //true: pen touch
 //false: no tsc activity
@@ -167,13 +187,98 @@ int main(int argc, char **argv) {
 	flush_dcache_all();	
 	/*			TGDS 1.6 Standard ARM9 Init code end	*/
 	
+	/////////////////////////////////////////////////////////Reload TGDS Proj///////////////////////////////////////////////////////////
+	#if !defined(ISEMULATOR)
+	char tmpName[256];
+	char ext[256];	
+	char TGDSProj[256];
+	char curChosenBrowseFile[256];
+	strcpy(TGDSProj,"0:/");
+	strcat(TGDSProj, "ToolchainGenericDS-multiboot");
+	if(__dsimode == true){
+		strcat(TGDSProj, ".srl");
+	}
+	else{
+		strcat(TGDSProj, ".nds");
+	}
+	//Force ARM7 reload once 
+	if( 
+		(argc < 3) 
+		&& 
+		(strncmp(argv[1], TGDSProj, strlen(TGDSProj)) != 0) 	
+	){
+		REG_IME = 0;
+		MPUSet();
+		REG_IME = 1;
+		char startPath[MAX_TGDSFILENAME_LENGTH+1];
+		strcpy(startPath,"/");
+		strcpy(curChosenBrowseFile, TGDSProj);
+		
+		char thisTGDSProject[MAX_TGDSFILENAME_LENGTH+1];
+		strcpy(thisTGDSProject, "0:/");
+		strcat(thisTGDSProject, TGDSPROJECTNAME);
+		if(__dsimode == true){
+			strcat(thisTGDSProject, ".srl");
+		}
+		else{
+			strcat(thisTGDSProject, ".nds");
+		}
+		
+		//Boot .NDS file! (homebrew only)
+		strcpy(tmpName, curChosenBrowseFile);
+		separateExtension(tmpName, ext);
+		strlwr(ext);
+		
+		//pass incoming launcher's ARGV0
+		char arg0[256];
+		int newArgc = 3;
+		if (argc > 2) {
+			printf(" ---- test");
+			printf(" ---- test");
+			printf(" ---- test");
+			printf(" ---- test");
+			printf(" ---- test");
+			printf(" ---- test");
+			printf(" ---- test");
+			printf(" ---- test");
+			
+			//arg 0: original NDS caller
+			//arg 1: this NDS binary
+			//arg 2: this NDS binary's ARG0: filepath
+			strcpy(arg0, (const char *)argv[2]);
+			newArgc++;
+		}
+		//or else stub out an incoming arg0 for relaunched TGDS binary
+		else {
+			strcpy(arg0, (const char *)"0:/incomingCommand.bin");
+			newArgc++;
+		}
+		//debug end
+		
+		char thisArgv[4][MAX_TGDSFILENAME_LENGTH];
+		memset(thisArgv, 0, sizeof(thisArgv));
+		strcpy(&thisArgv[0][0], thisTGDSProject);	//Arg0:	This Binary loaded
+		strcpy(&thisArgv[1][0], curChosenBrowseFile);	//Arg1:	Chainload caller: TGDS-MB
+		strcpy(&thisArgv[2][0], thisTGDSProject);	//Arg2:	NDS Binary reloaded through ChainLoad
+		strcpy(&thisArgv[3][0], (char*)&arg0[0]);//Arg3: NDS Binary reloaded through ChainLoad's ARG0
+		addARGV(newArgc, (char*)&thisArgv);				
+		if(TGDSMultibootRunNDSPayload(curChosenBrowseFile) == false){ //should never reach here, nor even return true. Should fail it returns false
+			
+		}
+	}
+	#endif
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	if(__dsimode == true){
+		TWLSetTouchscreenTWLMode();
+	}
+	
 	#ifdef NO_VIDEO_PLAYBACK
 	argv[2] = (char*)0x02000000; //debug, if enabled, disables video intro
 	#endif
 	
 	//Play game intro if coldboot
-	char tmpName[256];
 	if(argv[2] == NULL){
+		char tmpName[256];
 		strcpy(tmpName, videoIntro);
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		char startPath[MAX_TGDSFILENAME_LENGTH+1];
@@ -227,9 +332,8 @@ int main(int argc, char **argv) {
 	}
 	menuShow();
 	
-	/*
 	// Simple triangle example
-	
+	/*
 	//Simple Triangle GL init
 	float rotateX = 0.0;
 	float rotateY = 0.0;
@@ -311,17 +415,83 @@ int main(int argc, char **argv) {
 	}
 	*/
 	
-	mainSnakeGL(argc, argv);
-	clrscr();
-	printf("----");
-	printf("----");
-	printf("----");
-	printf("----");
-	printf("----");
-	
+	/* OpenGL 1.1 Dynamic Display List */
+	InitGL();
+	ReSizeGLScene(255, 191);
+
+    // Init GL before this
+    load_resources();
+
+    #if defined(ARM9)
+    startTimerCounter(tUnitsMilliseconds, 1);
+    #endif
+
+    game = new Game();
+
+
+	#if defined(WIN32)
+	glutMainLoop();
+	#endif
+	glMaterialShinnyness();
+
+	while (1){
+		DrawGLScene();
+		handleARM9SVC();	/* Do not remove, handles TGDS services */
+		IRQVBlankWait();
+	}
 	return 0;
 }
 
+//GL Display Lists Unit Test: Cube Demo
+// Build Cube Display Lists
+GLvoid BuildLists(){
+	box=glGenLists(2);									// Generate 2 Different Lists
+	glNewList(box,GL_COMPILE);							// Start With The Box List
+		glBegin(GL_QUADS);
+			// Bottom Face
+			glNormal3f(0.5f,-1.0f, 0.0f);
+			glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f, -1.0f, -1.0f);
+			glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f, -1.0f, -1.0f);
+			glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f,  1.0f);
+			glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);
+			// Front Face
+			glNormal3f( 1.0f, 1.0f, 1.0f);
+			glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);
+			glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, -1.0f,  1.0f);
+			glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f,  1.0f);
+			glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f,  1.0f);
+			// Back Face
+			glNormal3f( 1.0f, 1.0f,-1.0f);
+			glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f, -1.0f);
+			glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);
+			glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);
+			glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f, -1.0f);
+			// Right face
+			glNormal3f( 1.0f, 0.0f, 0.0f);
+			glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, -1.0f, -1.0f);
+			glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);
+			glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f,  1.0f,  1.0f);
+			glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f,  1.0f);
+			// Left Face
+			glNormal3f(-1.0f, 0.0f, 1.0f);
+			glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f, -1.0f);
+			glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);
+			glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f,  1.0f,  1.0f);
+			glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);
+		glEnd();
+	glEndList();
+	top=box+1;											// Storage For "Top" Is "Box" Plus One
+	glNewList(top,GL_COMPILE);							// Now The "Top" Display List
+		glBegin(GL_QUADS);
+			// Top Face
+			glNormal3f( 1.0f, 1.0f, 1.0f);
+			glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);
+			glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f,  1.0f,  1.0f);
+			glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f,  1.0f,  1.0f);
+			glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);
+		glEnd();
+	glEndList();
+}
 
 GLvoid ReSizeGLScene(GLsizei width, GLsizei height)		// Resize And Initialize The GL Window
 {
@@ -342,7 +512,6 @@ GLvoid ReSizeGLScene(GLsizei width, GLsizei height)		// Resize And Initialize Th
 	glLoadIdentity();									// Reset The Modelview Matrix
 }
 
-int textureArrayNDS[7];  
 static float camMov = -1.0;
 int InitGL()										// All Setup For OpenGL Goes Here
 {
@@ -362,11 +531,133 @@ int InitGL()										// All Setup For OpenGL Goes Here
 	arrayOfTextures[4] = (u32)&menu; //4: menu.bmp
 	arrayOfTextures[5] = (u32)&snakegfx; //5: snakegfx.bmp
 	arrayOfTextures[6] = (u32)&Texture_Cube; //6: Texture_Cube.bmp
-	int texturesInSlot = LoadLotsOfGLTextures((u32*)&arrayOfTextures, (int*)&textureArrayNDS, 7); //Implements both glBindTexture and glTexImage2D 
+	int texturesInSlot = LoadLotsOfGLTextures((u32*)&arrayOfTextures, (int*)&texturesSnakeGL, 7); //Implements both glBindTexture and glTexImage2D 
 	int i = 0;
 	for(i = 0; i < texturesInSlot; i++){
-		printf("Texture loaded: %d:textID[%d] Size: %d", i, textureArrayNDS[i], getTextureBaseFromTextureSlot(activeTexture));
+		printf("Texture loaded: %d:textID[%d] Size: %d", i, texturesSnakeGL[i], getTextureBaseFromTextureSlot(activeTexture));
 	}
 	
 	return true;				
+}
+
+int DrawGLScene(){									
+	scanKeys();
+	int pen_delta[2];
+	bool isTSCActive = get_pen_delta( &pen_delta[0], &pen_delta[1] );
+	if( isTSCActive == false ){
+		rotateX = 0.0;
+		rotateY = 0.0;
+	}
+	else{
+		clrscr();
+		printfCoords(0, 14, "camera_mode: %d", game->scenario->camera_mode);
+		printfCoords(0, 15, "xrot:%d-yrot:%d", xrot, yrot);
+		
+		rotateX = pen_delta[0];
+		rotateY = pen_delta[1];
+		if(yrot > 0){
+			yrot--;
+		}
+		else{
+			yrot++;
+		}
+		
+		if(xrot > 0){
+			xrot--;
+		}
+		else{
+			xrot++;
+		}
+	}
+	if (keysDown() & KEY_LEFT)
+	{
+		camMov-=2.8f;
+	}
+	if (keysDown() & KEY_RIGHT)
+	{
+		camMov+=2.8f;
+	}
+
+
+	/* //render example
+	glReset(); //Clear The Screen And The Depth Buffer
+	
+	//Set initial view to look at
+	gluPerspective(18, 256.0 / 192.0, 0.1, 40);
+
+	//Camera perspective from there
+	gluLookAt(	0.0, 0.0, 4.0,		//camera possition 
+				0.0, 0.0, 0.0,		//look at
+				0.0, 1.0, 0.0);		//up
+	
+	glMaterialShinnyness();
+	
+	GLfloat light_ambient[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
+    GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
+    GLfloat light_specular[] = { 1.0f, 1.0f, xrot, 1.0f };
+    GLfloat light_position[] = { 1.0f, 1.0f, 1.0f, 0.0f };
+
+	//Draw each cube through a set of Open GL Display List calls 
+	for (yloop=1;yloop<6;yloop++){
+		for (xloop=0;xloop<yloop;xloop++){
+			glBindTexture( 0, texturesSnakeGL[0]);
+			// Reset The View
+			glLoadIdentity();
+			glTranslatef(1.4f+(float(xloop)*2.8f)-(float(yloop)*1.4f),((6.0f-float(yloop))*2.4f)-7.3f,-20.0f + camMov);
+			
+			glRotatef(45.0f-(2.0f*yloop)+xrot,1.0f,0.0f,0.0f);
+			glRotatef(45.0f+yrot,0.0f,1.0f,0.0f);
+
+			//not a real gl function and will likely change
+			#define GX_LIGHT0 (1 << 0)
+			glPolyFmt(GX_LIGHT0 | POLY_ALPHA(31) | POLY_CULL_NONE);
+			
+			glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
+			glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
+			glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+			glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+			glMaterialf(GL_AMBIENT_AND_DIFFUSE, RGB15(31,31,31));	
+			//Run the precompiled standard Open GL 1.1 Display List here
+			glColor3fv(boxcol[yloop-1]);
+			glCallList(box);
+			glColor3fv(topcol[yloop-1]);
+			glCallList(top);
+		}
+	}
+	glFlush();
+	*/
+
+	//Snake GL exec
+	{
+
+		glReset(); //Clear The Screen And The Depth Buffer
+	
+		
+		
+		
+		
+		GLfloat light_ambient[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
+		GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
+		GLfloat light_specular[] = { 1.0f, 1.0f, xrot, 1.0f };
+		GLfloat light_position[] = { 1.0f, 1.0f, 1.0f, 0.0f };
+
+		//Handle keypress
+		game->on_key_pressed(keysDown());
+		
+		//Handle Display
+		{
+			//glViewport(width / 2, height / 2, 100, 100);
+			glMatrixMode(GL_PROJECTION);
+			glLoadIdentity();
+			
+			//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			
+			//not a real gl function and will likely change
+			#define GX_LIGHT0 (1 << 0)
+			glPolyFmt(GX_LIGHT0 | POLY_ALPHA(31) | POLY_CULL_NONE);
+			game->display();
+			glFlush();
+		}
+	}
+	return true;										// Keep Going
 }

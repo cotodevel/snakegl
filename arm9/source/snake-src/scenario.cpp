@@ -1,5 +1,5 @@
 #include "scenario.h"
-
+#include "main.h"
 
 //
 // Scenario implementation
@@ -260,8 +260,17 @@ void Scenario::set_camera()
         camera.zFar    = 100;
     }
 
-    gluPerspective(camera.fovy, camera.aspect, camera.zNear, camera.zFar);
-    gluLookAt(camera.eyeX, camera.eyeY, camera.eyeZ, camera.centerX, camera.centerY, camera.centerZ, camera.upX, camera.upY, camera.upZ);
+    //Set initial view to look at
+    gluPerspective(22, 256.0 / 192.0, 0.1, 40);
+
+    //Camera perspective from there
+    
+    gluLookAt(	0, 0, 16.0f,		//camera possition 
+                camera.centerX, camera.centerY, camera.centerZ,		//look at
+                1.0, 1.0, 1.0);		//up
+    
+    glRotateX(90.0f);
+    glRotateY(45.0f);
 
     glMatrixMode(GL_MODELVIEW);
 }

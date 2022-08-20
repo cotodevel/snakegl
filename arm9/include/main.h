@@ -27,9 +27,17 @@ USA
 #include "utilsTGDS.h"
 #include "VideoGL.h"
 
+#ifdef __cplusplus
+//snake GL
+#include "base.h"
+#include "game.h"
+#include "snake.h"
+#include "scenario.h"
+#endif
+
 #define TGDSPROJECTNAME ((char*) "snakeGL")
 
-//wipeout 1 multimedia list
+//project 1 multimedia list
 #define videoIntro ((char*)"0:/sth1.tvs") //video intro
 #define videoTest ((char*)"0:/test.tvs") 
 
@@ -42,6 +50,16 @@ USA
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#ifdef __cplusplus
+/////////////////////////////// Snake GL defs ///////////////////////////////////////
+extern int width;
+extern int height;
+extern bool is_game_over;
+extern bool is_running;
+extern Game* game;
+/////////////////////////////////////////////////////////////////////////////////////
 #endif
 
 extern int main(int argc, char **argv);
@@ -66,8 +84,8 @@ extern GLuint	top;				// Storage For The Top Display List
 extern GLuint	xloop;				// Loop For X Axis
 extern GLuint	yloop;				// Loop For Y Axis
 
-extern GLfloat	xrot;				// Rotates Cube On The X Axis
-extern GLfloat	yrot;				// Rotates Cube On The Y Axis
+extern int	xrot;				// Rotates Cube On The X Axis
+extern int	yrot;				// Rotates Cube On The Y Axis
 
 extern GLfloat boxcol[5][3];
 extern GLfloat topcol[5][3];
@@ -80,9 +98,6 @@ extern bool get_pen_delta( int *dx, int *dy );
 
 extern float rotateX;
 extern float rotateY;
-
-extern int textureArrayNDS[7];
-extern int mainSnakeGL(int argc, char** argv);
 
 #ifdef __cplusplus
 }

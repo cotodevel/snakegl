@@ -21,7 +21,6 @@ private:
     int       tick2;
     int       level;
     float     fps;
-    Scenario* scenario;
     bool      wait();
     bool      wait2();
     bool      clock();
@@ -30,6 +29,7 @@ private:
     void      run();
     void      draw_menu();
 public:
+    Scenario* scenario;
     int       currentTime;
 	Game();
     ~Game();

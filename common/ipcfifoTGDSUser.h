@@ -51,6 +51,8 @@ struct sIPCSharedTGDSSpecific {
 
 #define NO_VIDEO_PLAYBACK	1
 
+#define ISEMULATOR 1 //defined == TGDS Project does not self reload, undedfined == TGDS Project self reloads
+
 #endif
 
 #ifdef __cplusplus

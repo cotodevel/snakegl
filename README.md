@@ -4,7 +4,7 @@ NTR/TWL SDK: TGDS1.65
 
 master: Development branch. Use TGDS1.65: branch for stable features.
 
-This is the ToolchainGenericDS+Woopsi SDK + Wipeout1 for NintendoDS project:
+This is the ToolchainGenericDS for NintendoDS project:
 
 1.	Compile Toolchain:
 To compile this project you will need to follow the steps at https://bitbucket.org/Coto88/toolchaingenericds :
@@ -53,6 +53,6 @@ and toolchaingenericds-multiboot-config.txt (update here, the computer's IP you 
 /release folder has the latest binary precompiled for your convenience.
 
 Latest stable release:
-https://bitbucket.org/Coto88/mkbowling/get/TGDS1.65.zip
+https://bitbucket.org/Coto88/snakegl/get/TGDS1.65.zip
 
 Coto
