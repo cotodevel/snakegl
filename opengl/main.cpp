@@ -61,6 +61,7 @@ void init()
 {
     // Init GL before call this. Otherwise don't work.
     setVSync(true);
+	setupDLEnableDisable2DTextures();
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
