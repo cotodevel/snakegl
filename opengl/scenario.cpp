@@ -48,7 +48,9 @@ void Scenario::change_food_pos()
 void Scenario::draw_board()
 {
     enable_2D_texture();
-    glPushMatrix();
+    
+	//DL DrawBoard Start
+	glPushMatrix();
         glBindTexture(GL_TEXTURE_2D, textures[GROUND_TEXTURE]);
 		glBegin(GL_QUADS);
             glNormal3i(0.0, 1.0, 0.0);
@@ -91,7 +93,9 @@ void Scenario::draw_board()
         }
 
     glPopMatrix();
-    disable_2D_texture();
+    //DL DrawBoard End
+
+	disable_2D_texture();
 }
 
 void Scenario::draw_food()
@@ -123,8 +127,9 @@ void Scenario::draw_food()
         glBindTexture(GL_TEXTURE_2D, textures[FOOD_TEXTURE]);
         glTranslatef(p.x, p.y + m, p.z);
         glRotatef(a, 0.0, 1.0, 0.0);
-        drawSphere(0.25f, 50.0f, 50.0f); //glut2SolidSphere(0.25f, 100.0f, 100.0f); 
-    glPopMatrix();
+		glCallList(DLDRAWSPHERE); //draw sphere
+    
+	glPopMatrix();
 
     disable_2D_texture();
 }
