@@ -55,11 +55,11 @@ void Snake::draw()
     glColor3f(1.0, 1.0, 0.6);
     glPushMatrix();
         glTranslatef(h.x, h.y, h.z);
-        glut2SolidCube(0.5f);
+        glut2SolidCube05f();
     glPopMatrix(1);
 
     enable_2D_texture();
-    glBindTexture(GL_TEXTURE_2D, texturesSnakeGL[SNAKE_TEXTURE]);
+    glBindTexture(0, texturesSnakeGL[SNAKE_TEXTURE]);
 
     for (size_t i = 1; i < points.size(); ++i)
     {
@@ -67,7 +67,7 @@ void Snake::draw()
 
         glPushMatrix();
             glTranslatef(p.x, p.y, p.z);
-            glut2SolidCube(0.5f);
+            glut2SolidCube05f();
         glPopMatrix(1);
     }
 
@@ -172,10 +172,20 @@ void load_image(const char* filename)
 
 GLint DLEN2DTEX = -1;
 GLint DLDIS2DTEX = -1;
+GLint DLSOLIDCUBE05F = -1;
 
+
+#ifdef ARM9
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__((optnone))
+#endif
+#endif
 void setupDLEnableDisable2DTextures(){
-	DLEN2DTEX=glGenLists(2);									// Generate 2 Different Lists
-	glNewList(DLEN2DTEX,GL_COMPILE);							// Start With The Box List
+	DLEN2DTEX=glGenLists(5);									// Generate Different Lists
+	glNewList(DLEN2DTEX,GL_COMPILE);							// 1: enable_2D_texture()
 	{
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -202,8 +212,8 @@ void setupDLEnableDisable2DTextures(){
 		glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, high_shininess);
 	}
 	glEndList();
-	DLDIS2DTEX=DLEN2DTEX+1;											// Storage For "Top" Is "Box" Plus One
-	glNewList(DLDIS2DTEX,GL_COMPILE);							// Now The "Top" Display List
+	DLDIS2DTEX=DLEN2DTEX+1;										
+	glNewList(DLDIS2DTEX,GL_COMPILE);							// 2: disable_2D_texture()
 	{
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -231,6 +241,56 @@ void setupDLEnableDisable2DTextures(){
     glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, high_shininess);
 	}
 	glEndList();
+
+
+	DLSOLIDCUBE05F=DLDIS2DTEX+1;										
+	glNewList(DLSOLIDCUBE05F,GL_COMPILE);							// 3: draw solid cube: 0.5f()
+	{
+		float size = 0.5f;
+		GLfloat n[6][3] =
+		{
+			{-1.0f, 0.0f, 0.0f},
+			{0.0f, 1.0f, 0.0f},
+			{1.0f, 0.0f, 0.0f},
+			{0.0f, -1.0f, 0.0f},
+			{0.0f, 0.0f, 1.0f},
+			{0.0f, 0.0f, -1.0f}
+		};
+		GLint faces[6][4] =
+		{
+			{0, 1, 2, 3},
+			{3, 2, 6, 7},
+			{7, 6, 5, 4},
+			{4, 5, 1, 0},
+			{5, 6, 2, 1},
+			{7, 4, 0, 3}
+		};
+		GLfloat v[8][3];
+		GLint i;
+
+		v[0][0] = v[1][0] = v[2][0] = v[3][0] = -size / 2;
+		v[4][0] = v[5][0] = v[6][0] = v[7][0] = size / 2;
+		v[0][1] = v[1][1] = v[4][1] = v[5][1] = -size / 2;
+		v[2][1] = v[3][1] = v[6][1] = v[7][1] = size / 2;
+		v[0][2] = v[3][2] = v[4][2] = v[7][2] = -size / 2;
+		v[1][2] = v[2][2] = v[5][2] = v[6][2] = size / 2;
+
+		for (i = 5; i >= 0; i--)
+		{
+			glBegin(GL_QUADS);
+				glNormal3fv(&n[i][0]);
+				glTexCoord2f(0, 0);
+				glVertex3fv(&v[faces[i][0]][0]); //bugged
+				glTexCoord2f(1, 0);
+				glVertex3fv(&v[faces[i][1]][0]);
+				glTexCoord2f(1, 1);
+				glVertex3fv(&v[faces[i][2]][0]);
+				glTexCoord2f(0, 1);
+				glVertex3fv(&v[faces[i][3]][0]);
+			glEnd();
+		}
+	}
+	glEndList();
 }
 
 
@@ -249,7 +309,7 @@ void draw_cube(float size, Point p, int res_id)
     enable_2D_texture();
 
     glPushMatrix();
-        glBindTexture(GL_TEXTURE_2D, texturesSnakeGL[res_id]);
+        glBindTexture(0, texturesSnakeGL[res_id]);
         glTranslatef(p.x, p.y, p.z);
         glut2SolidCube(size);
     glPopMatrix(1);
@@ -257,17 +317,34 @@ void draw_cube(float size, Point p, int res_id)
     disable_2D_texture();
 }
 
-void draw_sphere(float size, Point p, int res_id)
-{
-    enable_2D_texture();
+//OpenGL DL seems to be broken for complex prebaked models. todo fix
+void drawSphere(){
+    const float PI = 3.141592f;
+    GLfloat x, y, z, alpha, beta; // Storage for coordinates and angles        
+    GLfloat radius = 0.6f;
+    int gradation = 10;
 
-    glPushMatrix();
-        glBindTexture(GL_TEXTURE_2D, texturesSnakeGL[res_id]);
-        glTranslatef(p.x, p.y, p.z); 
-		drawSphere(size, 100.0f, 100.0f);
-	glPopMatrix(1);
-
-    disable_2D_texture();
+    for (alpha = 0.0; alpha <  PI; alpha += PI/gradation)
+    {        
+        glBegin(GL_TRIANGLE_STRIP);
+        for (beta = 0.0; beta < 2.01*PI; beta += PI/gradation)            
+        {            
+            x = radius*cos(beta)*sin(alpha);
+            y = radius*sin(beta)*sin(alpha);
+            z = radius*cos(alpha);
+            //texture coords are wrong
+			glNormal3f(-y, x, z);
+			glTexCoord2f(y, -x * z);
+			glVertex3f(x, y, z);
+			x = radius*cos(beta)*sin(alpha + PI/gradation);
+            y = radius*sin(beta)*sin(alpha + PI/gradation);
+            z = radius*cos(alpha + PI/gradation);            
+            glNormal3f(-y, x, z);
+			glTexCoord2f(y, -x * z);
+			glVertex3f(x, y, z);            
+        }        
+        glEnd();
+    }
 }
 
 void load_resources()
@@ -327,8 +404,12 @@ void draw_text(string s, Point p, float r, float g, float b)
 	glEnable(GL_LIGHTING);
 }
 
-void drawBox(GLfloat size, GLenum type)
-{
+//hardcoded below function at 0.5f to speedup drawing
+void glut2SolidCube05f(){
+	glCallList(DLSOLIDCUBE05F);
+}
+
+void glut2SolidCube(GLdouble size){
     static GLfloat n[6][3] =
     {
         {-1.0, 0.0, 0.0},
@@ -359,7 +440,7 @@ void drawBox(GLfloat size, GLenum type)
 
     for (i = 5; i >= 0; i--)
     {
-        glBegin(type);
+        glBegin(GL_QUADS);
             glNormal3fv(&n[i][0]);
             glTexCoord2f(0, 0);
 			glVertex3fv(&v[faces[i][0]][0]);
@@ -373,41 +454,3 @@ void drawBox(GLfloat size, GLenum type)
     }
 }
 
-void glut2SolidCube(GLdouble size)
-{
-    drawBox(size, GL_QUADS);
-}
-
-#ifndef M_PI
-  #define M_PI 3.14159265358979323846
-#endif
-
-void drawSphere(double r, int lats, int longs)
-{
-    int i, j;
-    for(i = 0; i <= lats; i++) {
-        double lat0 = M_PI * (-0.5 + (double) (i - 1) / lats);
-        double z0  = sin(lat0);
-        double zr0 =  cos(lat0);
-
-        double lat1 = M_PI * (-0.5 + (double) i / lats);
-        double z1 = sin(lat1);
-        double zr1 = cos(lat1);
-
-        glBegin(GL_QUAD_STRIP);
-        for(j = 0; j <= longs; j++) {
-            double lng = 2 * M_PI * (double) (j - 1) / longs;
-            double x = cos(lng);
-            double y = sin(lng);
-			//texture coords are wrong
-            glNormal3f( y, x, 0);
-			glTexCoord2f(y, -x * z0);
-            glVertex3f(r * x * zr0, r * y * zr0, r * z0);
-            glNormal3f(y, x, 0);
-			
-			glTexCoord2f(y, -x * z1);
-            glVertex3f(r * x * zr1, r * y * zr1, r * z1);
-        }
-        glEnd();
-    }
-}

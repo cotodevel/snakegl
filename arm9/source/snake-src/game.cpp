@@ -76,7 +76,7 @@ void Game::draw_menu()
 {
     enable_2D_texture();
     glPushMatrix();
-        glBindTexture(GL_TEXTURE_2D, texturesSnakeGL[MENU_TEXTURE]);
+        glBindTexture(0, texturesSnakeGL[MENU_TEXTURE]);
         glBegin(GL_QUADS);
             glNormal3f(0.0, 1.0, 0.0);
             glTexCoord2f(0, 1);

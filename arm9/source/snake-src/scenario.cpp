@@ -49,7 +49,7 @@ void Scenario::draw_board()
 {
     enable_2D_texture();
     glPushMatrix();
-        glBindTexture(GL_TEXTURE_2D, texturesSnakeGL[GROUND_TEXTURE]);
+        glBindTexture(0, texturesSnakeGL[GROUND_TEXTURE]);
 		glBegin(GL_QUADS);
             glNormal3i(0.0, 1.0, 0.0);
             glTexCoord2f(0, 0);
@@ -101,18 +101,18 @@ void Scenario::draw_food()
 
     // "leaf"
 	glPushMatrix();
-        glTranslatef(p.x + 0.05, p.y + m + 0.25, p.z);
+        glTranslatef(p.x + 0.55, p.y + m + 0.95, p.z);
         glRotatef(a, 0.0, 1.0, 0.0);
 
         glColor3f(0.2f, 0.4f, 0.0f);
          glBegin(GL_TRIANGLE_STRIP);
-            glVertex3f(0, 0, 0.1);
-            glVertex3f(0, 0, 0.2);
-            glVertex3f(0.1, -0.01, 0.3);
+            glVertex3f(0, 0, 0.7);
+            glVertex3f(0, 0, 0.8);
+            glVertex3f(0.1, -0.01, 0.9);
 
-            glVertex3f(0.1, -0.01, 0.4);
-            glVertex3f(0.15, -0.02, 0.4);
-            glVertex3f(0.15, -0.02, 0.4);
+            glVertex3f(0.1, -0.01, 1.0);
+            glVertex3f(0.15, -0.02, 1.0);
+            glVertex3f(0.15, -0.02, 1.0);
             
         glEnd();
     glPopMatrix(1);
@@ -120,10 +120,10 @@ void Scenario::draw_food()
     enable_2D_texture();
 
     glPushMatrix();
-        glBindTexture(GL_TEXTURE_2D, texturesSnakeGL[FOOD_TEXTURE]);
+        glBindTexture(0, texturesSnakeGL[FOOD_TEXTURE]);
         glTranslatef(p.x, p.y + m, p.z);
         glRotatef(a, 0.0, 1.0, 0.0);
-        drawSphere(0.25f, 50.0f, 50.0f); //glut2SolidSphere(0.25f, 100.0f, 100.0f); 
+		drawSphere(); //draw sphere
     glPopMatrix(1);
 
     disable_2D_texture();

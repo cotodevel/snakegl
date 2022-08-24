@@ -29,17 +29,20 @@ extern void load_image(const char* filename);
 extern void enable_2D_texture();
 extern void disable_2D_texture();
 extern void draw_cube(float size, Point p, int res_id);
-extern void draw_sphere(float size, Point p, int res_id);
+extern void drawSphere();
 extern void load_resources();
 extern void unload_resources();
 extern void draw_text(string s, Point p, float r, float g, float b);
-extern void drawBox(GLfloat size, GLenum type);
+
 extern void glut2SolidCube(GLdouble size);
-extern void drawSphere(double r, int lats, int longs);
+	extern void glut2SolidCube05f();
+
 
 //Display Lists for accelerating repeated OpenGL calls
 extern GLint DLEN2DTEX;
 extern GLint DLDIS2DTEX;
+extern GLint DLSOLIDCUBE05F;
+
 extern void setupDLEnableDisable2DTextures();
 
 #endif

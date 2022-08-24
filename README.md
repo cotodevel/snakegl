@@ -1,5 +1,7 @@
 ![ToolchainGenericDS](img/TGDS-Logo.png)
 
+![ToolchainGenericDS](img/snakegl_nds.png)
+
 NTR/TWL SDK: TGDS1.65
 
 master: Development branch. Use TGDS1.65: branch for stable features.
