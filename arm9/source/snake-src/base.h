@@ -113,6 +113,6 @@ struct Camera
 };
 
 extern void setVSync(bool sync);
-extern GLuint texturesSnakeGL[TEXTURE_COUNT];
+extern GLuint texturesSnakeGL[TEXTURE_COUNT+1];
 
 #endif

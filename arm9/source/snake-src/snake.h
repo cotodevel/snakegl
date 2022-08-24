@@ -36,4 +36,10 @@ extern void draw_text(string s, Point p, float r, float g, float b);
 extern void drawBox(GLfloat size, GLenum type);
 extern void glut2SolidCube(GLdouble size);
 extern void drawSphere(double r, int lats, int longs);
+
+//Display Lists for accelerating repeated OpenGL calls
+extern GLint DLEN2DTEX;
+extern GLint DLDIS2DTEX;
+extern void setupDLEnableDisable2DTextures();
+
 #endif

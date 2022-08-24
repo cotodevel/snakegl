@@ -64,7 +64,7 @@ bool is_game_over = false,
 
 Game* game = NULL;
 
-GLuint texturesSnakeGL[TEXTURE_COUNT];
+GLuint texturesSnakeGL[TEXTURE_COUNT+1];
 
 /////////////////////////////////////////////////////////////////////////////////////
 char curChosenBrowseFile[MAX_TGDSFILENAME_LENGTH];
@@ -516,7 +516,7 @@ static float camMov = -1.0;
 int InitGL()										// All Setup For OpenGL Goes Here
 {
 	glInit(); //NDSDLUtils: Initializes a new videoGL context	
-	glClearColor(0,0,0);		// Black Background
+	glClearColor(255,255,255);		// Black Background
 	glClearDepth(0x7FFF);		// Depth Buffer Setup
 	glEnable(GL_ANTIALIAS);
 	glEnable(GL_TEXTURE_2D); // Enable Texture Mapping 
@@ -536,7 +536,7 @@ int InitGL()										// All Setup For OpenGL Goes Here
 	for(i = 0; i < texturesInSlot; i++){
 		printf("Texture loaded: %d:textID[%d] Size: %d", i, texturesSnakeGL[i], getTextureBaseFromTextureSlot(activeTexture));
 	}
-	
+	setupDLEnableDisable2DTextures();
 	return true;				
 }
 

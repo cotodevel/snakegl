@@ -170,12 +170,17 @@ void load_image(const char* filename)
 	#endif
 }
 
-void enable_2D_texture()
-{
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+GLint DLEN2DTEX = -1;
+GLint DLDIS2DTEX = -1;
+
+void setupDLEnableDisable2DTextures(){
+	DLEN2DTEX=glGenLists(2);									// Generate 2 Different Lists
+	glNewList(DLEN2DTEX,GL_COMPILE);							// Start With The Box List
+	{
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
     GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
     GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -186,26 +191,24 @@ void enable_2D_texture()
     GLfloat mat_diffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f };
     GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f };
     GLfloat high_shininess[] = { 0.0f };
-
-    glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+		glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
+		glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
+		glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+		glLightfv(GL_LIGHT0, GL_POSITION, light_position);
  
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   mat_ambient);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   mat_diffuse);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  mat_specular);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, high_shininess);
-	
-    glEnable(GL_TEXTURE_2D);
-}
-
-void disable_2D_texture()
-{
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   mat_ambient);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   mat_diffuse);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  mat_specular);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, high_shininess);
+	}
+	glEndList();
+	DLDIS2DTEX=DLEN2DTEX+1;											// Storage For "Top" Is "Box" Plus One
+	glNewList(DLDIS2DTEX,GL_COMPILE);							// Now The "Top" Display List
+	{
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
     GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
     GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -226,8 +229,19 @@ void disable_2D_texture()
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   mat_diffuse);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  mat_specular);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, high_shininess);
-	
-    glDisable(GL_TEXTURE_2D);
+	}
+	glEndList();
+}
+
+
+void enable_2D_texture(){
+	glCallList(DLEN2DTEX);
+	//glEnable(GL_TEXTURE_2D); //already init at InitGL()
+}
+
+void disable_2D_texture(){
+	glCallList(DLDIS2DTEX);
+	//glDisable(GL_TEXTURE_2D);
 }
 
 void draw_cube(float size, Point p, int res_id)
