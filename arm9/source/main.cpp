@@ -66,31 +66,15 @@ Game* game = NULL;
 
 GLuint texturesSnakeGL[TEXTURE_COUNT+1];
 
-/////////////////////////////////////////////////////////////////////////////////////
 char curChosenBrowseFile[MAX_TGDSFILENAME_LENGTH];
 bool pendingPlay = false;
 
-GLuint	texture[1];			// Storage For 1 Texture
-GLuint	box;				// Storage For The Box Display List
-GLuint	top;				// Storage For The Top Display List
-GLuint	xloop;				// Loop For X Axis
-GLuint	yloop;				// Loop For Y Axis
-
-int	xrot;				// Rotates Cube On The X Axis
-int	yrot;				// Rotates Cube On The Y Axis
-
-GLfloat boxcol[5][3]=
-{
-	{1.0f,0.0f,0.0f},{1.0f,0.5f,0.0f},{1.0f,1.0f,0.0f},{0.0f,1.0f,0.0f},{0.0f,1.0f,1.0f}
-};
-
-GLfloat topcol[5][3]=
-{
-	{.5f,0.0f,0.0f},{0.5f,0.25f,0.0f},{0.5f,0.5f,0.0f},{0.0f,0.5f,0.0f},{0.0f,0.5f,0.5f} 
-};
-
 float rotateX = 0.0;
 float rotateY = 0.0;
+float camMov = -1.0;
+
+GLfloat	xrot=0.0f;				// Rotates view camera On The X Axis
+GLfloat	yrot=0.0f;				// Rotates view camera On The Y Axis
 
 //true: pen touch
 //false: no tsc activity
@@ -119,19 +103,16 @@ bool get_pen_delta( int *dx, int *dy ){
 
 void menuShow(){
 	clrscr();
-	printf("     ");
-	printf("     ");
-	
+	printf(" ---- ");
+	printf(" ---- ");
+	printf(" ---- ");
 	printf("%s >%d", TGDSPROJECTNAME, TGDSPrintfColor_Yellow);
-	printf("(Start): Boot NDS File/Audio. ");
-	if(internalCodecType == SRC_WAVADPCM){
-		printf("ADPCM Play: >%d", TGDSPrintfColor_Red);
-	}
-	else if(internalCodecType == SRC_WAV){	
-		printf("WAVPCM Play: >%d", TGDSPrintfColor_Green);
+	printfCoords(0, 13, "Change Camera: Touchscreen");
+	if(game->scenario->close_camera_mode == true){
+		printfCoords(0, 14, "Camera: Close-up >%d", TGDSPrintfColor_Red);
 	}
 	else{
-		printf("Player Inactive");
+		printfCoords(0, 14, "Camera: Distant >%d", TGDSPrintfColor_Green);
 	}
 	printf("Available heap memory: %d >%d", getMaxRam(), TGDSPrintfColor_Cyan);
 }
@@ -330,90 +311,6 @@ int main(int argc, char **argv) {
 	else if(strncmp(argv[2], videoTest, strlen(videoTest)) == 0){
 		//play videoTest maybe?
 	}
-	menuShow();
-	
-	// Simple triangle example
-	/*
-	//Simple Triangle GL init
-	float rotateX = 0.0;
-	float rotateY = 0.0;
-	{
-		//set mode 0, enable BG0 and set it to 3D
-		SETDISPCNT_MAIN(MODE_0_3D);
-		
-		//this should work the same as the normal gl call
-		glViewport(0,0,255,191);
-		
-		glClearColor(0,0,0);
-		glClearDepth(0x7FFF);
-		glInit(); //NDSDLUtils: Initializes a new videoGL context
-	}
-	while (1){
-		if(pendingPlay == true){
-			internalCodecType = playSoundStream(curChosenBrowseFile, _FileHandleVideo, _FileHandleAudio);
-			
-			if(internalCodecType == SRC_NONE){
-				stopSoundStreamUser();
-			}
-			pendingPlay = false;
-			menuShow();
-		}
-		
-		scanKeys();
-		
-		int pen_delta[2];
-		bool isTSCActive = get_pen_delta( &pen_delta[0], &pen_delta[1] );
-		rotateY -= pen_delta[0];
-		rotateX -= pen_delta[1];
-		
-		if( isTSCActive == false ){
-			printfCoords(0, 16, " No TSC Activity ----");
-		}
-		else{
-			
-			printfCoords(0, 16, "TSC Activity ----");
-			
-			glReset();
-	
-			//any floating point gl call is being converted to fixed prior to being implemented
-			gluPerspective(35, 256.0 / 192.0, 0.1, 40);
-
-			gluLookAt(	0.0, 0.0, 1.0,		//camera possition 
-						0.0, 0.0, 0.0,		//look at
-						0.0, 1.0, 0.0);		//up
-
-			glPushMatrix();
-
-			//move it away from the camera
-			glTranslate3f32(0, 0, floattof32(-1));
-					
-			glRotateX(rotateX);
-			glRotateY(rotateY);			
-			glMatrixMode(GL_MODELVIEW);
-			
-			//not a real gl function and will likely change
-			glPolyFmt(POLY_ALPHA(31) | POLY_CULL_NONE);
-			
-			//glShadeModel(GL_FLAT); //forces the fill color to be the first glColor3b call
-			
-			//draw the obj
-			glBegin(GL_TRIANGLE);
-				
-				glColor3b(31,0,0);
-				glVertex3v16(inttov16(-1),inttov16(-1),0);
-
-				glColor3b(0,31,0);
-				glVertex3v16(inttov16(1), inttov16(-1), 0);
-
-				glColor3b(0,0,31);
-				glVertex3v16(inttov16(0), inttov16(1), 0);
-				
-			glEnd();
-			glPopMatrix(1);
-			glFlush();
-		}
-	}
-	*/
 	
 	/* OpenGL 1.1 Dynamic Display List */
 	InitGL();
@@ -428,69 +325,18 @@ int main(int argc, char **argv) {
 
     game = new Game();
 
-
 	#if defined(WIN32)
 	glutMainLoop();
 	#endif
 	glMaterialShinnyness();
-
+	menuShow();
+	
 	while (1){
 		DrawGLScene();
 		handleARM9SVC();	/* Do not remove, handles TGDS services */
 		IRQVBlankWait();
 	}
 	return 0;
-}
-
-//GL Display Lists Unit Test: Cube Demo
-// Build Cube Display Lists
-GLvoid BuildLists(){
-	box=glGenLists(2);									// Generate 2 Different Lists
-	glNewList(box,GL_COMPILE);							// Start With The Box List
-		glBegin(GL_QUADS);
-			// Bottom Face
-			glNormal3f(0.5f,-1.0f, 0.0f);
-			glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f, -1.0f, -1.0f);
-			glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f, -1.0f, -1.0f);
-			glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f,  1.0f);
-			glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);
-			// Front Face
-			glNormal3f( 1.0f, 1.0f, 1.0f);
-			glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);
-			glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, -1.0f,  1.0f);
-			glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f,  1.0f);
-			glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f,  1.0f);
-			// Back Face
-			glNormal3f( 1.0f, 1.0f,-1.0f);
-			glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f, -1.0f);
-			glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);
-			glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);
-			glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f, -1.0f);
-			// Right face
-			glNormal3f( 1.0f, 0.0f, 0.0f);
-			glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f, -1.0f, -1.0f);
-			glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);
-			glTexCoord2f(0.0f, 1.0f); glVertex3f( 1.0f,  1.0f,  1.0f);
-			glTexCoord2f(0.0f, 0.0f); glVertex3f( 1.0f, -1.0f,  1.0f);
-			// Left Face
-			glNormal3f(-1.0f, 0.0f, 1.0f);
-			glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, -1.0f, -1.0f);
-			glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, -1.0f,  1.0f);
-			glTexCoord2f(1.0f, 1.0f); glVertex3f(-1.0f,  1.0f,  1.0f);
-			glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);
-		glEnd();
-	glEndList();
-	top=box+1;											// Storage For "Top" Is "Box" Plus One
-	glNewList(top,GL_COMPILE);							// Now The "Top" Display List
-		glBegin(GL_QUADS);
-			// Top Face
-			glNormal3f( 1.0f, 1.0f, 1.0f);
-			glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f,  1.0f, -1.0f);
-			glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f,  1.0f,  1.0f);
-			glTexCoord2f(1.0f, 0.0f); glVertex3f( 1.0f,  1.0f,  1.0f);
-			glTexCoord2f(1.0f, 1.0f); glVertex3f( 1.0f,  1.0f, -1.0f);
-		glEnd();
-	glEndList();
 }
 
 GLvoid ReSizeGLScene(GLsizei width, GLsizei height)		// Resize And Initialize The GL Window
@@ -512,11 +358,10 @@ GLvoid ReSizeGLScene(GLsizei width, GLsizei height)		// Resize And Initialize Th
 	glLoadIdentity();									// Reset The Modelview Matrix
 }
 
-static float camMov = -1.0;
 int InitGL()										// All Setup For OpenGL Goes Here
 {
 	glInit(); //NDSDLUtils: Initializes a new videoGL context	
-	glClearColor(255,255,255);		// Black Background
+	glClearColor(255,255,255);		// White Background
 	glClearDepth(0x7FFF);		// Depth Buffer Setup
 	glEnable(GL_ANTIALIAS);
 	glEnable(GL_TEXTURE_2D); // Enable Texture Mapping 
@@ -543,32 +388,24 @@ int InitGL()										// All Setup For OpenGL Goes Here
 int DrawGLScene(){									
 	scanKeys();
 	int pen_delta[2];
-	bool isTSCActive = get_pen_delta( &pen_delta[0], &pen_delta[1] );
-	if( isTSCActive == false ){
+	if( get_pen_delta( &pen_delta[0], &pen_delta[1] ) == false ){ //TSC Inactive?
 		rotateX = 0.0;
 		rotateY = 0.0;
 	}
-	else{
-		clrscr();
-		printfCoords(0, 14, "camera_mode: %d", game->scenario->camera_mode);
-		printfCoords(0, 15, "xrot:%d-yrot:%d", xrot, yrot);
-		
-		rotateX = pen_delta[0];
-		rotateY = pen_delta[1];
-		if(yrot > 0){
-			yrot--;
-		}
-		else{
-			yrot++;
-		}
-		
-		if(xrot > 0){
-			xrot--;
-		}
-		else{
-			xrot++;
-		}
+	else{	
+		rotateY = pen_delta[0];
+		rotateX = pen_delta[1];
 	}
+	
+	if(keysDown()&KEY_TOUCH){
+		scanKeys();
+		while(keysHeld() & KEY_TOUCH){
+			scanKeys();
+		}
+		game->scenario->change_camera_pos();
+		menuShow();
+	}
+	
 	if (keysDown() & KEY_LEFT)
 	{
 		camMov-=2.8f;
@@ -578,86 +415,21 @@ int DrawGLScene(){
 		camMov+=2.8f;
 	}
 
-
-	/* //render example
-	glReset(); //Clear The Screen And The Depth Buffer
-	
-	//Set initial view to look at
-	gluPerspective(18, 256.0 / 192.0, 0.1, 40);
-
-	//Camera perspective from there
-	gluLookAt(	0.0, 0.0, 4.0,		//camera possition 
-				0.0, 0.0, 0.0,		//look at
-				0.0, 1.0, 0.0);		//up
-	
-	glMaterialShinnyness();
-	
-	GLfloat light_ambient[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
-    GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
-    GLfloat light_specular[] = { 1.0f, 1.0f, xrot, 1.0f };
-    GLfloat light_position[] = { 1.0f, 1.0f, 1.0f, 0.0f };
-
-	//Draw each cube through a set of Open GL Display List calls 
-	for (yloop=1;yloop<6;yloop++){
-		for (xloop=0;xloop<yloop;xloop++){
-			glBindTexture( 0, texturesSnakeGL[0]);
-			// Reset The View
-			glLoadIdentity();
-			glTranslatef(1.4f+(float(xloop)*2.8f)-(float(yloop)*1.4f),((6.0f-float(yloop))*2.4f)-7.3f,-20.0f + camMov);
-			
-			glRotatef(45.0f-(2.0f*yloop)+xrot,1.0f,0.0f,0.0f);
-			glRotatef(45.0f+yrot,0.0f,1.0f,0.0f);
-
-			//not a real gl function and will likely change
-			#define GX_LIGHT0 (1 << 0)
-			glPolyFmt(GX_LIGHT0 | POLY_ALPHA(31) | POLY_CULL_NONE);
-			
-			glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
-			glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
-			glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-			glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-			glMaterialf(GL_AMBIENT_AND_DIFFUSE, RGB15(31,31,31));	
-			//Run the precompiled standard Open GL 1.1 Display List here
-			glColor3fv(boxcol[yloop-1]);
-			glCallList(box);
-			glColor3fv(topcol[yloop-1]);
-			glCallList(top);
-		}
-	}
-	glFlush();
-	*/
-
-	//Snake GL exec
 	{
-
 		glReset(); //Clear The Screen And The Depth Buffer
-	
-		
-		
-		
-		
-		GLfloat light_ambient[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
-		GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
-		GLfloat light_specular[] = { 1.0f, 1.0f, xrot, 1.0f };
-		GLfloat light_position[] = { 1.0f, 1.0f, 1.0f, 0.0f };
-
 		//Handle keypress
 		game->on_key_pressed(keysDown());
 		
 		//Handle Display
-		{
-			//glViewport(width / 2, height / 2, 100, 100);
-			glMatrixMode(GL_PROJECTION);
-			glLoadIdentity();
-			
-			//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			
-			//not a real gl function and will likely change
-			#define GX_LIGHT0 (1 << 0)
-			glPolyFmt(GX_LIGHT0 | POLY_ALPHA(31) | POLY_CULL_NONE);
-			game->display();
-			glFlush();
-		}
+		//glViewport(width / 2, height / 2, 100, 100);
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		
+		//not a real gl function and will likely change
+		#define GX_LIGHT0 (1 << 0)
+		glPolyFmt(GX_LIGHT0 | POLY_ALPHA(31) | POLY_CULL_NONE);
+		game->display();
+		glFlush();
 	}
 	return true;										// Keep Going
 }

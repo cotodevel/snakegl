@@ -96,7 +96,7 @@ struct Point
 
 struct Camera
 {
-    GLdouble eyeX, /* gluLookAt */
+    GLfloat eyeX, /* gluLookAt */
              eyeY,
              eyeZ,
              centerX,
@@ -104,12 +104,7 @@ struct Camera
              centerZ,
              upX,
              upY,
-             upZ,
-             /* gluPerspective  */
-             fovy,
-             aspect,
-             zNear,
-             zFar;
+             upZ;
 };
 
 extern void setVSync(bool sync);

@@ -163,13 +163,9 @@ void Game::draw_menu()
     }
 }
 
-void Game::display()
-{
-    int old_cam = scenario->camera_mode;
+void Game::display(){
 
-    scenario->camera_mode = 3;
-    scenario->set_camera();
-
+	scenario->set_camera();
     calculateFPS();
     Point p;
 
@@ -184,12 +180,8 @@ void Game::display()
     draw_text(s, p, 0.0f, 0.0f, 0.0f);
 #endif
 
-    if (is_running)
-    {
-
-        scenario->camera_mode = old_cam;
-        scenario->set_camera();
-
+    if (is_running){
+		scenario->set_camera();
         if (1==1) //todo: use 1==1 in DS build
         {
             if (scenario->a > 360)
@@ -208,7 +200,6 @@ void Game::display()
         }
 
         scenario->draw_objects();
-        scenario->camera_mode = 3;
         scenario->set_camera();
 
         if (1==1) //todo: use 1==1 in DS build
@@ -249,8 +240,6 @@ void Game::display()
     {
         //draw_menu();
     }
-
-    scenario->camera_mode = old_cam;
 }
 
 void Game::run()

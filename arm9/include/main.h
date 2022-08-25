@@ -77,27 +77,17 @@ extern bool stopSoundStreamUser();
 extern void closeSoundUser();
 extern char args[8][MAX_TGDSFILENAME_LENGTH];
 extern char *argvs[8];
-
-extern GLuint	texture[1];			// Storage For 1 Texture
-extern GLuint	box;				// Storage For The Box Display List
-extern GLuint	top;				// Storage For The Top Display List
-extern GLuint	xloop;				// Loop For X Axis
-extern GLuint	yloop;				// Loop For Y Axis
-
-extern int	xrot;				// Rotates Cube On The X Axis
-extern int	yrot;				// Rotates Cube On The Y Axis
-
-extern GLfloat boxcol[5][3];
-extern GLfloat topcol[5][3];
-extern GLvoid BuildLists();
 extern GLvoid ReSizeGLScene(GLsizei width, GLsizei height);
 extern int InitGL();
 extern int DrawGLScene();
-
 extern bool get_pen_delta( int *dx, int *dy );
 
 extern float rotateX;
 extern float rotateY;
+extern float camMov;
+
+extern GLfloat	xrot;				
+extern GLfloat	yrot;			
 
 #ifdef __cplusplus
 }

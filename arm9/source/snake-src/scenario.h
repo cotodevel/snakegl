@@ -15,7 +15,7 @@ private:
     void draw_barrier();
     void draw_background();
 public:
-    int camera_mode;
+    bool close_camera_mode;
     float m;
     float a;
     Snake snake;

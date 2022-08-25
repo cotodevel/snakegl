@@ -1,5 +1,7 @@
 #include "scenario.h"
 #include "main.h"
+#include "snake.h"
+#include "game.h"
 
 //
 // Scenario implementation
@@ -9,12 +11,12 @@ Scenario::Scenario()
 {
     a = 0;
     m = 0.1;
+    close_camera_mode = false;
 }
 
 void Scenario::reset()
 {
     barriers.clear();
-    camera_mode = 3;
     snake.reset();
     change_food_pos();
     add_barrier();
@@ -179,14 +181,8 @@ ObjectType Scenario::has_collision(Point p)
     return NONE;
 }
 
-void Scenario::change_camera_pos()
-{
-    camera_mode += 1;
-
-    if (camera_mode > 3)
-    {
-        camera_mode = 0;
-    }
+void Scenario::change_camera_pos(){
+    close_camera_mode = !close_camera_mode;
 }
 
 void Scenario::set_camera()
@@ -197,80 +193,53 @@ void Scenario::set_camera()
     camera.upX    = 0.0f;
     camera.upY    = 1.0f;
     camera.upZ    = 0.0f;
-    camera.aspect = 1;
 
-    if (camera_mode == 0)
-    {
-        camera.eyeX    = 0.0f;
-        camera.eyeY    = 10.0f;
-        camera.eyeZ    = 15.0f;
-        camera.centerX = 0.0f;
-        camera.centerY = 0.0f;
-        camera.centerZ = 0.0f;
-        camera.fovy    = 45;
-        camera.zNear   = 0.1f;
-        camera.zFar    = 50;
-    }
-    else if (camera_mode == 1)
-    {
-        camera.eyeX    = 0.0f;
+    if (close_camera_mode == true){
+        Point snak = game->scenario->snake.head();
+        camera.eyeX    = snak.x;
         camera.eyeY    = 1.0f;
-        camera.eyeZ    = 20.0f;
+        camera.eyeZ    = 5.0f + snak.z;
         camera.centerX = 0.0f;
-        camera.centerY = 0.0f;
-        camera.centerZ = 0.0f;
-        camera.fovy    = 45;
-        camera.zNear   = 0.1f;
-        camera.zFar    = 50;
+        camera.centerY = 45.0f;
+        camera.centerZ = -90.0f;
+        camera.upX = 0.0f;
+        camera.upY = 0.0f;
+        camera.upZ = 45.0f;
     }
-    else if (camera_mode == 2)
-    {
-        #ifdef DEBUG
-            camera.eyeX    = 0.0f;
-            camera.eyeY    = -10.0f;
-            camera.eyeZ    = 15.0f;
-            camera.centerX = 0.0f;
-            camera.centerY = 0.0f;
-            camera.centerZ = 0.0f;
-            camera.fovy    = 45;
-            camera.zNear   = 0.1f;
-            camera.zFar    = 50;
-        #else
-            camera.eyeX    = -2.0f;
-            camera.eyeY    = 5.0f;
-            camera.eyeZ    = 20.0f;
-            camera.centerX = 0.0f;
-            camera.centerY = 0.0f;
-            camera.centerZ = 0.0f;
-            camera.fovy    = 45;
-            camera.zNear   = 1.0f;
-            camera.zFar    = 50;
-        #endif
-    }
-    else if (camera_mode == 3)
-    {
+    else {
         camera.eyeX    = 0.0f;
-        camera.eyeY    = 45.0f;
-        camera.eyeZ    = 1.0f;
+        camera.eyeY    = 0.0f;
+        camera.eyeZ    = 16.0f;
         camera.centerX = 0.0f;
         camera.centerY = 0.0f;
         camera.centerZ = 0.0f;
-        camera.fovy    = 20;
-        camera.zNear   = 1.0f;
-        camera.zFar    = 100;
+        camera.upX = 1.0f;
+        camera.upY = 1.0f;
+        camera.upZ = 1.0f;
     }
+    
+    /* 3rd view close camera OK
+    
+    //Camera perspective from there
+    Point snak = game->scenario->snake.head();
+    gluLookAt(	snak.x, 1.0f, 5.0f + snak.z,		//camera possition / eye
+                0, 45.0f, -90.0f,		//look at / center 
+                0, 0, 45.0f);		//up X,Y,Z
+    */
 
     //Set initial view to look at
-    gluPerspective(22, 256.0 / 192.0, 0.1, 40);
+    gluPerspective(20, 256.0 / 192.0, 0.1, 140);
+    gluLookAt(camera.eyeX, camera.eyeY, camera.eyeZ,		//camera possition / eye
+                camera.centerX, camera.centerY, camera.centerZ,		//look at / center 
+                camera.upX, camera.upY, camera.upZ);		//up X,Y,Z
 
-    //Camera perspective from there
-    
-    gluLookAt(	0, 0, 16.0f,		//camera possition 
-                camera.centerX, camera.centerY, camera.centerZ,		//look at
-                1.0, 1.0, 1.0);		//up
-    
-    glRotateX(90.0f);
-    glRotateY(45.0f);
-
+	if (close_camera_mode == true){
+		//glRotateX(90.0f);
+	    //glRotateY(45.0f);
+	}
+	else{
+		glRotateX(90.0f);
+	    glRotateY(45.0f);
+	}
     glMatrixMode(GL_MODELVIEW);
 }
