@@ -192,15 +192,15 @@ void setupDLEnableDisable2DTextures(){
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-    GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
+    GLfloat light_ambient[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
     GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
     GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    GLfloat light_position[] = { 2.0f, 5.0f, 5.0f, 0.0f };
+    GLfloat light_position[] = { 2.0f, 5.0f, 5.0f, -1.0f };
 
-    GLfloat mat_ambient[]    = { 0.7f, 0.7f, 0.7f, 1.0f };
-    GLfloat mat_diffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f };
+    GLfloat mat_ambient[]    = { 10.7f, 10.7f, 10.7f, 10.0f };
+    GLfloat mat_diffuse[]    = { 10.8f, 10.8f, 10.8f, 10.0f };
     GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f };
-    GLfloat high_shininess[] = { 0.0f };
+    GLfloat high_shininess[] = { 127.0f };
 		glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
 		glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
 		glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
@@ -215,30 +215,7 @@ void setupDLEnableDisable2DTextures(){
 	DLDIS2DTEX=DLEN2DTEX+1;										
 	glNewList(DLDIS2DTEX,GL_COMPILE);							// 2: disable_2D_texture()
 	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-    GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
-    GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
-    GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    GLfloat light_position[] = { 2.0f, 5.0f, 5.0f, 0.0f };
-
-    GLfloat mat_ambient[]    = { 0.7f, 0.7f, 0.7f, 1.0f };
-    GLfloat mat_diffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f };
-    GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f };
-    GLfloat high_shininess[] = { 100.0f };
-
-    glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
- 
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   mat_ambient);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   mat_diffuse);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  mat_specular);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, high_shininess);
 	}
 	glEndList();
 
@@ -321,8 +298,8 @@ void draw_cube(float size, Point p, int res_id)
 void drawSphere(){
     const float PI = 3.141592f;
     GLfloat x, y, z, alpha, beta; // Storage for coordinates and angles        
-    GLfloat radius = 0.6f;
-    int gradation = 10;
+    GLfloat radius = 0.7f;
+    int gradation = 9;
 
     for (alpha = 0.0; alpha <  PI; alpha += PI/gradation)
     {        
@@ -332,7 +309,6 @@ void drawSphere(){
             x = radius*cos(beta)*sin(alpha);
             y = radius*sin(beta)*sin(alpha);
             z = radius*cos(alpha);
-            //texture coords are wrong
 			glNormal3f(-y, x, z);
 			glTexCoord2f(y, -x * z);
 			glVertex3f(x, y, z);
@@ -406,13 +382,17 @@ void draw_text(string s, Point p, float r, float g, float b)
 
 //hardcoded below function at 0.5f to speedup drawing
 void glut2SolidCube05f(){
+    //Apply GX polygon properties (lights) before rendering vertices (snake body object)
+	#define GX_LIGHT0 (1 << 0)
+	glPolyFmt(GX_LIGHT0 | POLY_ALPHA(31) | POLY_CULL_NONE);
+	glColor3f(1.0f, 1.0f, 14.0f);
 	glCallList(DLSOLIDCUBE05F);
 }
 
 void glut2SolidCube(GLdouble size){
     static GLfloat n[6][3] =
     {
-        {-1.0, 0.0, 0.0},
+        {-1.0, 0.0, -1.0},
         {0.0, 1.0, 0.0},
         {1.0, 0.0, 0.0},
         {0.0, -1.0, 0.0},
@@ -441,6 +421,10 @@ void glut2SolidCube(GLdouble size){
     for (i = 5; i >= 0; i--)
     {
         glBegin(GL_QUADS);
+        	//Apply GX polygon properties (lights) before rendering vertices (snake head object)
+			#define GX_LIGHT0 (1 << 0)
+			glPolyFmt(GX_LIGHT0 | POLY_ALPHA(31) | POLY_CULL_NONE);
+			glColor3f(1.0f, 1.0f, 14.0f);
             glNormal3fv(&n[i][0]);
             glTexCoord2f(0, 0);
 			glVertex3fv(&v[faces[i][0]][0]);

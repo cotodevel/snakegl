@@ -103,14 +103,17 @@ void Scenario::draw_food()
 
     // "leaf"
 	glPushMatrix();
-        glTranslatef(p.x + 0.55, p.y + m + 0.95, p.z);
+        glTranslatef(p.x, p.y + m + 0.45, p.z);
         glRotatef(a, 0.0, 1.0, 0.0);
 
-        glColor3f(0.2f, 0.4f, 0.0f);
+        //Apply GX polygon properties (lights) before rendering vertices (leaf object)
+		#define GX_LIGHT0 (1 << 0)
+		glPolyFmt(GX_LIGHT0 | POLY_ALPHA(31) | POLY_CULL_NONE);
+        glColor3f(0.2f, 10.4f, 0.1f);
          glBegin(GL_TRIANGLE_STRIP);
-            glVertex3f(0, 0, 0.7);
-            glVertex3f(0, 0, 0.8);
-            glVertex3f(0.1, -0.01, 0.9);
+            glVertex3f(0, 0, 0.3);
+            glVertex3f(0, 0, 0.4);
+            glVertex3f(0.1, -0.01, 0.5);
 
             glVertex3f(0.1, -0.01, 1.0);
             glVertex3f(0.15, -0.02, 1.0);
@@ -125,7 +128,11 @@ void Scenario::draw_food()
         glBindTexture(0, texturesSnakeGL[FOOD_TEXTURE]);
         glTranslatef(p.x, p.y + m, p.z);
         glRotatef(a, 0.0, 1.0, 0.0);
-		drawSphere(); //draw sphere
+		//Apply GX polygon properties (lights) before rendering vertices (fruit object)
+		#define GX_LIGHT0 (1 << 0)
+		glPolyFmt(GX_LIGHT0 | POLY_ALPHA(31) | POLY_CULL_NONE);
+		glColor3f(1.0f, 1.0f, 14.0f);
+		drawSphere();
     glPopMatrix(1);
 
     disable_2D_texture();
