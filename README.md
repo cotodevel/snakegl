@@ -20,8 +20,11 @@ make <enter>
 
 After compiling, run the example in NDS. 
 
-Project Specific description:
-3D snake game 
+Project Specific description: snakeGL Nintendo DS port
+
+-Touchscreen changes camera
+-Directional Pad controls Snake direction
+-X button toggles backround music
 
 
 ____Remoteboot____
@@ -51,8 +54,12 @@ and toolchaingenericds-multiboot-config.txt (update here, the computer's IP you 
 - And finally boot ToolchainGenericDS-multiboot, and press (X), wait a few seconds and TGDS Project should boot remotely.
   After that, everytime you want to remoteboot a TGDS Project, repeat the last 2 steps. ;-)
 
+Note: 
+- /release folder has the latest binary precompiled for your convenience.
+- Preferably, use toolchaingenericds-multiboot and load snakeGL from there. It's guaranteed to work.
 
-/release folder has the latest binary precompiled for your convenience.
+Audio track is [Electrical Stud - PHHHP! Plus] by Ron Jarzombek, a genius composer. (guitars)
+Bobby Jarzombek is also a genius composer. (drums)
 
 Latest stable release:
 https://bitbucket.org/Coto88/snakegl/get/TGDS1.65.zip

@@ -107,6 +107,13 @@ void menuShow(){
 	printf(" ---- ");
 	printf(" ---- ");
 	printf("%s >%d", TGDSPROJECTNAME, TGDSPrintfColor_Yellow);
+	printf("[X: Enable / Disable BG Music]");
+	if(bgMusicEnabled == true){
+		printf("Background Music: ON");
+	}
+	else{
+		printf("Background Music: OFF");
+	}
 	printfCoords(0, 13, "Change Camera: Touchscreen");
 	if(game->scenario->close_camera_mode == true){
 		printfCoords(0, 14, "Camera: Close-up >%d", TGDSPrintfColor_Red);
@@ -312,6 +319,12 @@ int main(int argc, char **argv) {
 		//play videoTest maybe?
 	}
 	
+	//init sound
+	bgMusicEnabled = true;
+	BgMusic();
+	BgMusic();
+	
+
 	/* OpenGL 1.1 Dynamic Display List */
 	InitGL();
 	ReSizeGLScene(255, 191);
@@ -415,6 +428,19 @@ int DrawGLScene(){
 		camMov+=2.8f;
 	}
 
+	if (keysDown() & KEY_X){
+		bgMusicEnabled = !bgMusicEnabled;
+		if(bgMusicEnabled == true){
+			BgMusic();
+			BgMusic();
+		}
+		else{
+			BgMusicOff();
+			BgMusicOff();
+		}
+		menuShow();
+	}
+
 	{
 		glReset(); //Clear The Screen And The Depth Buffer
 		//Handle keypress
@@ -431,5 +457,6 @@ int DrawGLScene(){
 		game->display();
 		glFlush();
 	}
+	
 	return true;										// Keep Going
 }

@@ -48,6 +48,10 @@ USA
 #include "main.h"
 #include "wifi_arm9.h"
 #include "dswnifi_lib.h"
+#include "ah.h"
+#include "munchfood.h"
+#include "stud.h"
+#include "soundTGDS.h"
 
 #endif
 
@@ -84,6 +88,31 @@ void HandleFifoEmptyWeakRef(uint32 cmd1,uint32 cmd2){
 //project specific stuff
 
 #ifdef ARM9
+void playSound(u32 * buffer, int bufferSize, u32 flags, int ch){
+	u32 cnt   = flags | SOUND_VOL(127) | SOUND_PAN(64) | (2 << 29) | (0 << 24); //(2=IMA-ADPCM
+	int len = bufferSize;
+	u16 freq = 32000;
+	writeARM7SoundChannelFromSource(ch, cnt, (u16)freq, (u32)buffer, (u32)len);
+}
+
+bool soundGameOverEmitted = false;
+void gameoverSound(){
+	playSound((u32*)&ah[0], ah_size, SCHANNEL_ENABLE | SOUND_ONE_SHOT, 8);
+}
+
+void MunchFoodSound(){
+	playSound((u32*)&munchfood[0], munchfood_size, SCHANNEL_ENABLE | SOUND_ONE_SHOT, 9);
+}
+
+void BgMusic(){
+	playSound((u32*)&stud[0], stud_size, SCHANNEL_ENABLE | (1<<27), 10);
+}
+
+bool bgMusicEnabled = false;
+void BgMusicOff(){
+	playSound((u32*)&stud[0], 0, 0, 10);
+}
+
 
 void updateStreamCustomDecoder(u32 srcFrmt){
 

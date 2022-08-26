@@ -3,6 +3,7 @@
 
 #include "game.h"
 #include "timerTGDS.h"
+#include "ipcfifoTGDSUser.h"
 
 float to_fps(float fps, int value)
 {
@@ -64,7 +65,8 @@ void Game::reset()
     ate = false;
     is_game_over = false;
     paused = false;
-
+    soundGameOverEmitted = false;
+    
     tick = 30;
     tick2 = 10;
 
@@ -216,6 +218,10 @@ void Game::display(){
                 p.z = 0.15f;
                 draw_text("GAME OVER", p, 0.0f, 0.0f, 0.0f);
             }
+            if(soundGameOverEmitted == false){
+                gameoverSound();
+                soundGameOverEmitted = true;
+            }
         }
 
         sprintf(s, "SCORE: %d", score * 10);
@@ -256,6 +262,7 @@ void Game::run()
             scenario->snake.move();
         break;
         case FOOD:
+            MunchFoodSound();
             ate = true;
             score++;
             scenario->snake.grow(true);
