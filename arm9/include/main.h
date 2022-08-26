@@ -1,0 +1,94 @@
+/*
+
+			Copyright (C) 2017  Coto
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
+USA
+
+*/
+
+#ifndef __main9_h__
+#define __main9_h__
+
+#include "typedefsTGDS.h"
+#include "dsregs.h"
+#include "fatfslayerTGDS.h"
+#include "utilsTGDS.h"
+#include "VideoGL.h"
+
+#ifdef __cplusplus
+//snake GL
+#include "base.h"
+#include "game.h"
+#include "snake.h"
+#include "scenario.h"
+#endif
+
+#define TGDSPROJECTNAME ((char*) "snakeGL")
+
+//project 1 multimedia list
+#define videoIntro ((char*)"0:/sth1.tvs") //video intro
+#define videoTest ((char*)"0:/test.tvs") 
+
+//tracks
+
+//sound effects
+
+#endif
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifdef __cplusplus
+/////////////////////////////// Snake GL defs ///////////////////////////////////////
+extern int width;
+extern int height;
+extern bool is_game_over;
+extern bool is_running;
+extern Game* game;
+/////////////////////////////////////////////////////////////////////////////////////
+#endif
+
+extern int main(int argc, char **argv);
+extern void menuShow();
+extern char curChosenBrowseFile[MAX_TGDSFILENAME_LENGTH];
+extern bool pendingPlay;
+extern struct fd * _FileHandleVideo; 
+extern struct fd * _FileHandleAudio;
+
+//TGDS Soundstreaming API
+extern int internalCodecType;
+extern struct fd * _FileHandleVideo; 
+extern struct fd * _FileHandleAudio;
+extern bool stopSoundStreamUser();
+extern void closeSoundUser();
+extern char args[8][MAX_TGDSFILENAME_LENGTH];
+extern char *argvs[8];
+extern GLvoid ReSizeGLScene(GLsizei width, GLsizei height);
+extern int InitGL();
+extern int DrawGLScene();
+extern bool get_pen_delta( int *dx, int *dy );
+
+extern float rotateX;
+extern float rotateY;
+extern float camMov;
+
+extern GLfloat	xrot;				
+extern GLfloat	yrot;			
+
+#ifdef __cplusplus
+}
+#endif
