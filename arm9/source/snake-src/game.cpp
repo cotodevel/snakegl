@@ -66,7 +66,9 @@ void Game::reset()
     is_game_over = false;
     paused = false;
     soundGameOverEmitted = false;
-    
+    BgMusicOff();
+	BgMusic();
+	
     tick = 30;
     tick2 = 10;
 

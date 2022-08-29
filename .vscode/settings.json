@@ -2,6 +2,13 @@
     "terminal.integrated.defaultProfile.windows": "msys2",
     "files.associations": {
         "typedefstgds.h": "c",
-        "main.h": "c"
+        "main.h": "c",
+        "istream": "cpp",
+        "*.tcc": "cpp",
+        "fstream": "cpp",
+        "iostream": "cpp",
+        "ostream": "cpp",
+        "sstream": "cpp",
+        "streambuf": "cpp"
     },
 }

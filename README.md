@@ -55,7 +55,7 @@ and toolchaingenericds-multiboot-config.txt (update here, the computer's IP you 
   After that, everytime you want to remoteboot a TGDS Project, repeat the last 2 steps. ;-)
 
 Note: 
-- /release folder has the latest binary precompiled for your convenience.
+- /release folder has the latest binary precompiled for your convenience. Copy all contents from either /arm7dldi-ntr or /arm7dldi-twl folder depending on NintendoDS model.
 - Preferably, use toolchaingenericds-multiboot and load snakeGL from there. It's guaranteed to work.
 
 Audio track is [Electrical Stud - PHHHP! Plus] by Ron Jarzombek, a genius composer. (guitars)

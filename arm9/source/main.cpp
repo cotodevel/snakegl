@@ -107,13 +107,7 @@ void menuShow(){
 	printf(" ---- ");
 	printf(" ---- ");
 	printf("%s >%d", TGDSPROJECTNAME, TGDSPrintfColor_Yellow);
-	printf("[X: Enable / Disable BG Music]");
-	if(bgMusicEnabled == true){
-		printf("Background Music: ON");
-	}
-	else{
-		printf("Background Music: OFF");
-	}
+	printf("[Select: Start new game]");
 	printfCoords(0, 13, "Change Camera: Touchscreen");
 	if(game->scenario->close_camera_mode == true){
 		printfCoords(0, 14, "Camera: Close-up >%d", TGDSPrintfColor_Red);
@@ -169,7 +163,6 @@ int main(int argc, char **argv) {
 		printf("FS Init error: %d", ret);
 	}
 	
-	switch_dswnifi_mode(dswifi_idlemode);
 	asm("mcr	p15, 0, r0, c7, c10, 4");
 	flush_icache_all();
 	flush_dcache_all();	
@@ -320,11 +313,8 @@ int main(int argc, char **argv) {
 	}
 	
 	//init sound
-	bgMusicEnabled = true;
-	BgMusic();
-	BgMusic();
+	bgMusicEnabled = false;
 	
-
 	/* OpenGL 1.1 Dynamic Display List */
 	InitGL();
 	ReSizeGLScene(255, 191);
@@ -426,19 +416,6 @@ int DrawGLScene(){
 	if (keysDown() & KEY_RIGHT)
 	{
 		camMov+=2.8f;
-	}
-
-	if (keysDown() & KEY_X){
-		bgMusicEnabled = !bgMusicEnabled;
-		if(bgMusicEnabled == true){
-			BgMusic();
-			BgMusic();
-		}
-		else{
-			BgMusicOff();
-			BgMusicOff();
-		}
-		menuShow();
 	}
 
 	{
