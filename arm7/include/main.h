@@ -23,6 +23,8 @@ USA
 
 #include "typedefsTGDS.h"
 #include "dsregs.h"
+#include "pff.h"
+#include "soundTGDS.h"
 
 #endif
 
@@ -32,6 +34,16 @@ extern "C" {
 #endif
 
 extern int main(int argc, char **argv);
+extern FATFS Fatfs;					// Petit-FatFs work area 
+extern struct TGDSVideoFrameContext videoCtx;
+extern struct soundPlayerContext soundData;
+extern char fname[256];
+
+extern void handleARM7FSSetup();
+extern void handleARM7FSRender();
+
+extern bool stopSoundStreamUser();
+extern void playerStopARM7();
 
 #ifdef __cplusplus
 }

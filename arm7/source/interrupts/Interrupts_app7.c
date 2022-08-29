@@ -59,7 +59,7 @@ void Timer1handlerUser(){
 __attribute__((section(".itcm")))
 #endif
 void Timer2handlerUser(){
-
+	timerAudioCallback();
 }
 
 #ifdef ARM9

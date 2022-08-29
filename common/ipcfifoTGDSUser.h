@@ -37,7 +37,7 @@ USA
 //---------------------------------------------------------------------------------
 struct sIPCSharedTGDSSpecific {
 //---------------------------------------------------------------------------------
-	u32 stub1;
+	char filename[256];
 };
 
 #ifdef ARM9
@@ -48,6 +48,10 @@ struct sIPCSharedTGDSSpecific {
 #define TGDSDLDI_ARM7_ADDRESS (u32)(TGDS_ARM7_MALLOCSTART + TGDS_ARM7_MALLOCSIZE)
 
 #endif
+
+#define FIFO_DIRECTVIDEOFRAME_SETUP (u32)(0xFFFFABCB)
+#define FIFO_TGDSVIDEOPLAYER_STOPSOUND (u32)(0xFFAACC02)
+
 
 #define NO_VIDEO_PLAYBACK	1
 
@@ -73,6 +77,10 @@ extern void MunchFoodSound();
 extern void BgMusic();
 extern void BgMusicOff();
 extern bool bgMusicEnabled;
+
+#ifdef ARM9
+extern u32 setupDirectVideoFrameRender(char * videoStructFDFilename, bool loop);
+#endif
 
 #ifdef __cplusplus
 }

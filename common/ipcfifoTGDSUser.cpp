@@ -39,6 +39,8 @@ USA
 #include "main.h"
 #include "wifi_arm7.h"
 #include "spifwTGDS.h"
+#include "pff.h"
+#include "ima_adpcm.h"
 
 #endif
 
@@ -48,11 +50,8 @@ USA
 #include "main.h"
 #include "wifi_arm9.h"
 #include "dswnifi_lib.h"
-#include "ah.h"
-#include "munchfood.h"
-#include "stud.h"
 #include "soundTGDS.h"
-
+#include "biosTGDS.h"
 #endif
 
 #ifdef ARM9
@@ -70,7 +69,15 @@ __attribute__((section(".itcm")))
 void HandleFifoNotEmptyWeakRef(u32 cmd1, uint32 cmd2){
 	switch (cmd1) {
 		#ifdef ARM7
+		case(FIFO_TGDSVIDEOPLAYER_STOPSOUND):{
+			player.stop();
+		}
+		break;
 		
+		case(FIFO_DIRECTVIDEOFRAME_SETUP):{
+			handleARM7FSSetup();
+		}
+		break;
 		#endif
 		
 		#ifdef ARM9
@@ -92,25 +99,36 @@ void playSound(u32 * buffer, int bufferSize, u32 flags, int ch){
 	u32 cnt   = flags | SOUND_VOL(127) | SOUND_PAN(64) | (2 << 29) | (0 << 24); //(2=IMA-ADPCM
 	int len = bufferSize;
 	u16 freq = 32000;
-	writeARM7SoundChannelFromSource(ch, cnt, (u16)freq, (u32)buffer, (u32)len);
+	//writeARM7SoundChannelFromSource(ch, cnt, (u16)freq, (u32)buffer, (u32)len);
 }
 
 bool soundGameOverEmitted = false;
 void gameoverSound(){
-	playSound((u32*)&ah[0], ah_size, SCHANNEL_ENABLE | SOUND_ONE_SHOT, 8);
+	//ARM7 ADPCM playback 
+	char filename[256];
+	strcpy(filename, "0:/ah.wav");
+	char * filen = FS_getFileName(filename);
+	strcat(filen, ".ima");
+	u32 returnStatus = setupDirectVideoFrameRender((char*)&filen[2], false);
 }
 
 void MunchFoodSound(){
-	playSound((u32*)&munchfood[0], munchfood_size, SCHANNEL_ENABLE | SOUND_ONE_SHOT, 9);
+	//playSound((u32*)&munchfood[0], munchfood_size, SCHANNEL_ENABLE | SOUND_ONE_SHOT, 9);
 }
 
 void BgMusic(){
-	playSound((u32*)&stud[0], stud_size, SCHANNEL_ENABLE | (1<<27), 10);
+	//ARM7 ADPCM playback 
+	char filename[256];
+	strcpy(filename, "0:/stud.wav");
+	char * filen = FS_getFileName(filename);
+	strcat(filen, ".ima");
+	u32 returnStatus = setupDirectVideoFrameRender((char*)&filen[2], true);
 }
 
 bool bgMusicEnabled = false;
 void BgMusicOff(){
-	playSound((u32*)&stud[0], 0, 0, 10);
+	SendFIFOWords(FIFO_TGDSVIDEOPLAYER_STOPSOUND, 0xFF);
+	//playSound((u32*)&stud[0], 0, 0, 10);
 }
 
 
@@ -122,6 +140,28 @@ void freeSoundCustomDecoder(u32 srcFrmt){
 
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))
+#endif
+
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
+u32 setupDirectVideoFrameRender(char * videoStructFDFilename, bool loop){
+	struct sIPCSharedTGDSSpecific* sharedIPC = getsIPCSharedTGDSSpecific();
+	char * filename = (char*)&sharedIPC->filename[0];
+	strcpy(filename, videoStructFDFilename);
+	
+	uint32 * fifomsg = (uint32 *)NDS_UNCACHED_SCRATCHPAD;
+	fifomsg[33] = (uint32)0xFFFFCCAA;
+	fifomsg[34] = (uint32)loop;
+	SendFIFOWords(FIFO_DIRECTVIDEOFRAME_SETUP, 0xFF);
+	while(fifomsg[33] == (uint32)0xFFFFCCAA){
+		swiDelay(1);
+	}
+	return fifomsg[33];
+}
+
 #endif
 
 //Libutils setup: TGDS project uses Soundstream, WIFI, ARM7 malloc, etc.
@@ -131,27 +171,27 @@ void setupLibUtils(){
 	//Stage 0
 	#ifdef ARM9
 	initializeLibUtils9(
-		(HandleFifoNotEmptyWeakRefLibUtils_fn)&libUtilsFIFONotEmpty, //ARM7 & ARM9
-		(timerWifiInterruptARM9LibUtils_fn)&Timer_50ms, //ARM9 
-		(SoundStreamStopSoundStreamARM9LibUtils_fn)&stopSoundStream,	//ARM9: bool stopSoundStream(struct fd * tgdsStructFD1, struct fd * tgdsStructFD2, int * internalCodecType)
-		(SoundStreamUpdateSoundStreamARM9LibUtils_fn)&updateStream, //ARM9: void updateStream() 
-		(wifiDeinitARM7ARM9LibUtils_fn)&DeInitWIFI, //ARM7 & ARM9: DeInitWIFI()
-		(wifiswitchDsWnifiModeARM9LibUtils_fn)&switch_dswnifi_mode //ARM9: bool switch_dswnifi_mode(sint32 mode) 
+		NULL, //ARM7 & ARM9
+		NULL, //ARM9 
+		NULL, //ARM9: bool stopSoundStream(struct fd * tgdsStructFD1, struct fd * tgdsStructFD2, int * internalCodecType)
+		NULL,  //ARM9: void updateStream() 
+		NULL, //ARM7 & ARM9: DeInitWIFI()
+		NULL //ARM9: bool switch_dswnifi_mode(sint32 mode)
 	);
 	#endif
 	
 	//Stage 1
 	#ifdef ARM7
 	initializeLibUtils7(
-		(HandleFifoNotEmptyWeakRefLibUtils_fn)&libUtilsFIFONotEmpty, //ARM7 & ARM9
-		(wifiUpdateVBLANKARM7LibUtils_fn)&Wifi_Update, //ARM7
-		(wifiInterruptARM7LibUtils_fn)&Wifi_Interrupt,  //ARM7
-		(SoundStreamTimerHandlerARM7LibUtils_fn)&TIMER1Handler, //ARM7: void TIMER1Handler()
-		(SoundStreamStopSoundARM7LibUtils_fn)&stopSound, 	//ARM7: void stopSound()
-		(SoundStreamSetupSoundARM7LibUtils_fn)&setupSound,	//ARM7: void setupSound()
+		NULL, //ARM7 & ARM9
+		NULL, //ARM7
+		NULL, //ARM7
+		NULL, //ARM7: void TIMER1Handler()
+		NULL, //ARM7: void stopSound()
+		NULL, //ARM7: void setupSound()
 		(initMallocARM7LibUtils_fn)&initARM7Malloc, //ARM7: void initARM7Malloc(u32 ARM7MallocStartaddress, u32 ARM7MallocSize);
-		(wifiDeinitARM7ARM9LibUtils_fn)&DeInitWIFI,  //ARM7 & ARM9: DeInitWIFI()
-		(MicInterruptARM7LibUtils_fn)&micInterrupt //ARM7: micInterrupt()
+		NULL, //ARM7 & ARM9: DeInitWIFI()
+		NULL  //ARM7: micInterrupt()
 	);
 	#endif
 }
