@@ -64,8 +64,6 @@ bool is_game_over = false,
 
 Game* game = NULL;
 
-GLuint texturesSnakeGL[TEXTURE_COUNT+1];
-
 char curChosenBrowseFile[MAX_TGDSFILENAME_LENGTH];
 bool pendingPlay = false;
 
