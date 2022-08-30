@@ -30,7 +30,11 @@ USA
 #include "biosTGDS.h"
 #include "timerTGDS.h"
 
-FATFS Fatfs;					// Petit-FatFs work area 
+IMA_Adpcm_Player backgroundMusicPlayer;	//Actual PLAYER Instance. See ima_adpcm.cpp -> [PLAYER: section
+
+FATFS FatfsFILEBgMusic; //Sound stream handle
+FATFS FatfsFILESoundSample0; //Sound effect handle #0
+
 struct soundPlayerContext soundData;
 char fname[256];
 
@@ -44,7 +48,7 @@ void playSoundStreamARM7(){
 	uint32 * fifomsg = (uint32 *)NDS_CACHED_SCRATCHPAD;			
 	UINT br;	/* Bytes read */
 	uint8_t fresult;
-	fresult = pf_mount(&Fatfs);	/* Initialize file system */
+	fresult = pf_mount(&FatfsFILEBgMusic);	/* Initialize file system */
 	if (fresult != FR_OK) { /* File System could not be mounted */
 		fifomsg[33] = 0xAABBCCDD;
 	}
@@ -54,7 +58,7 @@ void playSoundStreamARM7(){
 	struct sIPCSharedTGDSSpecific* sharedIPC = getsIPCSharedTGDSSpecific();
 	char * filename = (char*)&sharedIPC->filename[0];
 	strcpy((char*)fname, filename);
-	fresult = pf_open(fname);
+	fresult = pf_open(fname, &FatfsFILEBgMusic);
 	
 	int argBuffer[MAXPRINT7ARGVCOUNT];
 	memset((unsigned char *)&argBuffer[0], 0, sizeof(argBuffer));
@@ -70,14 +74,13 @@ void playSoundStreamARM7(){
 		strcat((char*)0x02000000, filename);
 		
 	}
-	pf_lseek(0);
+	pf_lseek(0, &FatfsFILEBgMusic);
 	//pf_read((u8*)&videoCtx, sizeof(struct TGDSVideoFrameContext), &br);		/* Load a page data */
-	
 	
 	//decode audio here
 	bool loop_audio = loop;
 	bool automatic_updates = false;
-	if(player.play(loop_audio, automatic_updates, ADPCM_SIZE, stopSoundStreamUser) == 0){
+	if(backgroundMusicPlayer.play(loop_audio, automatic_updates, ADPCM_SIZE, stopSoundStreamUser, &FatfsFILEBgMusic) == 0){
 		//ADPCM Playback!
 	}
 	

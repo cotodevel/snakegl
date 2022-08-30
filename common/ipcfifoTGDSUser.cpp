@@ -70,7 +70,7 @@ void HandleFifoNotEmptyWeakRef(u32 cmd1, uint32 cmd2){
 	switch (cmd1) {
 		#ifdef ARM7
 		case(FIFO_STOPSOUNDSTREAM_FILE):{
-			player.stop();
+			backgroundMusicPlayer.stop();
 		}
 		break;
 		
