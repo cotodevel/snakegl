@@ -667,7 +667,9 @@ void get_fileinfo (		/* No return code */
 /*-----------------------------------------------------------------------*/
 /* Follow a file path                                                    */
 /*-----------------------------------------------------------------------*/
+#ifdef ARM7
 __attribute__ ((optnone))
+#endif
 FRESULT follow_path (	/* FR_OK(0): successful, !=0: error code */
 	DIR *dj,			/* Directory object to return last directory and found object */
 	BYTE *dir,			/* 32-byte working buffer */
@@ -815,7 +817,9 @@ FRESULT pf_mount (
 /*-----------------------------------------------------------------------*/
 /* Open or Create a File                                                 */
 /*-----------------------------------------------------------------------*/
+#ifdef ARM7
 __attribute__ ((optnone))
+#endif
 FRESULT pf_open (
 	const char *path	/* Pointer to the file name */
 )
@@ -850,7 +854,9 @@ FRESULT pf_open (
 /* Read File                                                             */
 /*-----------------------------------------------------------------------*/
 #if _USE_READ
+#ifdef ARM7
 __attribute__ ((optnone)) 
+#endif
 FRESULT pf_read (
 	void* buff,		/* Pointer to the read buffer (NULL:Forward data to the stream)*/
 	UINT btr,		/* Number of bytes to read */
@@ -861,7 +867,7 @@ FRESULT pf_read (
 	CLUST clst;
 	DWORD sect, remain;
 	UINT rcnt;
-	BYTE cs, *rbuff = buff;
+	BYTE cs, *rbuff = (BYTE*)buff;
 	FATFS *fs = FatFs;
 
 
