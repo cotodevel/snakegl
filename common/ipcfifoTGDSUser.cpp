@@ -69,13 +69,13 @@ __attribute__((section(".itcm")))
 void HandleFifoNotEmptyWeakRef(u32 cmd1, uint32 cmd2){
 	switch (cmd1) {
 		#ifdef ARM7
-		case(FIFO_TGDSVIDEOPLAYER_STOPSOUND):{
+		case(FIFO_STOPSOUNDSTREAM_FILE):{
 			player.stop();
 		}
 		break;
 		
-		case(FIFO_DIRECTVIDEOFRAME_SETUP):{
-			handleARM7FSSetup();
+		case(FIFO_PLAYSOUNDSTREAM_FILE):{
+			playSoundStreamARM7();
 		}
 		break;
 		#endif
@@ -109,7 +109,7 @@ void gameoverSound(){
 	strcpy(filename, "0:/ah.wav");
 	char * filen = FS_getFileName(filename);
 	strcat(filen, ".ima");
-	u32 returnStatus = setupDirectVideoFrameRender((char*)&filen[2], false);
+	playSoundStreamFromFile((char*)&filen[2], false);
 }
 
 void MunchFoodSound(){
@@ -122,12 +122,12 @@ void BgMusic(){
 	strcpy(filename, "0:/stud.wav");
 	char * filen = FS_getFileName(filename);
 	strcat(filen, ".ima");
-	u32 returnStatus = setupDirectVideoFrameRender((char*)&filen[2], true);
+	playSoundStreamFromFile((char*)&filen[2], true);
 }
 
 bool bgMusicEnabled = false;
 void BgMusicOff(){
-	SendFIFOWords(FIFO_TGDSVIDEOPLAYER_STOPSOUND, 0xFF);
+	SendFIFOWords(FIFO_STOPSOUNDSTREAM_FILE, 0xFF);
 	//playSound((u32*)&stud[0], 0, 0, 10);
 }
 
@@ -147,7 +147,7 @@ __attribute__((optimize("O0")))
 #if (!defined(__GNUC__) && defined(__clang__))
 __attribute__ ((optnone))
 #endif
-u32 setupDirectVideoFrameRender(char * videoStructFDFilename, bool loop){
+u32 playSoundStreamFromFile(char * videoStructFDFilename, bool loop){
 	struct sIPCSharedTGDSSpecific* sharedIPC = getsIPCSharedTGDSSpecific();
 	char * filename = (char*)&sharedIPC->filename[0];
 	strcpy(filename, videoStructFDFilename);
@@ -155,7 +155,7 @@ u32 setupDirectVideoFrameRender(char * videoStructFDFilename, bool loop){
 	uint32 * fifomsg = (uint32 *)NDS_UNCACHED_SCRATCHPAD;
 	fifomsg[33] = (uint32)0xFFFFCCAA;
 	fifomsg[34] = (uint32)loop;
-	SendFIFOWords(FIFO_DIRECTVIDEOFRAME_SETUP, 0xFF);
+	SendFIFOWords(FIFO_PLAYSOUNDSTREAM_FILE, 0xFF);
 	while(fifomsg[33] == (uint32)0xFFFFCCAA){
 		swiDelay(1);
 	}

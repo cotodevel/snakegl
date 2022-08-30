@@ -49,8 +49,8 @@ struct sIPCSharedTGDSSpecific {
 
 #endif
 
-#define FIFO_DIRECTVIDEOFRAME_SETUP (u32)(0xFFFFABCB)
-#define FIFO_TGDSVIDEOPLAYER_STOPSOUND (u32)(0xFFAACC02)
+#define FIFO_PLAYSOUNDSTREAM_FILE (u32)(0xFFFFABCB)
+#define FIFO_STOPSOUNDSTREAM_FILE (u32)(0xFFFFABCC)
 
 
 #define NO_VIDEO_PLAYBACK	1
@@ -79,7 +79,7 @@ extern void BgMusicOff();
 extern bool bgMusicEnabled;
 
 #ifdef ARM9
-extern u32 setupDirectVideoFrameRender(char * videoStructFDFilename, bool loop);
+extern u32 playSoundStreamFromFile(char * videoStructFDFilename, bool loop);
 #endif
 
 #ifdef __cplusplus

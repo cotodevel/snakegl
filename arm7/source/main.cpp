@@ -40,7 +40,7 @@ __attribute__((optimize("O0")))
 #if (!defined(__GNUC__) && defined(__clang__))
 __attribute__ ((optnone))
 #endif
-void handleARM7FSSetup(){
+void playSoundStreamARM7(){
 	uint32 * fifomsg = (uint32 *)NDS_CACHED_SCRATCHPAD;			
 	UINT br;	/* Bytes read */
 	uint8_t fresult;

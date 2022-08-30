@@ -39,7 +39,7 @@ extern struct TGDSVideoFrameContext videoCtx;
 extern struct soundPlayerContext soundData;
 extern char fname[256];
 
-extern void handleARM7FSSetup();
+extern void playSoundStreamARM7();
 extern void handleARM7FSRender();
 
 extern bool stopSoundStreamUser();
