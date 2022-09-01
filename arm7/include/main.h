@@ -32,6 +32,8 @@ USA
 #ifdef __cplusplus
 extern "C" {
 extern IMA_Adpcm_Player backgroundMusicPlayer;	//Sound stream Background music Instance
+extern IMA_Adpcm_Player SoundEffect0Player;	//Sound stream Background music Instance
+
 #endif
 
 extern int main(int argc, char **argv);

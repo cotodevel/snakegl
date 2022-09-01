@@ -54,7 +54,7 @@ private:
 	IMA_Adpcm_Data		data;
 	IMA_Adpcm_Data		loop_data;
 	
-	u8		datacache[8192];	//Highest IMA-ADPCM block is 512 bytes but we add some overhead just in case
+	u8		datacache[4096];	//Highest IMA-ADPCM block is 512 bytes but we add some overhead just in case
 	u8*		loop_src;
 	int		loop_cblock;
 	int		loop_state;
@@ -112,14 +112,15 @@ public:
 //**********************************************************************************************
 
 class IMA_Adpcm_Player {
-	IMA_Adpcm_Stream stream;
 	bool autofill;
 	bool paused;
-	bool active;
+	int currentStreamingMode;
 public:
+	IMA_Adpcm_Stream stream;
+	bool active;
 	IMA_Adpcm_Player();
 	wavFormatChunk headerChunk;
-	int play(bool loop_audio, bool automatic_updates, int buffer_length = ADPCM_SIZE*16, closeSoundHandle = NULL, FATFS * inFatfsFILEHandle = NULL);
+	int play(bool loop_audio, bool automatic_updates, int buffer_length = ADPCM_SIZE*16, closeSoundHandle = NULL, FATFS * inFatfsFILEHandle = NULL, int incomingStreamingMode = 0);
 	void pause();
 	void resume();
 	void stop();
