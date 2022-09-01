@@ -69,13 +69,13 @@ __attribute__((section(".itcm")))
 void HandleFifoNotEmptyWeakRef(u32 cmd1, uint32 cmd2){
 	switch (cmd1) {
 		#ifdef ARM7
-		case(FIFO_TGDSVIDEOPLAYER_STOPSOUND):{
-			player.stop();
+		case(FIFO_STOPSOUNDSTREAM_FILE):{
+			backgroundMusicPlayer.stop();
 		}
 		break;
 		
-		case(FIFO_DIRECTVIDEOFRAME_SETUP):{
-			handleARM7FSSetup();
+		case(FIFO_PLAYSOUNDSTREAM_FILE):{
+			playSoundStreamARM7();
 		}
 		break;
 		#endif
@@ -109,11 +109,18 @@ void gameoverSound(){
 	strcpy(filename, "0:/ah.wav");
 	char * filen = FS_getFileName(filename);
 	strcat(filen, ".ima");
-	u32 returnStatus = setupDirectVideoFrameRender((char*)&filen[2], false);
+	u32 streamType = FIFO_PLAYSOUNDSTREAM_FILE;
+	playSoundStreamFromFile((char*)&filen[2], false, streamType);
 }
 
 void MunchFoodSound(){
-	//playSound((u32*)&munchfood[0], munchfood_size, SCHANNEL_ENABLE | SOUND_ONE_SHOT, 9);
+	//ARM7 ADPCM playback 
+	char filename[256];
+	strcpy(filename, "0:/munch.wav");
+	char * filen = FS_getFileName(filename);
+	strcat(filen, ".ima");
+	u32 streamType = FIFO_PLAYSOUNDEFFECT_FILE;
+	playSoundStreamFromFile((char*)&filen[2], false, streamType);
 }
 
 void BgMusic(){
@@ -122,13 +129,13 @@ void BgMusic(){
 	strcpy(filename, "0:/stud.wav");
 	char * filen = FS_getFileName(filename);
 	strcat(filen, ".ima");
-	u32 returnStatus = setupDirectVideoFrameRender((char*)&filen[2], true);
+	u32 streamType = FIFO_PLAYSOUNDSTREAM_FILE;
+	playSoundStreamFromFile((char*)&filen[2], true, streamType);
 }
 
 bool bgMusicEnabled = false;
 void BgMusicOff(){
-	SendFIFOWords(FIFO_TGDSVIDEOPLAYER_STOPSOUND, 0xFF);
-	//playSound((u32*)&stud[0], 0, 0, 10);
+	SendFIFOWords(FIFO_STOPSOUNDSTREAM_FILE, 0xFF);
 }
 
 
@@ -147,7 +154,7 @@ __attribute__((optimize("O0")))
 #if (!defined(__GNUC__) && defined(__clang__))
 __attribute__ ((optnone))
 #endif
-u32 setupDirectVideoFrameRender(char * videoStructFDFilename, bool loop){
+u32 playSoundStreamFromFile(char * videoStructFDFilename, bool loop, u32 streamType){
 	struct sIPCSharedTGDSSpecific* sharedIPC = getsIPCSharedTGDSSpecific();
 	char * filename = (char*)&sharedIPC->filename[0];
 	strcpy(filename, videoStructFDFilename);
@@ -155,7 +162,8 @@ u32 setupDirectVideoFrameRender(char * videoStructFDFilename, bool loop){
 	uint32 * fifomsg = (uint32 *)NDS_UNCACHED_SCRATCHPAD;
 	fifomsg[33] = (uint32)0xFFFFCCAA;
 	fifomsg[34] = (uint32)loop;
-	SendFIFOWords(FIFO_DIRECTVIDEOFRAME_SETUP, 0xFF);
+	fifomsg[35] = (uint32)streamType;
+	SendFIFOWords(FIFO_PLAYSOUNDSTREAM_FILE, 0xFF);
 	while(fifomsg[33] == (uint32)0xFFFFCCAA){
 		swiDelay(1);
 	}
