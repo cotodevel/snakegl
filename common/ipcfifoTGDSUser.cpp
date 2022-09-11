@@ -95,13 +95,6 @@ void HandleFifoEmptyWeakRef(uint32 cmd1,uint32 cmd2){
 //project specific stuff
 
 #ifdef ARM9
-void playSound(u32 * buffer, int bufferSize, u32 flags, int ch){
-	u32 cnt   = flags | SOUND_VOL(127) | SOUND_PAN(64) | (2 << 29) | (0 << 24); //(2=IMA-ADPCM
-	int len = bufferSize;
-	u16 freq = 32000;
-	//writeARM7SoundChannelFromSource(ch, cnt, (u16)freq, (u32)buffer, (u32)len);
-}
-
 bool soundGameOverEmitted = false;
 void gameoverSound(){
 	//ARM7 ADPCM playback 
@@ -164,10 +157,13 @@ u32 playSoundStreamFromFile(char * videoStructFDFilename, bool loop, u32 streamT
 	fifomsg[34] = (uint32)loop;
 	fifomsg[35] = (uint32)streamType;
 	SendFIFOWords(FIFO_PLAYSOUNDSTREAM_FILE, 0xFF);
-	while(fifomsg[33] == (uint32)0xFFFFCCAA){
-		swiDelay(1);
+	//If audio stream track... reset everytime entirely. Otherwise for sound effects play right away
+	if(streamType != FIFO_PLAYSOUNDEFFECT_FILE){
+		while(fifomsg[33] == (uint32)0xFFFFCCAA){
+			swiDelay(1);
+		}
+		return fifomsg[33];
 	}
-	return fifomsg[33];
 }
 
 #endif
