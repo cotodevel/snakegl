@@ -40,6 +40,7 @@ USA
 #include "timerTGDS.h"
 #include "keypadTGDS.h"
 #include "biosTGDS.h"
+#include "InterruptsARMCores_h.h"
 
 //snake GL
 #include "base.h"
@@ -431,6 +432,7 @@ int DrawGLScene(){
 		glPolyFmt(GX_LIGHT0 | POLY_ALPHA(31) | POLY_CULL_NONE);
 		game->display();
 		glFlush();
+		HaltUntilIRQ(); //Save power until next Vblank
 	}
 	
 	return true;										// Keep Going
