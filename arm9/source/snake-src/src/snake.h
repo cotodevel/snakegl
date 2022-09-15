@@ -29,6 +29,7 @@ extern void load_image(const char* filename);
 extern void enable_2D_texture();
 extern void disable_2D_texture();
 extern void draw_cube(float size, Point p, int res_id);
+extern void drawSphereNDS();
 extern void drawSphere();
 extern void load_resources();
 extern void unload_resources();
@@ -42,7 +43,7 @@ extern void glut2SolidCube(GLdouble size);
 extern GLint DLEN2DTEX;
 extern GLint DLDIS2DTEX;
 extern GLint DLSOLIDCUBE05F;
-
+extern GLint DLSPHERE;
 extern void setupDLEnableDisable2DTextures();
 
 #endif

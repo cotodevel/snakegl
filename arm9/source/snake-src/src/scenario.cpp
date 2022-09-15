@@ -161,7 +161,12 @@ void Scenario::draw_food()
 		glPolyFmt(GX_LIGHT0 | POLY_ALPHA(31) | POLY_CULL_NONE);
 		#endif
 		glColor3f(1.0f, 1.0f, 14.0f);
+		#ifdef WIN32
 		drawSphere();
+		#endif
+		#ifdef ARM9
+		drawSphereNDS();
+		#endif
 	#ifdef WIN32
     glPopMatrix();
 	#endif
