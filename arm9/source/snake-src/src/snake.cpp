@@ -3,6 +3,7 @@
 #include "debugNocash.h"
 #include "game.h"
 #include "timerTGDS.h"
+#include "Sphere008.h"
 #endif
 
 //
@@ -405,35 +406,13 @@ void draw_cube(float size, Point p, int res_id)
 
 //This will be replaced by a NintendoDS display list sphere later because ARM9 cpu sucks for building more than 3 spheres realtime
 void drawSphere(){
-	glCallList(DLSPHERE);  
-}
-
-void drawSphereNDS(){
-    const float PI = 3.141592f;
-    GLfloat x, y, z, alpha, beta; // Storage for coordinates and angles        
-    GLfloat radius = 0.7f;
-    int gradation = 9;
-
-    for (alpha = 0.0; alpha <  PI; alpha += PI/gradation)
-    {        
-        glBegin(GL_TRIANGLE_STRIP);
-        for (beta = 0.0; beta < 2.01*PI; beta += PI/gradation)            
-        {            
-            x = radius*cos(beta)*sin(alpha);
-            y = radius*sin(beta)*sin(alpha);
-            z = radius*cos(alpha);
-			glNormal3f(-y, x, z);
-			glTexCoord2f(y, -x * z);
-			glVertex3f(x, y, z);
-			x = radius*cos(beta)*sin(alpha + PI/gradation);
-            y = radius*sin(beta)*sin(alpha + PI/gradation);
-            z = radius*cos(alpha + PI/gradation);            
-            glNormal3f(-y, x, z);
-			glTexCoord2f(y, -x * z);
-			glVertex3f(x, y, z);            
-        }        
-        glEnd();
-    }
+    #ifdef WIN32
+	glCallList(DLSPHERE);
+    #endif
+	#ifdef ARM9
+    // Execute the display list
+    glCallListGX((u32*)&Sphere008);
+	#endif
 }
 
 void load_resources()

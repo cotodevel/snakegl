@@ -29,7 +29,6 @@ extern void load_image(const char* filename);
 extern void enable_2D_texture();
 extern void disable_2D_texture();
 extern void draw_cube(float size, Point p, int res_id);
-extern void drawSphereNDS();
 extern void drawSphere();
 extern void load_resources();
 extern void unload_resources();
