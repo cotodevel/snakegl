@@ -404,7 +404,6 @@ void draw_cube(float size, Point p, int res_id)
     disable_2D_texture();
 }
 
-//This will be replaced by a NintendoDS display list sphere later because ARM9 cpu sucks for building more than 3 spheres realtime
 void drawSphere(){
     #ifdef WIN32
 	glCallList(DLSPHERE);
