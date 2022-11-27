@@ -3,6 +3,7 @@
 #include "debugNocash.h"
 #include "game.h"
 #include "timerTGDS.h"
+#include "Sphere008.h"
 #endif
 
 //
@@ -191,6 +192,7 @@ void load_image(const char* filename)
 GLint DLEN2DTEX = -1;
 GLint DLDIS2DTEX = -1;
 GLint DLSOLIDCUBE05F = -1;
+GLint DLSPHERE = -1;
 
 
 #ifdef ARM9
@@ -202,7 +204,7 @@ __attribute__((optnone))
 #endif
 #endif
 void setupDLEnableDisable2DTextures(){
-	DLEN2DTEX=glGenLists(5);									// Generate Different Lists
+	DLEN2DTEX=glGenLists(4);									// Generate Different Lists
 	glNewList(DLEN2DTEX,GL_COMPILE);							// 1: enable_2D_texture()
 	{
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -310,8 +312,61 @@ void setupDLEnableDisable2DTextures(){
 		}
 	}
 	glEndList();
-}
 
+	
+	DLSPHERE=DLSOLIDCUBE05F+1;										
+	glNewList(DLSPHERE,GL_COMPILE);							// 4: draw sphere
+	{
+		#define TWOPI ((double)((3.141592f)*2))
+		double r=0.6,faces=12;
+		double PID2 = 6*5; //6*4 move tex to upper sphere end
+		double ex=0,ey=0,ez=0,px=0,py=0,pz=0,cx=0,cy=0,cz=0;
+   
+		//internal
+		int i,j;
+		double theta1,theta2,theta3;
+		if (r < 0)
+			r = -r;
+		if (faces < 0)
+			faces = -faces;
+		if (faces < 4 || r <= 0) {
+			return;
+		}
+		for (j=0;j<faces/2;j++) {
+			theta1 = j * TWOPI / faces - PID2;
+			theta2 = (j + 1) * TWOPI / faces - PID2;
+
+			glBegin(GL_TRIANGLE_STRIP);
+			for (i=0;i<=faces;i++) {
+				theta3 = i * TWOPI / faces;
+				ex = cos(theta2) * cos(theta3);
+				ey = sin(theta2);
+				ez = cos(theta2) * sin(theta3);
+				px = cx + r * ex;
+				py = cy + r * ey;
+				pz = cz + r * ez;
+
+				glNormal3f(ex,ey,ez);
+				glTexCoord2f(-i/(double)faces,2*(j+1)/(double)faces);
+				glVertex3f(px,py,pz);
+
+				ex = cos(theta1) * cos(theta3);
+				ey = sin(theta1);
+				ez = cos(theta1) * sin(theta3);
+				px = cx + r * ex;
+				py = cy + r * ey;
+				pz = cz + r * ez;
+
+				glNormal3f(ex,ey,ez);
+				glTexCoord2f(-i/(double)faces,2*j/(double)faces);
+				glVertex3f(px,py,pz);
+			}
+			glEnd();
+		}
+	}
+	glEndList();
+
+}
 
 void enable_2D_texture(){
 	glCallList(DLEN2DTEX);
@@ -349,33 +404,14 @@ void draw_cube(float size, Point p, int res_id)
     disable_2D_texture();
 }
 
-//OpenGL DL seems to be broken for complex prebaked models. todo fix
 void drawSphere(){
-    const float PI = 3.141592f;
-    GLfloat x, y, z, alpha, beta; // Storage for coordinates and angles        
-    GLfloat radius = 0.7f;
-    int gradation = 9;
-
-    for (alpha = 0.0; alpha <  PI; alpha += PI/gradation)
-    {        
-        glBegin(GL_TRIANGLE_STRIP);
-        for (beta = 0.0; beta < 2.01*PI; beta += PI/gradation)            
-        {            
-            x = radius*cos(beta)*sin(alpha);
-            y = radius*sin(beta)*sin(alpha);
-            z = radius*cos(alpha);
-			glNormal3f(-y, x, z);
-			glTexCoord2f(y, -x * z);
-			glVertex3f(x, y, z);
-			x = radius*cos(beta)*sin(alpha + PI/gradation);
-            y = radius*sin(beta)*sin(alpha + PI/gradation);
-            z = radius*cos(alpha + PI/gradation);            
-            glNormal3f(-y, x, z);
-			glTexCoord2f(y, -x * z);
-			glVertex3f(x, y, z);            
-        }        
-        glEnd();
-    }
+    #ifdef WIN32
+	glCallList(DLSPHERE);
+    #endif
+	#ifdef ARM9
+    // Execute the display list
+    glCallListGX((u32*)&Sphere008);
+	#endif
 }
 
 void load_resources()

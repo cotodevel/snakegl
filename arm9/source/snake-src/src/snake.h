@@ -42,7 +42,7 @@ extern void glut2SolidCube(GLdouble size);
 extern GLint DLEN2DTEX;
 extern GLint DLDIS2DTEX;
 extern GLint DLSOLIDCUBE05F;
-
+extern GLint DLSPHERE;
 extern void setupDLEnableDisable2DTextures();
 
 #endif
