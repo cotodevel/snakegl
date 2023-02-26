@@ -330,7 +330,7 @@ int main(int argc, char **argv) {
 	#if defined(WIN32)
 	glutMainLoop();
 	#endif
-	glMaterialShinnyness();
+	glMaterialShinnyness(USERSPACE_TGDS_OGL_DL_POINTER);
 	menuShow();
 	
 	while (1){
@@ -348,16 +348,16 @@ GLvoid ReSizeGLScene(GLsizei width, GLsizei height)		// Resize And Initialize Th
 		height=1;										// Making Height Equal One
 	}
 
-	glViewport(0,0,width,height);						// Reset The Current Viewport
+	glViewport(0,0,width,height, USERSPACE_TGDS_OGL_DL_POINTER);						// Reset The Current Viewport
 
-	glMatrixMode(GL_PROJECTION);						// Select The Projection Matrix
-	glLoadIdentity();									// Reset The Projection Matrix
+	glMatrixMode(GL_PROJECTION, USERSPACE_TGDS_OGL_DL_POINTER);						// Select The Projection Matrix
+	glLoadIdentity(USERSPACE_TGDS_OGL_DL_POINTER);									// Reset The Projection Matrix
 
 	// Calculate The Aspect Ratio Of The Window
-	gluPerspective(45.0f,(GLfloat)width/(GLfloat)height,0.1f,100.0f);
+	gluPerspective(45.0f,(GLfloat)width/(GLfloat)height,0.1f,100.0f, USERSPACE_TGDS_OGL_DL_POINTER);
 
-	glMatrixMode(GL_MODELVIEW);							// Select The Modelview Matrix
-	glLoadIdentity();									// Reset The Modelview Matrix
+	glMatrixMode(GL_MODELVIEW, USERSPACE_TGDS_OGL_DL_POINTER);							// Select The Modelview Matrix
+	glLoadIdentity(USERSPACE_TGDS_OGL_DL_POINTER);									// Reset The Modelview Matrix
 }
 
 int InitGL()										// All Setup For OpenGL Goes Here
@@ -418,20 +418,20 @@ int DrawGLScene(){
 	}
 
 	{
-		glReset(); //Clear The Screen And The Depth Buffer
+		glReset(USERSPACE_TGDS_OGL_DL_POINTER); //Clear The Screen And The Depth Buffer
 		//Handle keypress
 		game->on_key_pressed(keysDown());
 		
 		//Handle Display
 		//glViewport(width / 2, height / 2, 100, 100);
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
+		glMatrixMode(GL_PROJECTION, USERSPACE_TGDS_OGL_DL_POINTER);
+		glLoadIdentity(USERSPACE_TGDS_OGL_DL_POINTER);
 		
 		//not a real gl function and will likely change
 		#define GX_LIGHT0 (1 << 0)
-		glPolyFmt(GX_LIGHT0 | POLY_ALPHA(31) | POLY_CULL_NONE);
+		glPolyFmt(GX_LIGHT0 | POLY_ALPHA(31) | POLY_CULL_NONE, USERSPACE_TGDS_OGL_DL_POINTER);
 		game->display();
-		glFlush();
+		glFlush(USERSPACE_TGDS_OGL_DL_POINTER);
 		HaltUntilIRQ(); //Save power until next Vblank
 	}
 	
