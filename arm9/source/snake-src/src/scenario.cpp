@@ -57,24 +57,24 @@ void Scenario::change_food_pos()
 void Scenario::draw_board()
 {
     enable_2D_texture();
-    glPushMatrix();
+    glPushMatrix(USERSPACE_TGDS_OGL_DL_POINTER);
 		#ifdef WIN32
         glBindTexture(GL_TEXTURE_2D, texturesSnakeGL[GROUND_TEXTURE]);
         #endif
 		#ifdef ARM9
-		glBindTexture(0, texturesSnakeGL[GROUND_TEXTURE]);
+		glBindTexture(0, texturesSnakeGL[GROUND_TEXTURE], USERSPACE_TGDS_OGL_DL_POINTER);
 		#endif
-		glBegin(GL_QUADS);
-            glNormal3i(0.0, 1.0, 0.0);
-            glTexCoord2f(0, 0);
-            glVertex3f(-BOARD_SIZE, 0,  BOARD_SIZE);
-            glTexCoord2f(1, 0);
-            glVertex3f( BOARD_SIZE, 0,  BOARD_SIZE);
-            glTexCoord2f(1, 1);
-            glVertex3f( BOARD_SIZE, 0, -BOARD_SIZE);
-            glTexCoord2f(0, 1);
-            glVertex3f(-BOARD_SIZE, 0, -BOARD_SIZE);
-        glEnd();
+		glBegin(GL_QUADS, USERSPACE_TGDS_OGL_DL_POINTER);
+            glNormal3i(0.0, 1.0, 0.0, USERSPACE_TGDS_OGL_DL_POINTER);
+            glTexCoord2f(0, 0, USERSPACE_TGDS_OGL_DL_POINTER);
+            glVertex3f(-BOARD_SIZE, 0,  BOARD_SIZE, USERSPACE_TGDS_OGL_DL_POINTER);
+            glTexCoord2f(1, 0, USERSPACE_TGDS_OGL_DL_POINTER);
+            glVertex3f( BOARD_SIZE, 0,  BOARD_SIZE, USERSPACE_TGDS_OGL_DL_POINTER);
+            glTexCoord2f(1, 1, USERSPACE_TGDS_OGL_DL_POINTER);
+            glVertex3f( BOARD_SIZE, 0, -BOARD_SIZE, USERSPACE_TGDS_OGL_DL_POINTER);
+            glTexCoord2f(0, 1, USERSPACE_TGDS_OGL_DL_POINTER);
+            glVertex3f(-BOARD_SIZE, 0, -BOARD_SIZE, USERSPACE_TGDS_OGL_DL_POINTER);
+        glEnd(USERSPACE_TGDS_OGL_DL_POINTER);
 		
         Point p;
         double size = -BOARD_SIZE - 0.1;
@@ -104,7 +104,7 @@ void Scenario::draw_board()
             size += 0.25f;
         }
 	#ifdef ARM9
-    glPopMatrix(1);
+    glPopMatrix(1, USERSPACE_TGDS_OGL_DL_POINTER);
 	#endif
 	#ifdef WIN32
     glPopMatrix();
@@ -118,27 +118,27 @@ void Scenario::draw_food()
     //draw_sphere(0.25f, p, FOOD_TEXTURE);
 
     // "leaf"
-	glPushMatrix();
-        glTranslatef(p.x, p.y + m + 0.45, p.z);
-        glRotatef(a, 0.0, 1.0, 0.0);
+	glPushMatrix(USERSPACE_TGDS_OGL_DL_POINTER);
+        glTranslatef(p.x, p.y + m + 0.45, p.z, USERSPACE_TGDS_OGL_DL_POINTER);
+        glRotatef(a, 0.0, 1.0, 0.0, USERSPACE_TGDS_OGL_DL_POINTER);
 		#ifdef ARM9
         //Apply GX polygon properties (lights) before rendering vertices (leaf object)
 		#define GX_LIGHT0 (1 << 0)
-		glPolyFmt(GX_LIGHT0 | POLY_ALPHA(31) | POLY_CULL_NONE);
+		glPolyFmt(GX_LIGHT0 | POLY_ALPHA(31) | POLY_CULL_NONE, USERSPACE_TGDS_OGL_DL_POINTER);
 		#endif
-        glColor3f(0.0f, 200.4f, 0.0f);
-         glBegin(GL_TRIANGLE_STRIP);
-            glVertex3f(0, 0, 0.3);
-            glVertex3f(0, 0, 0.4);
-            glVertex3f(0.1, -0.01, 0.5);
+        glColor3f(0.0f, 200.4f, 0.0f, USERSPACE_TGDS_OGL_DL_POINTER);
+         glBegin(GL_TRIANGLE_STRIP, USERSPACE_TGDS_OGL_DL_POINTER);
+            glVertex3f(0, 0, 0.3, USERSPACE_TGDS_OGL_DL_POINTER);
+            glVertex3f(0, 0, 0.4, USERSPACE_TGDS_OGL_DL_POINTER);
+            glVertex3f(0.1, -0.01, 0.5, USERSPACE_TGDS_OGL_DL_POINTER);
 
-            glVertex3f(0.1, -0.01, 1.0);
-            glVertex3f(0.15, -0.02, 1.0);
-            glVertex3f(0.15, -0.02, 1.0);
+            glVertex3f(0.1, -0.01, 1.0, USERSPACE_TGDS_OGL_DL_POINTER);
+            glVertex3f(0.15, -0.02, 1.0, USERSPACE_TGDS_OGL_DL_POINTER);
+            glVertex3f(0.15, -0.02, 1.0, USERSPACE_TGDS_OGL_DL_POINTER);
             
-        glEnd();
+        glEnd(USERSPACE_TGDS_OGL_DL_POINTER);
 	#ifdef ARM9
-	glPopMatrix(1);
+	glPopMatrix(1, USERSPACE_TGDS_OGL_DL_POINTER);
 	#endif
     #ifdef WIN32
 	glPopMatrix();
@@ -146,27 +146,27 @@ void Scenario::draw_food()
     
 	enable_2D_texture();
 
-    glPushMatrix();
+    glPushMatrix(USERSPACE_TGDS_OGL_DL_POINTER);
 		#ifdef WIN32
         glBindTexture(GL_TEXTURE_2D, texturesSnakeGL[FOOD_TEXTURE]);
         #endif
 		#ifdef ARM9
-		glBindTexture(0, texturesSnakeGL[FOOD_TEXTURE]);
+		glBindTexture(0, texturesSnakeGL[FOOD_TEXTURE], USERSPACE_TGDS_OGL_DL_POINTER);
 		#endif
-        glTranslatef(p.x, p.y + m, p.z);
-        glRotatef(a, 0.0, 1.0, 0.0);
+        glTranslatef(p.x, p.y + m, p.z, USERSPACE_TGDS_OGL_DL_POINTER);
+        glRotatef(a, 0.0, 1.0, 0.0, USERSPACE_TGDS_OGL_DL_POINTER);
 		#ifdef ARM9
 		//Apply GX polygon properties (lights) before rendering vertices (fruit object)
 		#define GX_LIGHT0 (1 << 0)
-		glPolyFmt(GX_LIGHT0 | POLY_ALPHA(31) | POLY_CULL_NONE);
+		glPolyFmt(GX_LIGHT0 | POLY_ALPHA(31) | POLY_CULL_NONE, USERSPACE_TGDS_OGL_DL_POINTER);
 		#endif
-		glColor3f(1.0f, 1.0f, 14.0f);
+		glColor3f(1.0f, 1.0f, 14.0f, USERSPACE_TGDS_OGL_DL_POINTER);
 		drawSphere();
 	#ifdef WIN32
     glPopMatrix();
 	#endif
 	#ifdef ARM9
-	glPopMatrix(1);
+	glPopMatrix(1, USERSPACE_TGDS_OGL_DL_POINTER);
 	#endif
     disable_2D_texture();
 }
@@ -236,8 +236,8 @@ void Scenario::change_camera_pos(){
 
 void Scenario::set_camera()
 {
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
+    glMatrixMode(GL_PROJECTION, USERSPACE_TGDS_OGL_DL_POINTER);
+    glLoadIdentity(USERSPACE_TGDS_OGL_DL_POINTER);
 
     camera.upX    = 0.0f;
     camera.upY    = 1.0f;
@@ -336,15 +336,15 @@ void Scenario::set_camera()
     }
     
     //Set initial view to look at
-    gluPerspective(20, 256.0 / 192.0, 0.1, 140);
+    gluPerspective(20, 256.0 / 192.0, 0.1, 140, USERSPACE_TGDS_OGL_DL_POINTER);
     gluLookAt(camera.eyeX, camera.eyeY, camera.eyeZ,		//camera possition / eye
                 camera.centerX, camera.centerY, camera.centerZ,		//look at / center 
-                camera.upX, camera.upY, camera.upZ);		//up X,Y,Z
+                camera.upX, camera.upY, camera.upZ, USERSPACE_TGDS_OGL_DL_POINTER);		//up X,Y,Z
 
 	if (close_camera_mode != true){
-		glRotateX(90.0f);
-	    glRotateY(45.0f);
+		glRotateX(90.0f, USERSPACE_TGDS_OGL_DL_POINTER);
+	    glRotateY(45.0f, USERSPACE_TGDS_OGL_DL_POINTER);
 	}
 	#endif
-    glMatrixMode(GL_MODELVIEW);
+    glMatrixMode(GL_MODELVIEW, USERSPACE_TGDS_OGL_DL_POINTER);
 }

@@ -58,35 +58,35 @@ void Snake::draw()
     // Use glut2Cylinder. 
     Point h = points[0];
 
-    glColor3f(1.0, 1.0, 0.6);
-    glPushMatrix();
-        glTranslatef(h.x, h.y, h.z);
+    glColor3f(1.0, 1.0, 0.6, USERSPACE_TGDS_OGL_DL_POINTER);
+    glPushMatrix(USERSPACE_TGDS_OGL_DL_POINTER);
+        glTranslatef(h.x, h.y, h.z, USERSPACE_TGDS_OGL_DL_POINTER);
         glut2SolidCube05f();
 	#ifdef WIN32
     glPopMatrix();
 	#endif
 	#ifdef ARM9
-	glPopMatrix(1);
+	glPopMatrix(1, USERSPACE_TGDS_OGL_DL_POINTER);
     #endif
     enable_2D_texture();
 	#ifdef WIN32
     glBindTexture(GL_TEXTURE_2D, texturesSnakeGL[SNAKE_TEXTURE]);
 	#endif
 	#ifdef ARM9
-	glBindTexture(0, texturesSnakeGL[SNAKE_TEXTURE]);
+	glBindTexture(0, texturesSnakeGL[SNAKE_TEXTURE], USERSPACE_TGDS_OGL_DL_POINTER);
 	#endif
     for (size_t i = 1; i < points.size(); ++i)
     {
         Point p = points.at(i);
 
-        glPushMatrix();
-            glTranslatef(p.x, p.y, p.z);
+        glPushMatrix(USERSPACE_TGDS_OGL_DL_POINTER);
+            glTranslatef(p.x, p.y, p.z, USERSPACE_TGDS_OGL_DL_POINTER);
             glut2SolidCube05f();
 		#ifdef WIN32
         glPopMatrix();
 		#endif
 		#ifdef ARM9
-		glPopMatrix(1);
+		glPopMatrix(1, USERSPACE_TGDS_OGL_DL_POINTER);
 		#endif
     }
 
@@ -204,13 +204,13 @@ __attribute__((optnone))
 #endif
 #endif
 void setupDLEnableDisable2DTextures(){
-	DLEN2DTEX=glGenLists(4);									// Generate Different Lists
-	glNewList(DLEN2DTEX,GL_COMPILE);							// 1: enable_2D_texture()
+	DLEN2DTEX=glGenLists(4, USERSPACE_TGDS_OGL_DL_POINTER);									// Generate Different Lists
+	glNewList(DLEN2DTEX,GL_COMPILE, USERSPACE_TGDS_OGL_DL_POINTER);							// 1: enable_2D_texture()
 	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT, USERSPACE_TGDS_OGL_DL_POINTER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT, USERSPACE_TGDS_OGL_DL_POINTER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR, USERSPACE_TGDS_OGL_DL_POINTER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR, USERSPACE_TGDS_OGL_DL_POINTER);
 
         GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
         GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -222,24 +222,24 @@ void setupDLEnableDisable2DTextures(){
         GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f };
         GLfloat high_shininess[] = { 0.0f };
 
-        glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
-        glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
-        glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-        glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+        glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient, USERSPACE_TGDS_OGL_DL_POINTER);
+        glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse, USERSPACE_TGDS_OGL_DL_POINTER);
+        glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular, USERSPACE_TGDS_OGL_DL_POINTER);
+        glLightfv(GL_LIGHT0, GL_POSITION, light_position, USERSPACE_TGDS_OGL_DL_POINTER);
     
-        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   mat_ambient);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   mat_diffuse);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  mat_specular);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, high_shininess);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   mat_ambient, USERSPACE_TGDS_OGL_DL_POINTER);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   mat_diffuse, USERSPACE_TGDS_OGL_DL_POINTER);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  mat_specular, USERSPACE_TGDS_OGL_DL_POINTER);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, high_shininess, USERSPACE_TGDS_OGL_DL_POINTER);
 	}
-	glEndList();
+	glEndList(USERSPACE_TGDS_OGL_DL_POINTER);
 	DLDIS2DTEX=DLEN2DTEX+1;										
-	glNewList(DLDIS2DTEX,GL_COMPILE);							// 2: disable_2D_texture()
+	glNewList(DLDIS2DTEX,GL_COMPILE, USERSPACE_TGDS_OGL_DL_POINTER);							// 2: disable_2D_texture()
 	{
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT, USERSPACE_TGDS_OGL_DL_POINTER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT, USERSPACE_TGDS_OGL_DL_POINTER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR, USERSPACE_TGDS_OGL_DL_POINTER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR, USERSPACE_TGDS_OGL_DL_POINTER);
 
         GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
         GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -251,21 +251,21 @@ void setupDLEnableDisable2DTextures(){
         GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f };
         GLfloat high_shininess[] = { 100.0f };
 
-        glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
-        glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
-        glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-        glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+        glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient, USERSPACE_TGDS_OGL_DL_POINTER);
+        glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse, USERSPACE_TGDS_OGL_DL_POINTER);
+        glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular, USERSPACE_TGDS_OGL_DL_POINTER);
+        glLightfv(GL_LIGHT0, GL_POSITION, light_position, USERSPACE_TGDS_OGL_DL_POINTER);
     
-        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   mat_ambient);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   mat_diffuse);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  mat_specular);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, high_shininess);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   mat_ambient, USERSPACE_TGDS_OGL_DL_POINTER);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   mat_diffuse, USERSPACE_TGDS_OGL_DL_POINTER);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  mat_specular, USERSPACE_TGDS_OGL_DL_POINTER);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, high_shininess, USERSPACE_TGDS_OGL_DL_POINTER);
 	}
-	glEndList();
+	glEndList(USERSPACE_TGDS_OGL_DL_POINTER);
 
 
 	DLSOLIDCUBE05F=DLDIS2DTEX+1;										
-	glNewList(DLSOLIDCUBE05F,GL_COMPILE);							// 3: draw solid cube: 0.5f()
+	glNewList(DLSOLIDCUBE05F,GL_COMPILE, USERSPACE_TGDS_OGL_DL_POINTER);							// 3: draw solid cube: 0.5f()
 	{
 		float size = 0.5f;
 		GLfloat n[6][3] =
@@ -298,24 +298,24 @@ void setupDLEnableDisable2DTextures(){
 
 		for (i = 5; i >= 0; i--)
 		{
-			glBegin(GL_QUADS);
-				glNormal3fv(&n[i][0]);
-				glTexCoord2f(0, 0);
-				glVertex3fv(&v[faces[i][0]][0]);
-				glTexCoord2f(1, 0);
-				glVertex3fv(&v[faces[i][1]][0]);
-				glTexCoord2f(1, 1);
-				glVertex3fv(&v[faces[i][2]][0]);
-				glTexCoord2f(0, 1);
-				glVertex3fv(&v[faces[i][3]][0]);
-			glEnd();
+			glBegin(GL_QUADS, USERSPACE_TGDS_OGL_DL_POINTER);
+				glNormal3fv(&n[i][0], USERSPACE_TGDS_OGL_DL_POINTER);
+				glTexCoord2f(0, 0, USERSPACE_TGDS_OGL_DL_POINTER);
+				glVertex3fv(&v[faces[i][0]][0], USERSPACE_TGDS_OGL_DL_POINTER);
+				glTexCoord2f(1, 0, USERSPACE_TGDS_OGL_DL_POINTER);
+				glVertex3fv(&v[faces[i][1]][0], USERSPACE_TGDS_OGL_DL_POINTER);
+				glTexCoord2f(1, 1, USERSPACE_TGDS_OGL_DL_POINTER);
+				glVertex3fv(&v[faces[i][2]][0], USERSPACE_TGDS_OGL_DL_POINTER);
+				glTexCoord2f(0, 1, USERSPACE_TGDS_OGL_DL_POINTER);
+				glVertex3fv(&v[faces[i][3]][0], USERSPACE_TGDS_OGL_DL_POINTER);
+			glEnd(USERSPACE_TGDS_OGL_DL_POINTER);
 		}
 	}
-	glEndList();
+	glEndList(USERSPACE_TGDS_OGL_DL_POINTER);
 
 	
 	DLSPHERE=DLSOLIDCUBE05F+1;										
-	glNewList(DLSPHERE,GL_COMPILE);							// 4: draw sphere
+	glNewList(DLSPHERE,GL_COMPILE, USERSPACE_TGDS_OGL_DL_POINTER);							// 4: draw sphere
 	{
 		#define TWOPI ((double)((3.141592f)*2))
 		double r=0.6,faces=12;
@@ -336,7 +336,7 @@ void setupDLEnableDisable2DTextures(){
 			theta1 = j * TWOPI / faces - PID2;
 			theta2 = (j + 1) * TWOPI / faces - PID2;
 
-			glBegin(GL_TRIANGLE_STRIP);
+			glBegin(GL_TRIANGLE_STRIP, USERSPACE_TGDS_OGL_DL_POINTER);
 			for (i=0;i<=faces;i++) {
 				theta3 = i * TWOPI / faces;
 				ex = cos(theta2) * cos(theta3);
@@ -346,9 +346,9 @@ void setupDLEnableDisable2DTextures(){
 				py = cy + r * ey;
 				pz = cz + r * ez;
 
-				glNormal3f(ex,ey,ez);
-				glTexCoord2f(-i/(double)faces,2*(j+1)/(double)faces);
-				glVertex3f(px,py,pz);
+				glNormal3f(ex,ey,ez, USERSPACE_TGDS_OGL_DL_POINTER);
+				glTexCoord2f(-i/(double)faces,2*(j+1)/(double)faces, USERSPACE_TGDS_OGL_DL_POINTER);
+				glVertex3f(px,py,pz, USERSPACE_TGDS_OGL_DL_POINTER);
 
 				ex = cos(theta1) * cos(theta3);
 				ey = sin(theta1);
@@ -357,26 +357,26 @@ void setupDLEnableDisable2DTextures(){
 				py = cy + r * ey;
 				pz = cz + r * ez;
 
-				glNormal3f(ex,ey,ez);
-				glTexCoord2f(-i/(double)faces,2*j/(double)faces);
-				glVertex3f(px,py,pz);
+				glNormal3f(ex,ey,ez, USERSPACE_TGDS_OGL_DL_POINTER);
+				glTexCoord2f(-i/(double)faces,2*j/(double)faces, USERSPACE_TGDS_OGL_DL_POINTER);
+				glVertex3f(px,py,pz, USERSPACE_TGDS_OGL_DL_POINTER);
 			}
-			glEnd();
+			glEnd(USERSPACE_TGDS_OGL_DL_POINTER);
 		}
 	}
-	glEndList();
+	glEndList(USERSPACE_TGDS_OGL_DL_POINTER);
 
 }
 
 void enable_2D_texture(){
-	glCallList(DLEN2DTEX);
+	glCallList(DLEN2DTEX, USERSPACE_TGDS_OGL_DL_POINTER);
 	#ifdef WIN32
 	glEnable(GL_TEXTURE_2D); //win32 only
 	#endif
 }
 
 void disable_2D_texture(){
-	glCallList(DLDIS2DTEX);
+	glCallList(DLDIS2DTEX, USERSPACE_TGDS_OGL_DL_POINTER);
 	#ifdef WIN32
 	glDisable(GL_TEXTURE_2D); //win32 only
 	#endif
@@ -386,17 +386,17 @@ void draw_cube(float size, Point p, int res_id)
 {
     enable_2D_texture();
 
-    glPushMatrix();
+    glPushMatrix(USERSPACE_TGDS_OGL_DL_POINTER);
 		#ifdef ARM9
-        glBindTexture(0, texturesSnakeGL[res_id]);
+        glBindTexture(0, texturesSnakeGL[res_id], USERSPACE_TGDS_OGL_DL_POINTER);
 		#endif
 		#ifdef WIN32
 		glBindTexture(GL_TEXTURE_2D, texturesSnakeGL[res_id]);
 		#endif
-		glTranslatef(p.x, p.y, p.z);
+		glTranslatef(p.x, p.y, p.z, USERSPACE_TGDS_OGL_DL_POINTER);
         glut2SolidCube(size);
 	#ifdef ARM9
-    glPopMatrix(1);
+    glPopMatrix(1, USERSPACE_TGDS_OGL_DL_POINTER);
 	#endif
 	#ifdef WIN32
     glPopMatrix();
@@ -478,10 +478,10 @@ void glut2SolidCube05f(){
 	#ifdef ARM9
     //Apply GX polygon properties (lights) before rendering vertices (snake body object)
 	#define GX_LIGHT0 (1 << 0)
-	glPolyFmt(GX_LIGHT0 | POLY_ALPHA(31) | POLY_CULL_NONE);
+	glPolyFmt(GX_LIGHT0 | POLY_ALPHA(31) | POLY_CULL_NONE, USERSPACE_TGDS_OGL_DL_POINTER);
 	#endif
-	glColor3f(1.0f, 1.0f, 14.0f);
-	glCallList(DLSOLIDCUBE05F);
+	glColor3f(1.0f, 1.0f, 14.0f, USERSPACE_TGDS_OGL_DL_POINTER);
+	glCallList(DLSOLIDCUBE05F, USERSPACE_TGDS_OGL_DL_POINTER);
 }
 
 void glut2SolidCube(GLdouble size){
@@ -515,23 +515,23 @@ void glut2SolidCube(GLdouble size){
 
     for (i = 5; i >= 0; i--)
     {
-        glBegin(GL_QUADS);
+        glBegin(GL_QUADS, USERSPACE_TGDS_OGL_DL_POINTER);
 			#ifdef ARM9
         	//Apply GX polygon properties (lights) before rendering vertices (snake head object)
 			#define GX_LIGHT0 (1 << 0)
-			glPolyFmt(GX_LIGHT0 | POLY_ALPHA(31) | POLY_CULL_NONE);
+			glPolyFmt(GX_LIGHT0 | POLY_ALPHA(31) | POLY_CULL_NONE, USERSPACE_TGDS_OGL_DL_POINTER);
 			#endif
-			glColor3f(1.0f, 1.0f, 14.0f);
-            glNormal3fv(&n[i][0]);
-            glTexCoord2f(0, 0);
-			glVertex3fv(&v[faces[i][0]][0]);
-            glTexCoord2f(1, 0);
-            glVertex3fv(&v[faces[i][1]][0]);
-            glTexCoord2f(1, 1);
-            glVertex3fv(&v[faces[i][2]][0]);
-            glTexCoord2f(0, 1);
-            glVertex3fv(&v[faces[i][3]][0]);
-        glEnd();
+			glColor3f(1.0f, 1.0f, 14.0f, USERSPACE_TGDS_OGL_DL_POINTER);
+            glNormal3fv(&n[i][0], USERSPACE_TGDS_OGL_DL_POINTER);
+            glTexCoord2f(0, 0, USERSPACE_TGDS_OGL_DL_POINTER);
+			glVertex3fv(&v[faces[i][0]][0], USERSPACE_TGDS_OGL_DL_POINTER);
+            glTexCoord2f(1, 0, USERSPACE_TGDS_OGL_DL_POINTER);
+            glVertex3fv(&v[faces[i][1]][0], USERSPACE_TGDS_OGL_DL_POINTER);
+            glTexCoord2f(1, 1, USERSPACE_TGDS_OGL_DL_POINTER);
+            glVertex3fv(&v[faces[i][2]][0], USERSPACE_TGDS_OGL_DL_POINTER);
+            glTexCoord2f(0, 1, USERSPACE_TGDS_OGL_DL_POINTER);
+            glVertex3fv(&v[faces[i][3]][0], USERSPACE_TGDS_OGL_DL_POINTER);
+        glEnd(USERSPACE_TGDS_OGL_DL_POINTER);
     }
 }
 
