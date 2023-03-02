@@ -87,14 +87,26 @@ void Game::reset()
 void Game::draw_menu()
 {
     enable_2D_texture();
-    glPushMatrix(USERSPACE_TGDS_OGL_DL_POINTER);
 		#ifdef WIN32
-        glBindTexture(GL_TEXTURE_2D, texturesSnakeGL[MENU_TEXTURE]);
+		glPushMatrix();    
+		glBindTexture(GL_TEXTURE_2D, texturesSnakeGL[MENU_TEXTURE]);
+		glBegin(GL_QUADS);
+            glNormal3f(0.0, 1.0, 0.0);
+            glTexCoord2f(0, 1);
+            glVertex3f(-8, 0.0f,  8);
+            glTexCoord2f(1, 1);
+            glVertex3f( 8, 0.0f,  8);
+            glTexCoord2f(1, 0);
+            glVertex3f( 8, 0.0f, -8);
+            glTexCoord2f(0, 0);
+            glVertex3f(-8, 0.0f, -8);
+        glEnd();
+		glPopMatrix();
 		#endif
 		#ifdef ARM9
+		glPushMatrix(USERSPACE_TGDS_OGL_DL_POINTER);
 		glBindTexture(0, texturesSnakeGL[MENU_TEXTURE], USERSPACE_TGDS_OGL_DL_POINTER);
-		#endif
-        glBegin(GL_QUADS, USERSPACE_TGDS_OGL_DL_POINTER);
+		glBegin(GL_QUADS, USERSPACE_TGDS_OGL_DL_POINTER);
             glNormal3f(0.0, 1.0, 0.0, USERSPACE_TGDS_OGL_DL_POINTER);
             glTexCoord2f(0, 1, USERSPACE_TGDS_OGL_DL_POINTER);
             glVertex3f(-8, 0.0f,  8, USERSPACE_TGDS_OGL_DL_POINTER);
@@ -105,14 +117,10 @@ void Game::draw_menu()
             glTexCoord2f(0, 0, USERSPACE_TGDS_OGL_DL_POINTER);
             glVertex3f(-8, 0.0f, -8, USERSPACE_TGDS_OGL_DL_POINTER);
         glEnd(USERSPACE_TGDS_OGL_DL_POINTER);
-	#ifdef WIN32
-    glPopMatrix();
+		glPopMatrix(1, USERSPACE_TGDS_OGL_DL_POINTER);	
 	#endif
-	#ifdef ARM9
-	glPopMatrix(1, USERSPACE_TGDS_OGL_DL_POINTER);
-	#endif
-    disable_2D_texture();
-
+    
+	disable_2D_texture();
     Point p;
 
     p.x = -2.3f;
