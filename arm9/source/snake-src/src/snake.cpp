@@ -645,9 +645,7 @@ void draw_text(string s, Point p, float r, float g, float b)
 //hardcoded below function at 0.5f to speedup drawing
 void glut2SolidCube05f(){
 	#ifdef ARM9
-    //Apply GX polygon properties (lights) before rendering vertices (snake body object)
-	#define GX_LIGHT0 (1 << 0)
-	glPolyFmt(GX_LIGHT0 | POLY_ALPHA(31) | POLY_CULL_NONE, USERSPACE_TGDS_OGL_DL_POINTER);
+    //(snake body object)
 	glColor3f(1.0f, 1.0f, 14.0f, USERSPACE_TGDS_OGL_DL_POINTER);
 	glCallList(DLSOLIDCUBE05F, USERSPACE_TGDS_OGL_DL_POINTER);
 	#endif
@@ -690,9 +688,7 @@ void glut2SolidCube(GLdouble size){
     {
 		#ifdef ARM9
         glBegin(GL_QUADS, USERSPACE_TGDS_OGL_DL_POINTER);
-			//Apply GX polygon properties (lights) before rendering vertices (snake head object)
-			#define GX_LIGHT0 (1 << 0)
-			glPolyFmt(GX_LIGHT0 | POLY_ALPHA(31) | POLY_CULL_NONE, USERSPACE_TGDS_OGL_DL_POINTER);
+			//(snake head object)
 			glColor3f(1.0f, 1.0f, 14.0f, USERSPACE_TGDS_OGL_DL_POINTER);
             glNormal3fv(&n[i][0], USERSPACE_TGDS_OGL_DL_POINTER);
             glTexCoord2f(0, 0, USERSPACE_TGDS_OGL_DL_POINTER);
