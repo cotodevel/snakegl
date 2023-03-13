@@ -243,38 +243,47 @@ void setupDLEnableDisable2DTextures(){
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR, USERSPACE_TGDS_OGL_DL_POINTER);
 		#endif
         
-		GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
-        GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
-        GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-        GLfloat light_position[] = { 2.0f, 5.0f, 5.0f, 0.0f };
-
-        GLfloat mat_ambient[]    = { 0.7f, 0.7f, 0.7f, 1.0f };
-        GLfloat mat_diffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f };
-        GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f };
-        GLfloat high_shininess[] = { 0.0f };
-
+		GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f }; 
+		GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f }; 
+		GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f }; 
+		GLfloat light_position[] = { 2.0f, 5.0f, 5.0f, 0.0f }; 
+		
 		#ifdef WIN32
-        glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
-        glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
-        glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-        glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-    
-        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   mat_ambient);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   mat_diffuse);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  mat_specular);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, high_shininess);
+        glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient); //WIN32
+        glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse); //WIN32
+        glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular); //WIN32
+        glLightfv(GL_LIGHT0, GL_POSITION, light_position); //WIN32
+		
+		{
+			GLfloat mat_ambient[]    = { 0.7f, 0.7f, 0.7f, 1.0f }; //WIN32
+			GLfloat mat_diffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f }; //WIN32
+			GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f }; //WIN32
+			GLfloat high_shininess[] = { 0.0f }; //WIN32
+			
+			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   mat_ambient); //WIN32
+			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   mat_diffuse); //WIN32
+			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  mat_specular); //WIN32
+			glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, high_shininess); //WIN32
+		}
 		#endif
 
 		#ifdef ARM9
-        glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient, USERSPACE_TGDS_OGL_DL_POINTER);
-        glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse, USERSPACE_TGDS_OGL_DL_POINTER);
-        glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular, USERSPACE_TGDS_OGL_DL_POINTER);
-        glLightfv(GL_LIGHT0, GL_POSITION, light_position, USERSPACE_TGDS_OGL_DL_POINTER);
-    
-        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   mat_ambient, USERSPACE_TGDS_OGL_DL_POINTER);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   mat_diffuse, USERSPACE_TGDS_OGL_DL_POINTER);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  mat_specular, USERSPACE_TGDS_OGL_DL_POINTER);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, high_shininess, USERSPACE_TGDS_OGL_DL_POINTER);
+        glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient, USERSPACE_TGDS_OGL_DL_POINTER); //NDS
+        glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse, USERSPACE_TGDS_OGL_DL_POINTER); //NDS
+        glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular, USERSPACE_TGDS_OGL_DL_POINTER); //NDS
+        glLightfv(GL_LIGHT0, GL_POSITION, light_position, USERSPACE_TGDS_OGL_DL_POINTER); //NDS
+		
+		{
+			GLfloat mat_ambient[]    = { 60.0f, 60.0f, 60.0f, 60.0f }; //NDS
+			GLfloat mat_diffuse[]    = { 1.0f, 1.0f, 1.0f, 1.0f }; //NDS
+			GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f }; //NDS
+			GLfloat high_shininess[] = { 128.0f }; //NDS
+			
+			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   mat_ambient, USERSPACE_TGDS_OGL_DL_POINTER); //NDS
+			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   mat_diffuse, USERSPACE_TGDS_OGL_DL_POINTER); //NDS
+			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  mat_specular, USERSPACE_TGDS_OGL_DL_POINTER); //NDS
+			glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, high_shininess, USERSPACE_TGDS_OGL_DL_POINTER); //NDS
+		}
 		#endif
 	}
 	
@@ -315,33 +324,42 @@ void setupDLEnableDisable2DTextures(){
         GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
         GLfloat light_position[] = { 2.0f, 5.0f, 5.0f, 0.0f };
 
-        GLfloat mat_ambient[]    = { 0.7f, 0.7f, 0.7f, 1.0f };
-        GLfloat mat_diffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f };
-        GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f };
-        GLfloat high_shininess[] = { 100.0f };
-
 		#ifdef ARM9
-        glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient, USERSPACE_TGDS_OGL_DL_POINTER);
-        glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse, USERSPACE_TGDS_OGL_DL_POINTER);
-        glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular, USERSPACE_TGDS_OGL_DL_POINTER);
-        glLightfv(GL_LIGHT0, GL_POSITION, light_position, USERSPACE_TGDS_OGL_DL_POINTER);
+        glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient, USERSPACE_TGDS_OGL_DL_POINTER); //NDS
+        glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse, USERSPACE_TGDS_OGL_DL_POINTER); //NDS
+        glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular, USERSPACE_TGDS_OGL_DL_POINTER); //NDS
+        glLightfv(GL_LIGHT0, GL_POSITION, light_position, USERSPACE_TGDS_OGL_DL_POINTER); //NDS
 		
-		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   mat_ambient, USERSPACE_TGDS_OGL_DL_POINTER);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   mat_diffuse, USERSPACE_TGDS_OGL_DL_POINTER);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  mat_specular, USERSPACE_TGDS_OGL_DL_POINTER);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, high_shininess, USERSPACE_TGDS_OGL_DL_POINTER);
+		{
+			GLfloat mat_ambient[]    = { 60.0f, 60.0f, 60.0f, 60.0f }; //NDS
+			GLfloat mat_diffuse[]    = { 1.0f, 1.0f, 1.0f, 1.0f }; //NDS
+			GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f }; //NDS
+			GLfloat high_shininess[] = { 128.0f }; //NDS
+			
+			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   mat_ambient, USERSPACE_TGDS_OGL_DL_POINTER); //NDS
+			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   mat_diffuse, USERSPACE_TGDS_OGL_DL_POINTER); //NDS
+			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  mat_specular, USERSPACE_TGDS_OGL_DL_POINTER); //NDS
+			glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, high_shininess, USERSPACE_TGDS_OGL_DL_POINTER); //NDS
+		}
 		#endif
         
 		#ifdef WIN32
-        glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
-        glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
-        glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-        glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+        glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient); //WIN32
+        glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse); //WIN32
+        glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular); //WIN32
+        glLightfv(GL_LIGHT0, GL_POSITION, light_position); //WIN32
 		
-		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   mat_ambient);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   mat_diffuse);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  mat_specular);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, high_shininess);
+		{
+			GLfloat mat_ambient[]    = { 0.7f, 0.7f, 0.7f, 1.0f }; //WIN32
+			GLfloat mat_diffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f }; //WIN32
+			GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f }; //WIN32
+			GLfloat high_shininess[] = { 100.0f }; //WIN32
+			
+			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   mat_ambient); //WIN32
+			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   mat_diffuse); //WIN32
+			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  mat_specular); //WIN32
+			glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, high_shininess); //WIN32
+		}
 		#endif
         
 	}
