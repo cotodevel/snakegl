@@ -454,10 +454,10 @@ int InitGL()										// All Setup For OpenGL Goes Here
 	glInit(); //NDSDLUtils: Initializes a new videoGL context	
 	glClearColor(255,255,255);		// White Background
 	glClearDepth(0x7FFF);		// Depth Buffer Setup
-	glEnable(GL_ANTIALIAS);
-	glEnable(GL_TEXTURE_2D); // Enable Texture Mapping 
-	glEnable(GL_BLEND);
-	glEnable(GL_LIGHT0); //SnakeGL light #0 enabled per scene
+	glEnable(GL_ANTIALIAS, USERSPACE_TGDS_OGL_DL_POINTER);
+	glEnable(GL_TEXTURE_2D, USERSPACE_TGDS_OGL_DL_POINTER); // Enable Texture Mapping 
+	glEnable(GL_BLEND, USERSPACE_TGDS_OGL_DL_POINTER);
+	glEnable(GL_LIGHT0, USERSPACE_TGDS_OGL_DL_POINTER); //SnakeGL light #0 enabled per scene
 	
 	//#1: Load a texture and map each one to a texture slot
 	u32 arrayOfTextures[7];

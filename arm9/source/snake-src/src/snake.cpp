@@ -636,7 +636,7 @@ void unload_resources()
 //Todo DS: use WoopsiSDK instead
 void draw_text(string s, Point p, float r, float g, float b)
 {
-    glDisable(GL_LIGHTING);
+    glDisable(GL_LIGHTING, USERSPACE_TGDS_OGL_DL_POINTER);
 
 	#ifdef WIN32
     int len, i;
@@ -657,7 +657,7 @@ void draw_text(string s, Point p, float r, float g, float b)
     nocashMessage(debugBuf);
     #endif
 	
-	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHTING, USERSPACE_TGDS_OGL_DL_POINTER);
 }
 
 //hardcoded below function at 0.5f to speedup drawing
