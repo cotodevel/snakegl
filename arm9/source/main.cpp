@@ -454,10 +454,11 @@ int InitGL()										// All Setup For OpenGL Goes Here
 	glInit(); //NDSDLUtils: Initializes a new videoGL context	
 	glClearColor(255,255,255);		// White Background
 	glClearDepth(0x7FFF);		// Depth Buffer Setup
-	glEnable(GL_ANTIALIAS);
-	glEnable(GL_TEXTURE_2D); // Enable Texture Mapping 
-	glEnable(GL_BLEND);
-
+	glEnable(GL_ANTIALIAS, USERSPACE_TGDS_OGL_DL_POINTER);
+	glEnable(GL_TEXTURE_2D, USERSPACE_TGDS_OGL_DL_POINTER); // Enable Texture Mapping 
+	glEnable(GL_BLEND, USERSPACE_TGDS_OGL_DL_POINTER);
+	glEnable(GL_LIGHT0, USERSPACE_TGDS_OGL_DL_POINTER); //SnakeGL light #0 enabled per scene
+	
 	//#1: Load a texture and map each one to a texture slot
 	u32 arrayOfTextures[7];
 	arrayOfTextures[0] = (u32)&apple; //0: apple.bmp  
@@ -516,9 +517,7 @@ int DrawGLScene(){
 		glMatrixMode(GL_PROJECTION, USERSPACE_TGDS_OGL_DL_POINTER);
 		glLoadIdentity(USERSPACE_TGDS_OGL_DL_POINTER);
 		
-		//not a real gl function and will likely change
-		#define GX_LIGHT0 (1 << 0)
-		glPolyFmt(GX_LIGHT0 | POLY_ALPHA(31) | POLY_CULL_NONE, USERSPACE_TGDS_OGL_DL_POINTER);
+		updateGXLights(USERSPACE_TGDS_OGL_DL_POINTER); //Update GX 3D light scene!
 		game->display();
 		glFlush(USERSPACE_TGDS_OGL_DL_POINTER);
 		HaltUntilIRQ(); //Save power until next Vblank

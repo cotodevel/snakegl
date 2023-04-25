@@ -139,9 +139,7 @@ void Scenario::draw_food()
 	glPushMatrix(USERSPACE_TGDS_OGL_DL_POINTER);
         glTranslatef(p.x, p.y + m + 0.45, p.z, USERSPACE_TGDS_OGL_DL_POINTER);
         glRotatef(a, 0.0, 1.0, 0.0, USERSPACE_TGDS_OGL_DL_POINTER);
-		//Apply GX polygon properties (lights) before rendering vertices (leaf object)
-		#define GX_LIGHT0 (1 << 0)
-		glPolyFmt(GX_LIGHT0 | POLY_ALPHA(31) | POLY_CULL_NONE, USERSPACE_TGDS_OGL_DL_POINTER);
+		//(leaf object)
         glColor3f(0.0f, 200.4f, 0.0f, USERSPACE_TGDS_OGL_DL_POINTER);
          glBegin(GL_TRIANGLE_STRIP, USERSPACE_TGDS_OGL_DL_POINTER);
             glVertex3f(0, 0, 0.3, USERSPACE_TGDS_OGL_DL_POINTER);
@@ -187,9 +185,7 @@ void Scenario::draw_food()
 		glBindTexture(0, texturesSnakeGL[FOOD_TEXTURE], USERSPACE_TGDS_OGL_DL_POINTER);
 		glTranslatef(p.x, p.y + m, p.z, USERSPACE_TGDS_OGL_DL_POINTER);
         glRotatef(a, 0.0, 1.0, 0.0, USERSPACE_TGDS_OGL_DL_POINTER);
-		//Apply GX polygon properties (lights) before rendering vertices (fruit object)
-		#define GX_LIGHT0 (1 << 0)
-		glPolyFmt(GX_LIGHT0 | POLY_ALPHA(31) | POLY_CULL_NONE, USERSPACE_TGDS_OGL_DL_POINTER);
+		//(fruit object)
 		glColor3f(1.0f, 1.0f, 14.0f, USERSPACE_TGDS_OGL_DL_POINTER);
 		#endif
 		drawSphere();
