@@ -419,7 +419,7 @@ int main(int argc, char **argv) {
 	#if defined(WIN32)
 	glutMainLoop();
 	#endif
-	glMaterialShinnyness(USERSPACE_TGDS_OGL_DL_POINTER);
+	glMaterialShinnyness();
 	menuShow();
 	
 	while (1){
@@ -437,16 +437,16 @@ GLvoid ReSizeGLScene(GLsizei width, GLsizei height)		// Resize And Initialize Th
 		height=1;										// Making Height Equal One
 	}
 
-	glViewport(0,0,width,height, USERSPACE_TGDS_OGL_DL_POINTER);						// Reset The Current Viewport
+	glViewport(0,0,width,height);						// Reset The Current Viewport
 
-	glMatrixMode(GL_PROJECTION, USERSPACE_TGDS_OGL_DL_POINTER);						// Select The Projection Matrix
-	glLoadIdentity(USERSPACE_TGDS_OGL_DL_POINTER);									// Reset The Projection Matrix
+	glMatrixMode(GL_PROJECTION);						// Select The Projection Matrix
+	glLoadIdentity();									// Reset The Projection Matrix
 
 	// Calculate The Aspect Ratio Of The Window
-	gluPerspective(45.0f,(GLfloat)width/(GLfloat)height,0.1f,100.0f, USERSPACE_TGDS_OGL_DL_POINTER);
+	gluPerspective(45.0f,(GLfloat)width/(GLfloat)height,0.1f,100.0f);
 
-	glMatrixMode(GL_MODELVIEW, USERSPACE_TGDS_OGL_DL_POINTER);							// Select The Modelview Matrix
-	glLoadIdentity(USERSPACE_TGDS_OGL_DL_POINTER);									// Reset The Modelview Matrix
+	glMatrixMode(GL_MODELVIEW);							// Select The Modelview Matrix
+	glLoadIdentity();									// Reset The Modelview Matrix
 }
 
 int InitGL()										// All Setup For OpenGL Goes Here
@@ -454,10 +454,10 @@ int InitGL()										// All Setup For OpenGL Goes Here
 	glInit(); //NDSDLUtils: Initializes a new videoGL context	
 	glClearColor(255,255,255);		// White Background
 	glClearDepth(0x7FFF);		// Depth Buffer Setup
-	glEnable(GL_ANTIALIAS, USERSPACE_TGDS_OGL_DL_POINTER);
-	glEnable(GL_TEXTURE_2D, USERSPACE_TGDS_OGL_DL_POINTER); // Enable Texture Mapping 
-	glEnable(GL_BLEND, USERSPACE_TGDS_OGL_DL_POINTER);
-	glEnable(GL_LIGHT0, USERSPACE_TGDS_OGL_DL_POINTER); //SnakeGL light #0 enabled per scene
+	glEnable(GL_ANTIALIAS);
+	glEnable(GL_TEXTURE_2D); // Enable Texture Mapping 
+	glEnable(GL_BLEND);
+	glEnable(GL_LIGHT0); //SnakeGL light #0 enabled per scene
 	
 	//#1: Load a texture and map each one to a texture slot
 	u32 arrayOfTextures[7];
@@ -508,18 +508,18 @@ int DrawGLScene(){
 	}
 
 	{
-		glReset(USERSPACE_TGDS_OGL_DL_POINTER); //Clear The Screen And The Depth Buffer
+		glReset(); //Clear The Screen And The Depth Buffer
 		//Handle keypress
 		game->on_key_pressed(keysDown());
 		
 		//Handle Display
 		//glViewport(width / 2, height / 2, 100, 100);
-		glMatrixMode(GL_PROJECTION, USERSPACE_TGDS_OGL_DL_POINTER);
-		glLoadIdentity(USERSPACE_TGDS_OGL_DL_POINTER);
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
 		
-		updateGXLights(USERSPACE_TGDS_OGL_DL_POINTER); //Update GX 3D light scene!
+		updateGXLights(); //Update GX 3D light scene!
 		game->display();
-		glFlush(USERSPACE_TGDS_OGL_DL_POINTER);
+		glFlush();
 		HaltUntilIRQ(); //Save power until next Vblank
 	}
 	
