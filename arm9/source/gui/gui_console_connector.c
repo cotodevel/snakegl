@@ -46,6 +46,12 @@ vramSetup * getProjectSpecificVRAMSetup(){
 	return TGDSFOOBILLIARD_3DVRAM_SETUP();
 }
 
+//setTGDSARM9PrintfCallback((printfARM9LibUtils_fn)&TGDSCustomPrintf2DConsole); //Redirect printf to custom Console implementation
+//setTGDSARM9PrintfCallback((printfARM9LibUtils_fn)&TGDSDefaultPrintf2DConsole); //Redirect printf to default TGDS 2D Console output
+int TGDSCustomPrintf2DConsole(const char * stringToRenderOnscreen){
+
+	return 0;
+}
 
 //2) Uses subEngine: VRAM Layout -> Console Setup
 bool InitProjectSpecificConsole(){
@@ -101,6 +107,9 @@ bool InitProjectSpecificConsole(){
 	mainEngine = false;
 	setOrientation(ORIENTATION_0, mainEngine);
 	
+	//custom printf
+	//setTGDSARM9PrintfCallback((printfARM9LibUtils_fn)&TGDSCustomPrintf2DConsole);
+
 	return true;
 }
 

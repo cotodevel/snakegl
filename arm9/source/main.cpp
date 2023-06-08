@@ -483,16 +483,10 @@ int InitGL()										// All Setup For OpenGL Goes Here
 
 int DrawGLScene(){									
 	scanKeys();
-	int pen_delta[2];
-	if( get_pen_delta( &pen_delta[0], &pen_delta[1] ) == false ){ //TSC Inactive?
-		rotateX = 0.0;
-		rotateY = 0.0;
-	}
-	else{	
-		rotateY = pen_delta[0];
-		rotateX = pen_delta[1];
-	}
 	
+	//NDS: Dual 3D Render implementation
+	//todo
+
 	if(keysDown()&KEY_TOUCH){
 		scanKeys();
 		while(keysHeld() & KEY_TOUCH){
