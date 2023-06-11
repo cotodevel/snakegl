@@ -89,6 +89,9 @@ extern float camMov;
 extern GLfloat	xrot;				
 extern GLfloat	yrot;			
 
+extern void render3DUpperScreen();
+extern void render3DBottomScreen();
+
 #ifdef __cplusplus
 }
 #endif

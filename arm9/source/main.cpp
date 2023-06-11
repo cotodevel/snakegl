@@ -222,7 +222,7 @@ __attribute__ ((optnone))
 #endif
 int main(int argc, char **argv) {
 	/*			TGDS 1.6 Standard ARM9 Init code start	*/
-	bool isTGDSCustomConsole = true;	//set default console or custom console: default console
+	bool isTGDSCustomConsole = true;	//set default console or custom console: custom console (TGDS Dual 3D)
 	GUI_init(isTGDSCustomConsole);
 	GUI_clear();
 	
@@ -458,10 +458,7 @@ int InitGL()										// All Setup For OpenGL Goes Here
 	glInit(); //NDSDLUtils: Initializes a new videoGL context	
 	glClearColor(255,255,255);		// White Background
 	glClearDepth(0x7FFF);		// Depth Buffer Setup
-	glEnable(GL_ANTIALIAS);
-	glEnable(GL_TEXTURE_2D); // Enable Texture Mapping 
-	glEnable(GL_BLEND);
-	glEnable(GL_LIGHT0); //SnakeGL light #0 enabled per scene
+	glEnable(GL_ANTIALIAS|GL_TEXTURE_2D|GL_BLEND|GL_LIGHT0); // Enable Texture Mapping + light #0 enabled per scene
 	
 	//#1: Load a texture and map each one to a texture slot
 	u32 arrayOfTextures[7];
@@ -481,11 +478,19 @@ int InitGL()										// All Setup For OpenGL Goes Here
 	return true;				
 }
 
+void render3DUpperScreen(){
+	game->scenario->close_camera_mode = true;
+}
+
+void render3DBottomScreen(){
+	game->scenario->close_camera_mode = false;
+}
+
 int DrawGLScene(){									
 	scanKeys();
 	
 	//NDS: Dual 3D Render implementation
-	//todo
+	TGDS_ProcessDual(render3DUpperScreen, render3DBottomScreen);
 
 	if(keysDown()&KEY_TOUCH){
 		scanKeys();

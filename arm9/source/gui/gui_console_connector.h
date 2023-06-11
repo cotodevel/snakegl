@@ -56,9 +56,6 @@ extern vramSetup * getProjectSpecificVRAMSetup();
 
 //1) VRAM Layout
 extern bool InitProjectSpecificConsole();
-
-extern vramSetup * TGDSFOOBILLIARD_3DVRAM_SETUP();
-
 extern int TGDSCustomPrintf2DConsole(const char * stringToRenderOnscreen);
 
 #ifdef __cplusplus
