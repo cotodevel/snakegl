@@ -428,8 +428,6 @@ int main(int argc, char **argv) {
 	
 	while (1){
 		DrawGLScene();
-		handleARM9SVC();	/* Do not remove, handles TGDS services */
-		IRQVBlankWait();
 	}
 	return 0;
 }
@@ -523,7 +521,8 @@ int DrawGLScene(){
 		updateGXLights(); //Update GX 3D light scene!
 		game->display();
 		glFlush();
-		HaltUntilIRQ(); //Save power until next Vblank
+		handleARM9SVC();	/* Do not remove, handles TGDS services */
+		IRQVBlankWait();
 	}
 	
 	return true;										// Keep Going
