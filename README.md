@@ -24,7 +24,7 @@ Project Specific description: snakeGL Nintendo DS port.
 Many thanks to original author "alexandrevicenzi: https://github.com/alexandrevicenzi/SnakeGL
 
 
--Touchscreen changes camera
+-Touchscreen swaps camera
 -Directional Pad controls Snake direction
 -X button toggles backround music
 

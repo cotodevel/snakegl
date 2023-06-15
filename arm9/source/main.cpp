@@ -476,12 +476,14 @@ int InitGL()										// All Setup For OpenGL Goes Here
 	return true;				
 }
 
+static bool NDSDual3DCameraFlag = false;
+
 void render3DUpperScreen(){
-	game->scenario->close_camera_mode = true;
+	game->scenario->close_camera_mode = NDSDual3DCameraFlag;
 }
 
 void render3DBottomScreen(){
-	game->scenario->close_camera_mode = false;
+	game->scenario->close_camera_mode = !NDSDual3DCameraFlag;
 }
 
 int DrawGLScene(){									
@@ -495,7 +497,7 @@ int DrawGLScene(){
 		while(keysHeld() & KEY_TOUCH){
 			scanKeys();
 		}
-		game->scenario->change_camera_pos();
+		NDSDual3DCameraFlag = !NDSDual3DCameraFlag;
 		menuShow();
 	}
 	
