@@ -453,7 +453,8 @@ GLvoid ReSizeGLScene(GLsizei width, GLsizei height)		// Resize And Initialize Th
 
 int InitGL()										// All Setup For OpenGL Goes Here
 {
-	glInit(); //NDSDLUtils: Initializes a new videoGL context	
+	int TGDSOpenGLDisplayListWorkBufferSize = (256*1024);
+	glInit(TGDSOpenGLDisplayListWorkBufferSize); //NDSDLUtils: Initializes a new videoGL context	
 	glClearColor(255,255,255);		// White Background
 	glClearDepth(0x7FFF);		// Depth Buffer Setup
 	glEnable(GL_ANTIALIAS|GL_TEXTURE_2D|GL_BLEND|GL_LIGHT0); // Enable Texture Mapping + light #0 enabled per scene
