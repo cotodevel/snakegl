@@ -41,7 +41,6 @@ public:
     bool on_key_pressed(unsigned int key);
 };
 
-
 extern float to_fps(float fps, int value);
 #endif
 
@@ -49,7 +48,20 @@ extern float to_fps(float fps, int value);
 extern "C" {
 #endif
 
+extern int width, height;
+extern bool is_game_over, is_running;
 extern Game* game;
+extern void DrawGLScene();
+extern void ResizeGLScene(int w, int h);
+
+#if defined(_MSC_VER)
+extern void keyboard(unsigned char key, int x, int y);
+extern void keyboardSpecial(int key, int x, int y);
+extern void setVSync(bool sync);
+#endif
+
+extern int startSnakeGL(int argc, char *argv[]);
+extern void InitGL();
 
 #ifdef __cplusplus
 }

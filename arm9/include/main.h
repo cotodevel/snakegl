@@ -52,16 +52,6 @@ USA
 extern "C" {
 #endif
 
-#ifdef __cplusplus
-/////////////////////////////// Snake GL defs ///////////////////////////////////////
-extern int width;
-extern int height;
-extern bool is_game_over;
-extern bool is_running;
-extern Game* game;
-/////////////////////////////////////////////////////////////////////////////////////
-#endif
-
 extern int main(int argc, char **argv);
 extern void menuShow();
 extern char curChosenBrowseFile[MAX_TGDSFILENAME_LENGTH];
@@ -77,9 +67,6 @@ extern bool stopSoundStreamUser();
 extern void closeSoundUser();
 extern char args[8][MAX_TGDSFILENAME_LENGTH];
 extern char *argvs[8];
-extern GLvoid ReSizeGLScene(GLsizei width, GLsizei height);
-extern int InitGL();
-extern int DrawGLScene();
 extern bool get_pen_delta( int *dx, int *dy );
 
 extern float rotateX;
@@ -89,6 +76,7 @@ extern float camMov;
 extern GLfloat	xrot;				
 extern GLfloat	yrot;			
 
+extern bool NDSDual3DCameraFlag;
 extern void render3DUpperScreen();
 extern void render3DBottomScreen();
 

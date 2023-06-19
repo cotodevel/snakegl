@@ -43,34 +43,11 @@ USA
 #include "InterruptsARMCores_h.h"
 
 //snake GL
-#include "base.h"
 #include "game.h"
-#include "snake.h"
-#include "scenario.h"
-
-#include "apple.h"
-#include "boxbitmap.h"
-#include "brick.h"
-#include "grass.h"
-#include "menu.h"
-#include "snakegfx.h"
-#include "Texture_Cube.h"
-
-/////////////////////////////// Snake GL defs ///////////////////////////////////////
-int width  = 640,
-    height = 640;
-
-bool is_game_over = false,
-     is_running   = false;
 
 #if (defined(__GNUC__) && !defined(__clang__))
 __attribute__((optimize("O0")))
 #endif
-
-#if (!defined(__GNUC__) && defined(__clang__))
-__attribute__ ((optnone))
-#endif
-Game* game = NULL;
 
 #if (defined(__GNUC__) && !defined(__clang__))
 __attribute__((optimize("O0")))
@@ -407,77 +384,10 @@ int main(int argc, char **argv) {
 	//init sound
 	bgMusicEnabled = false;
 	
-	/* OpenGL 1.1 Dynamic Display List */
-	InitGL();
-	ReSizeGLScene(255, 191);
-
-    // Init GL before this
-    load_resources();
-
-    #if defined(ARM9)
-    startTimerCounter(tUnitsMilliseconds, 1);
-    #endif
-
-    game = new Game();
-
-	#if defined(WIN32)
-	glutMainLoop();
-	#endif
-	glMaterialShinnyness();
-	menuShow();
-	
-	while (1){
-		DrawGLScene();
-	}
-	return 0;
+    return startSnakeGL(argc, argv);
 }
 
-GLvoid ReSizeGLScene(GLsizei width, GLsizei height)		// Resize And Initialize The GL Window
-{
-	if (height==0)										// Prevent A Divide By Zero By
-	{
-		height=1;										// Making Height Equal One
-	}
-
-	glViewport(0,0,width,height);						// Reset The Current Viewport
-
-	glMatrixMode(GL_PROJECTION);						// Select The Projection Matrix
-	glLoadIdentity();									// Reset The Projection Matrix
-
-	// Calculate The Aspect Ratio Of The Window
-	gluPerspective(45.0f,(GLfloat)width/(GLfloat)height,0.1f,100.0f);
-
-	glMatrixMode(GL_MODELVIEW);							// Select The Modelview Matrix
-	glLoadIdentity();									// Reset The Modelview Matrix
-}
-
-int InitGL()										// All Setup For OpenGL Goes Here
-{
-	int TGDSOpenGLDisplayListWorkBufferSize = (256*1024);
-	glInit(TGDSOpenGLDisplayListWorkBufferSize); //NDSDLUtils: Initializes a new videoGL context	
-	glClearColor(255,255,255);		// White Background
-	glClearDepth(0x7FFF);		// Depth Buffer Setup
-	glEnable(GL_ANTIALIAS|GL_TEXTURE_2D|GL_BLEND|GL_LIGHT0); // Enable Texture Mapping + light #0 enabled per scene
-	
-	//#1: Load a texture and map each one to a texture slot
-	u32 arrayOfTextures[7];
-	arrayOfTextures[0] = (u32)&apple; //0: apple.bmp  
-	arrayOfTextures[1] = (u32)&boxbitmap; //1: boxbitmap.bmp  
-	arrayOfTextures[2] = (u32)&brick; //2: brick.bmp  
-	arrayOfTextures[3] = (u32)&grass; //3: grass.bmp
-	arrayOfTextures[4] = (u32)&menu; //4: menu.bmp
-	arrayOfTextures[5] = (u32)&snakegfx; //5: snakegfx.bmp
-	arrayOfTextures[6] = (u32)&Texture_Cube; //6: Texture_Cube.bmp
-	int texturesInSlot = LoadLotsOfGLTextures((u32*)&arrayOfTextures, (int*)&texturesSnakeGL, 7); //Implements both glBindTexture and glTexImage2D 
-	int i = 0;
-	for(i = 0; i < texturesInSlot; i++){
-		printf("Texture loaded: %d:textID[%d] Size: %d", i, texturesSnakeGL[i], getTextureBaseFromTextureSlot(activeTexture));
-	}
-	setupDLEnableDisable2DTextures();
-	return true;				
-}
-
-static bool NDSDual3DCameraFlag = false;
+bool NDSDual3DCameraFlag = false;
 
 void render3DUpperScreen(){
 	game->scenario->close_camera_mode = NDSDual3DCameraFlag;
@@ -485,48 +395,4 @@ void render3DUpperScreen(){
 
 void render3DBottomScreen(){
 	game->scenario->close_camera_mode = !NDSDual3DCameraFlag;
-}
-
-int DrawGLScene(){									
-	scanKeys();
-	
-	//NDS: Dual 3D Render implementation
-	TGDS_ProcessDual(render3DUpperScreen, render3DBottomScreen);
-
-	if(keysDown()&KEY_TOUCH){
-		scanKeys();
-		while(keysHeld() & KEY_TOUCH){
-			scanKeys();
-		}
-		NDSDual3DCameraFlag = !NDSDual3DCameraFlag;
-		menuShow();
-	}
-	
-	if (keysDown() & KEY_LEFT)
-	{
-		camMov-=2.8f;
-	}
-	if (keysDown() & KEY_RIGHT)
-	{
-		camMov+=2.8f;
-	}
-
-	{
-		glReset(); //Clear The Screen And The Depth Buffer
-		//Handle keypress
-		game->on_key_pressed(keysDown());
-		
-		//Handle Display
-		//glViewport(width / 2, height / 2, 100, 100);
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		
-		updateGXLights(); //Update GX 3D light scene!
-		game->display();
-		glFlush();
-		handleARM9SVC();	/* Do not remove, handles TGDS services */
-		IRQVBlankWait();
-	}
-	
-	return true;										// Keep Going
 }

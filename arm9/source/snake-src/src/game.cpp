@@ -7,10 +7,25 @@
 #pragma warning(disable:4996)
 #endif
 #include "game.h"
+
 #ifdef ARM9
+#include "main.h"
 #include "timerTGDS.h"
 #include "ipcfifoTGDSUser.h"
+#include "biosTGDS.h"
+#include "imagepcx.h"
+
+//Textures
+#include "apple.h"
+#include "boxbitmap.h"
+#include "brick.h"
+#include "grass.h"
+#include "menu.h"
+#include "snakegfx.h"
+#include "Texture_Cube.h"
 #endif
+
+#include "../src/base.h"
 
 float to_fps(float fps, int value)
 {
@@ -185,25 +200,27 @@ void Game::draw_menu(){
 }
 
 void Game::display(){
+	#if defined(_MSC_VER)
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    #endif
+	#ifdef ARM9
+	//NDS: Dual 3D Render implementation. Must be called right before a new 3D scene is drawn
+	TGDS_ProcessDual(render3DUpperScreen, render3DBottomScreen);
+	#endif
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    #ifdef ARM9
+    updateGXLights(); //Update GX 3D light scene!
+    #endif
+
 	#ifdef WIN32
     int old_cam = scenario->camera_mode;
     scenario->camera_mode = 3;
 	#endif
-	scenario->set_camera();
+    scenario->set_camera();
     calculateFPS();
     Point p;
-
     char s [50];
-
-#ifdef DEBUG
-    sprintf(s, "FPS: %.2f", fps);
-
-    p.x = -7.0f;
-    p.y = 0.5f;
-    p.z = 7.0f;
-    draw_text(s, p, 0.0f, 0.0f, 0.0f);
-#endif
-
     if (is_running){
 		#ifdef WIN32
         scenario->camera_mode = old_cam;
@@ -290,10 +307,15 @@ void Game::display(){
 		draw_menu();
 		#endif
     }
-	
 	#ifdef WIN32
     scenario->camera_mode = old_cam;
 	#endif
+	
+	glFlush();	
+	#ifdef ARM9
+    handleARM9SVC();	/* Do not remove, handles TGDS services */
+    IRQVBlankWait();
+    #endif
 }
 
 void Game::run()
@@ -504,4 +526,203 @@ bool Game::clock2()
     bool wait = tick2 < to_fps(fps, 10);
     if (tick2 > to_fps(fps, 10)) tick2 = 0;
     return !wait;
+}
+
+//WIN32 & TGDS ARM9 Game boot code
+
+int width  = 640, height = 640;
+bool is_game_over = false, is_running = false;
+
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
+Game* game = NULL;
+
+#if defined(_MSC_VER)
+void keyboard(unsigned char key, int x, int y)
+{
+    game->on_key_pressed((int)key);
+    glutPostRedisplay();
+}
+
+void keyboardSpecial(int key, int x, int y)
+{
+    game->on_key_pressed((int)key);
+    glutPostRedisplay();
+}
+
+/*
+    http://www.dbfinteractive.com/forum/index.php?topic=5998.0
+*/
+void setVSync(bool sync)
+{
+#ifdef _WIN32
+    typedef BOOL (APIENTRY *PFNWGLSWAPINTERVALPROC)( int );
+    PFNWGLSWAPINTERVALPROC wglSwapIntervalEXT = 0;
+
+    const char *extensions = (char*)glGetString( GL_EXTENSIONS );
+
+    if(extensions && strstr( extensions, "WGL_EXT_swap_control" ) == 0 )
+    {
+        cout << "Can't enable vSync.\n";
+        return;
+    }
+    else
+    {
+        wglSwapIntervalEXT = (PFNWGLSWAPINTERVALPROC)wglGetProcAddress( "wglSwapIntervalEXT" );
+
+        if( wglSwapIntervalEXT )
+        {
+            wglSwapIntervalEXT(sync);
+        }
+        else
+        {
+            cout << "Can't enable vSync.\n";
+        }
+    }
+#else
+    glewGetProcAddress((const GLubyte*)"glXSwapIntervalEXT");
+    PFNGLXSWAPINTERVALEXTPROC glXSwapIntervalEXT = 0;
+
+    GLboolean r = GL_FALSE;
+    r = ((glXSwapIntervalEXT = (PFNGLXSWAPINTERVALEXTPROC)glewGetProcAddress((const GLubyte*)"glXSwapIntervalEXT")) == NULL) || r;
+
+    Display *dpy = glXGetCurrentDisplay();
+    GLXDrawable drawable = glXGetCurrentDrawable();
+
+    // TODO: not working.
+    if (r && glXSwapIntervalEXT)
+    {
+        glXSwapIntervalEXT(dpy, drawable, (int)sync);
+    }
+    else
+    {
+        cout << "Can't enable vSync.\n";
+    }
+#endif
+}
+#endif
+
+void ResizeGLScene(GLsizei widthIn, GLsizei heightIn)
+{
+	#ifdef WIN32
+    glutPostRedisplay();
+	#endif
+
+	#ifdef ARM9
+	if (heightIn==0)										// Prevent A Divide By Zero By
+	{
+		heightIn=1;										// Making Height Equal One
+	}
+
+	glViewport(0,0,widthIn,heightIn);						// Reset The Current Viewport
+
+	glMatrixMode(GL_PROJECTION);						// Select The Projection Matrix
+	glLoadIdentity();									// Reset The Projection Matrix
+
+	// Calculate The Aspect Ratio Of The Window
+	gluPerspective(45.0f,(GLfloat)widthIn/(GLfloat)heightIn,0.1f,100.0f);
+
+	glMatrixMode(GL_MODELVIEW);							// Select The Modelview Matrix
+	glLoadIdentity();									// Reset The Modelview Matrix
+	#endif
+}
+
+void DrawGLScene(){									
+	#ifdef ARM9
+	scanKeys();
+	if(keysDown()&KEY_TOUCH){
+		scanKeys();
+		while(keysHeld() & KEY_TOUCH){
+			scanKeys();
+		}
+		NDSDual3DCameraFlag = !NDSDual3DCameraFlag;
+		menuShow();
+	}
+	{
+		game->on_key_pressed(keysDown());
+	}
+	#endif
+
+	game->display();
+}
+
+void InitGL(){
+	#ifdef ARM9
+	/* OpenGL 1.1 Dynamic Display List */
+	int TGDSOpenGLDisplayListWorkBufferSize = (256*1024);
+	glInit(TGDSOpenGLDisplayListWorkBufferSize); //NDSDLUtils: Initializes a new videoGL context	
+	glClearColor(255,255,255);		// White Background
+	glClearDepth(0x7FFF);		// Depth Buffer Setup
+	glEnable(GL_ANTIALIAS|GL_TEXTURE_2D|GL_BLEND|GL_LIGHT0); // Enable Texture Mapping + light #0 enabled per scene
+	
+	//#1: Load a texture and map each one to a texture slot
+	u32 arrayOfTextures[7];
+	arrayOfTextures[0] = (u32)&apple; //0: apple.bmp  
+	arrayOfTextures[1] = (u32)&boxbitmap; //1: boxbitmap.bmp  
+	arrayOfTextures[2] = (u32)&brick; //2: brick.bmp  
+	arrayOfTextures[3] = (u32)&grass; //3: grass.bmp
+	arrayOfTextures[4] = (u32)&menu; //4: menu.bmp
+	arrayOfTextures[5] = (u32)&snakegfx; //5: snakegfx.bmp
+	arrayOfTextures[6] = (u32)&Texture_Cube; //6: Texture_Cube.bmp
+	int texturesInSlot = LoadLotsOfGLTextures((u32*)&arrayOfTextures, (int*)&texturesSnakeGL, 7); //Implements both glBindTexture and glTexImage2D 
+	int i = 0;
+	for(i = 0; i < texturesInSlot; i++){
+		printf("Texture loaded: %d:textID[%d] Size: %d", i, texturesSnakeGL[i], getTextureBaseFromTextureSlot(activeTexture));
+	}
+	setupDLEnableDisable2DTextures();
+	#endif
+	
+	#if defined(_MSC_VER)
+	setVSync(true);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    float pos_light[4] = { 5.0f, 5.0f, 10.0f, 0.0f };
+    glLightfv(GL_LIGHT0, GL_POSITION, pos_light);
+    glEnable(GL_LIGHT0);
+	glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_NORMALIZE);
+    glEnable(GL_COLOR_MATERIAL);
+	glDisable(GL_LIGHTING);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	#endif
+}
+
+int startSnakeGL(int argc, char *argv[])
+{	
+	#if defined(_MSC_VER)
+    glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE);
+    glutInitWindowSize(width, height);
+    glutInitWindowPosition(100, 100);
+    glutCreateWindow("SnakeGL");
+    glutDisplayFunc(DrawGLScene);
+    glutIdleFunc(DrawGLScene);
+    glutReshapeFunc(ResizeGLScene);
+    glutKeyboardFunc(keyboard);
+    glutSpecialFunc(keyboardSpecial);
+	#endif
+
+	InitGL();
+    #if defined(ARM9)
+	ResizeGLScene(255, 191);
+	#endif
+
+	load_resources(); // InitGL(); must be called before this
+	setupDLEnableDisable2DTextures();
+    game = new Game();
+
+	#if defined(_MSC_VER)
+	glutMainLoop();
+	#endif
+    
+	#if defined(ARM9)
+	startTimerCounter(tUnitsMilliseconds, 1);
+    glMaterialShinnyness();
+	glReset(); //Depend on GX stack to render scene
+	while (1){
+		DrawGLScene();
+	}
+	#endif
+	return 0;
 }
