@@ -81,7 +81,8 @@ export DIRS_ARM9_SRC = data/	\
 			source/interrupts/	\
 			source/gui/	\
 			source/TGDSMemoryAllocator/	\
-			source/snake-src/src/	\
+			source/project/src/glm/	\
+			source/project/src/	\
 			../common/	\
 			../common/templateCode/source/	\
 			../common/templateCode/data/arm9/	
@@ -91,7 +92,8 @@ export DIRS_ARM9_HEADER = data/	\
 			include/	\
 			source/gui/	\
 			source/TGDSMemoryAllocator/	\
-			source/snake-src/src/	\
+			source/project/src/glm/	\
+			source/project/src/	\
 			../common/	\
 			../common/templateCode/source/	\
 			../common/templateCode/data/arm9/	\
