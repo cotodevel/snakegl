@@ -9,8 +9,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 #include "typedefsTGDS.h"
 #include "xmem.h"
+
+extern void *malloc( size_t size );
+extern void free( void *ptr );
+extern void *calloc( size_t num, size_t size );
 
 // default use 1.5 MB
 unsigned int XMEMTOTALSIZE = (1500*1024);
@@ -30,7 +35,6 @@ unsigned int XMEM_TABLESIZE = 0;
 
 
 unsigned char *xmem_table;
-//XMEM_BLOCK *xmem_blocks;
 unsigned char *xmem_blocks;
 
 void XmemSetup(unsigned int size, unsigned short blocks) {
@@ -64,8 +68,8 @@ void XmemInit(unsigned int mallocLinearMemoryStart, unsigned int mallocLinearMem
 	//free(XT);
 	
 	printf("***       XMEM       *** ");
-	printf("TABLE: %8.8X (%d) ",xmem_table,XMEM_TABLESIZE);
-	printf("BLOCK: %8.8X (%d) ",xmem_blocks,XMEM_BLOCKSIZE*XMEM_BLOCKCOUNT);
+	printf("TABLE: %8.8X (%d) ",(unsigned int)xmem_table, XMEM_TABLESIZE);
+	printf("BLOCK: %8.8X (%d) ",(unsigned int)xmem_blocks, XMEM_BLOCKSIZE*XMEM_BLOCKCOUNT);
 	printf("***XMEM INIT COMPLETE*** ");
 	
 	xmem_table[0] = XMEM_STARTBLOCK | XMEM_ENDBLOCK | XMEM_USEDBLOCK; // reserved i suppose
@@ -156,11 +160,11 @@ void Xfree(const void *ptr) {
 	int block,sblock;
 	
 	while (1) {
-		if (ptr < xmem_blocks) {
+		if ((unsigned char*)ptr < xmem_blocks) {
 			//printf("XM: Free: NXML %8.8X ",(unsigned int)ptr);
 			break;
 		}
-		if (ptr > (xmem_blocks+(XMEM_BLOCKCOUNT*XMEM_BLOCKSIZE))) {
+		if ((unsigned char*)ptr > (xmem_blocks+(XMEM_BLOCKCOUNT*XMEM_BLOCKSIZE))) {
 			//printf("XM: Free: NXMG %8.8X ",(u32)ptr);
 			break;
 		}

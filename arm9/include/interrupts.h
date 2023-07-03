@@ -41,6 +41,9 @@ extern void VcounterUser();
 extern void screenLidHasOpenedhandlerUser();
 extern void screenLidHasClosedhandlerUser();
 
+extern int msCounter;
+extern bool runGameTick;
+
 #ifdef __cplusplus
 }
 #endif
