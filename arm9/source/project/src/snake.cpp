@@ -193,7 +193,7 @@ void draw_cube(float size, Point p, int res_id)
 			texturesSnakeGL[res_id]
 		);
 		glTranslatef(p.x, p.y, p.z);
-		glut2SolidCube(size);
+		glut2SolidCubeSlow(size);
 	glPopMatrix(
 		#ifdef ARM9
 		1

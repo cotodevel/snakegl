@@ -15,6 +15,11 @@
 #include "SoundTGDS.h"
 #include "biosTGDS.h"
 #include "main.h"
+#include "ndsDisplayListUtils.h"
+#endif
+
+#if defined(_MSC_VER)
+#include "..\..\..\..\..\ndsdisplaylistutils\ndsDisplayListUtils\ndsDisplayListUtils.h"
 #endif
 
 #if defined(_MSC_VER) || defined(WIN32)
