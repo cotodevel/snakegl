@@ -19,7 +19,7 @@
 #endif
 
 #if defined(_MSC_VER)
-#include "..\..\..\..\..\ndsdisplaylistutils\ndsDisplayListUtils\ndsDisplayListUtils.h"
+#include "..\..\..\..\..\toolchaingenericds\src\common\libutils\arm9\source\ndsDisplayListUtils.h"
 #endif
 
 #if defined(_MSC_VER) || defined(WIN32)
