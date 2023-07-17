@@ -30,6 +30,9 @@
     <ClInclude Include="..\src\Scene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\..\toolchaingenericds\src\common\libutils\arm9\source\ndsDisplayListUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\soil.c">
@@ -56,7 +59,7 @@
     <ClCompile Include="..\src\Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\ndsdisplaylistutils\ndsDisplayListUtils\ndsDisplayListUtils.c">
+    <ClCompile Include="..\..\..\..\..\toolchaingenericds\src\common\libutils\arm9\source\ndsDisplayListUtils.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

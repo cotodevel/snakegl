@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\toolchaingenericds\src\common\libutils\arm9\source\ndsDisplayListUtils.h" />
     <ClInclude Include="..\src\game.h" />
     <ClInclude Include="..\src\Scene.h" />
     <ClInclude Include="..\src\snake.h" />
@@ -18,7 +19,7 @@
     <ClInclude Include="..\src\TGDSTypes.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\ndsdisplaylistutils\ndsDisplayListUtils\ndsDisplayListUtils.c" />
+    <ClCompile Include="..\..\..\..\..\toolchaingenericds\src\common\libutils\arm9\source\ndsDisplayListUtils.c" />
     <ClCompile Include="..\src\game.cpp" />
     <ClCompile Include="..\src\image_dxt.c" />
     <ClCompile Include="..\src\image_helper.c" />
