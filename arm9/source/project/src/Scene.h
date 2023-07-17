@@ -68,8 +68,6 @@ public:
 extern "C"{
 #endif
 
-extern void drawSphere(float r, int lats, int longs);
-
 // light 0 colours
 extern GLfloat ambient0Scene[4];
 extern GLfloat diffuse0Scene[4];
@@ -90,17 +88,12 @@ extern void animateScene(int type);	/// animates the scene (GLUT)
 extern void drawScene(void);	/// Renders a single frame of the scene
 extern int TWLPrintf(const char *fmt, ...);
 
-extern void drawCircle(GLfloat x, GLfloat y, GLfloat r, GLfloat BALL_RADIUS);
-extern void drawCylinder(int numMajor, int numMinor, float height, float radius);
-
 extern GLint DLEN2DTEX;
 extern GLint DLDIS2DTEX;
 extern GLint DLSOLIDCUBE05F;
-extern GLint DLSPHERE;
 extern void enable_2D_texture();
 extern void disable_2D_texture();
 extern void glut2SolidCube05f();
-extern void glut2SolidCube(GLdouble size);
 extern int InitGL(int argc, char *argv[]); /// initialises OpenGL
 extern void setupTGDSProjectOpenGLDisplayLists();
 

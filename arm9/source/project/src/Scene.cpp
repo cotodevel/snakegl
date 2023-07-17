@@ -199,6 +199,10 @@ void Scene::draw_food()
         glRotatef(a, 0.0, 1.0, 0.0);
 		//(fruit object)
 		glColor3f(1.0f, 1.0f, 14.0f);
+		
+#ifdef ARM9
+		glScalef(0.3, 0.3, 0.3);
+#endif
 		drawSphere(3, 3, 3);
 	glPopMatrix(
         #ifdef ARM9
@@ -572,73 +576,9 @@ void drawScene(){
     #endif
 }
 
-//glutSolidSphere(radius, 16, 16);  -> NDS GX Replacement
-void drawSphere(float r, int lats, int longs) {
-	#ifdef _MSC_VER
-	glCallList(DLSPHERE);
-    #endif
-
-	#ifdef ARM9
-	// Execute the display list
-    glCallListGX((u32*)&Sphere008); //comment out when running on NDSDisplayListUtils
-	#endif
-}
-
-
-//gluDisk(qObj, 0.0, RADIUS, 16, 16); -> NDS GX Implementation
-void drawCircle(GLfloat x, GLfloat y, GLfloat r, GLfloat BALL_RADIUS)
-{
-	#define SLICES_PER_CIRCLE ((int)16)
-	float angle = 360.f / SLICES_PER_CIRCLE;
-	float anglex = cos(angle);
-	float angley = sin(angle);
-	GLfloat lastX = 1;
-	GLfloat lastY = 0;
-	int c = 0; 
-	glBegin(GL_TRIANGLE_STRIP);
-	for (c = 1; c < SLICES_PER_CIRCLE; c++)
-	{
-		x = lastX * anglex - lastY * angley;
-		y = lastX * angley + lastY * anglex;
-		glVertex2f(x * BALL_RADIUS, y * BALL_RADIUS);
-		lastX = x;
-		lastY = y;
-	}
-	glEnd();
-}
-
-
-void drawCylinder(int numMajor, int numMinor, float height, float radius){
-	double majorStep = height / numMajor;
-	double minorStep = 2.0 * PI / numMinor;
-	int i, j;
-
-	for (i = 0; i < numMajor; ++i) {
-		GLfloat z0 = 0.5 * height - i * majorStep;
-		GLfloat z1 = z0 - majorStep;
-
-		//glBegin(GL_TRIANGLE_STRIP);
-		for (j = 0; j <= numMinor; ++j) {
-			double a = j * minorStep;
-			GLfloat x = radius * cos(a);
-			GLfloat y = radius * sin(a);
-			glNormal3f(x / radius, y / radius, 0.0);
-			
-			glTexCoord2f(j / (GLfloat) numMinor, i / (GLfloat) numMajor);
-			glVertex3f(x, y, z0);
-
-			glNormal3f(x / radius, y / radius, 0.0);
-			glTexCoord2f(j / (GLfloat) numMinor, (i + 1) / (GLfloat) numMajor);
-			glVertex3f(x, y, z1);
-		}
-		//glEnd();
-	}
-}
-
 GLint DLEN2DTEX = -1;
 GLint DLDIS2DTEX = -1;
 GLint DLSOLIDCUBE05F = -1;
-GLint DLSPHERE = -1;
 
 void enable_2D_texture(){
 	glCallList(DLEN2DTEX);
@@ -659,53 +599,6 @@ void glut2SolidCube05f(){
 	//(snake body object)
 	glColor3f(1.0f, 1.0f, 14.0f);
 	glCallList(DLSOLIDCUBE05F);
-}
-
-void glut2SolidCube(GLdouble size){
-    static GLfloat n[6][3] =
-    {
-        {-1.0, 0.0, -1.0},
-        {0.0, 1.0, 0.0},
-        {1.0, 0.0, 0.0},
-        {0.0, -1.0, 0.0},
-        {0.0, 0.0, 1.0},
-        {0.0, 0.0, -1.0}
-    };
-    static GLint faces[6][4] =
-    {
-        {0, 1, 2, 3},
-        {3, 2, 6, 7},
-        {7, 6, 5, 4},
-        {4, 5, 1, 0},
-        {5, 6, 2, 1},
-        {7, 4, 0, 3}
-    };
-    GLfloat v[8][3];
-    GLint i;
-
-    v[0][0] = v[1][0] = v[2][0] = v[3][0] = -size / 2;
-    v[4][0] = v[5][0] = v[6][0] = v[7][0] = size / 2;
-    v[0][1] = v[1][1] = v[4][1] = v[5][1] = -size / 2;
-    v[2][1] = v[3][1] = v[6][1] = v[7][1] = size / 2;
-    v[0][2] = v[3][2] = v[4][2] = v[7][2] = -size / 2;
-    v[1][2] = v[2][2] = v[5][2] = v[6][2] = size / 2;
-
-    for (i = 5; i >= 0; i--)
-    {
-		glBegin(GL_QUADS);
-			//(snake head object)
-			glColor3f(1.0f, 1.0f, 14.0f);
-            glNormal3fv(&n[i][0]);
-            glTexCoord2f(0, 0);
-			glVertex3fv(&v[faces[i][0]][0]);
-            glTexCoord2f(1, 0);
-            glVertex3fv(&v[faces[i][1]][0]);
-            glTexCoord2f(1, 1);
-            glVertex3fv(&v[faces[i][2]][0]);
-            glTexCoord2f(0, 1);
-            glVertex3fv(&v[faces[i][3]][0]);
-        glEnd();
-    }
 }
 
 /// Sets up the OpenGL state machine environment
