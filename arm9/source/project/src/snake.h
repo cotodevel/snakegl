@@ -10,9 +10,9 @@
 
 #ifdef ARM9
 #include <math.h>
-#include "TimerTGDS.h"
+#include "timerTGDS.h"
 #include "VideoGL.h"
-#include "SoundTGDS.h"
+#include "soundTGDS.h"
 #include "biosTGDS.h"
 #include "main.h"
 #include "ndsDisplayListUtils.h"
