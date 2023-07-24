@@ -12,13 +12,10 @@
 #include <string.h>
 #include "typedefsTGDS.h"
 #include "xmem.h"
-
-extern void *malloc( size_t size );
-extern void free( void *ptr );
-extern void *calloc( size_t num, size_t size );
+#include "utilsTGDS.h"
 
 // default use 1.5 MB
-unsigned int XMEMTOTALSIZE = (1500*1024);
+unsigned int XMEMTOTALSIZE = (128*1024);
 
 // how many bytes will each of our blocks be?
 unsigned short XMEM_BLOCKSIZE = 128;
@@ -33,17 +30,29 @@ unsigned int XMEM_TABLESIZE = 0;
 #define XMEM_ENDBLOCK 0x02
 #define XMEM_USEDBLOCK 0x04
 
-
 unsigned char *xmem_table;
+//XMEM_BLOCK *xmem_blocks;
 unsigned char *xmem_blocks;
 
-void XmemSetup(unsigned int size, unsigned short blocks) {
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))
+#endif
 
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
+void XmemSetup(unsigned int size, unsigned short blocks) {
 	XMEMTOTALSIZE = size;
 	XMEM_BLOCKSIZE = blocks;
-	
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))
+#endif
+
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 void XmemInit(unsigned int mallocLinearMemoryStart, unsigned int mallocLinearMemorySize) {
 	// init XMEM
 	memset((u8*)mallocLinearMemoryStart, 0, mallocLinearMemorySize);
@@ -59,7 +68,9 @@ void XmemInit(unsigned int mallocLinearMemoryStart, unsigned int mallocLinearMem
 	xmem_blocks = (unsigned char *) malloc(XMEM_BLOCKSIZE*XMEM_BLOCKCOUNT);
 	
 	if ((xmem_table == NULL) || (xmem_blocks == NULL)) {
-		printf("XMEM: Could not allocate %d bytes of main ram for XMEM...",XMEM_TABLESIZE+(XMEM_BLOCKSIZE*XMEM_BLOCKCOUNT));
+		if(getTGDSDebuggingState() == true){
+			printf("XMEM: Could not allocate %d bytes of main ram for XMEM...",XMEM_TABLESIZE+(XMEM_BLOCKSIZE*XMEM_BLOCKCOUNT));
+		}
 		if (xmem_table) free(xmem_table);
 		if (xmem_blocks) free(xmem_blocks);
 		return;
@@ -67,11 +78,12 @@ void XmemInit(unsigned int mallocLinearMemoryStart, unsigned int mallocLinearMem
 	
 	//free(XT);
 	
-	printf("***       XMEM       *** ");
-	printf("TABLE: %8.8X (%d) ",(unsigned int)xmem_table, XMEM_TABLESIZE);
-	printf("BLOCK: %8.8X (%d) ",(unsigned int)xmem_blocks, XMEM_BLOCKSIZE*XMEM_BLOCKCOUNT);
-	printf("***XMEM INIT COMPLETE*** ");
-	
+	if(getTGDSDebuggingState() == true){
+		printf("***       XMEM       *** ");
+		printf("TABLE: %8.8X (%d) ",xmem_table,XMEM_TABLESIZE);
+		printf("BLOCK: %8.8X (%d) ",xmem_blocks,XMEM_BLOCKSIZE*XMEM_BLOCKCOUNT);
+		printf("***XMEM INIT COMPLETE*** ");
+	}
 	xmem_table[0] = XMEM_STARTBLOCK | XMEM_ENDBLOCK | XMEM_USEDBLOCK; // reserved i suppose
 	int i=0;
 	for (i=1;(unsigned)i<XMEM_TABLESIZE;i++) {
@@ -79,12 +91,17 @@ void XmemInit(unsigned int mallocLinearMemoryStart, unsigned int mallocLinearMem
 	}
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))
+#endif
+
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 void *Xmalloc(const int size) {
 
 	int i, blocks, sblock, fbr;
 	bool found;
-	
-	//printf("XMS");
 	
 	// find size amount of memory to give to 
 	blocks = (size / XMEM_BLOCKSIZE) + 1;
@@ -114,11 +131,12 @@ void *Xmalloc(const int size) {
 	}
 
 	if (!found) {
-		// couldnt find enough free blocks!
-		printf("XM: Couldnt Find Mem: %d/%d ",size, XMEM_FreeMem());
+		if(getTGDSDebuggingState() == true){
+			// couldnt find enough free blocks!
+			printf("XM: Couldnt Find Mem: %d/%d ",size, XMEM_FreeMem());
+		}
 		return NULL;
 	}
-	//printf("XM: SBLOCK: %d ",sblock);
 
 	// we found enough blocks!
 	// allocate them...
@@ -133,11 +151,16 @@ void *Xmalloc(const int size) {
 		xmem_table[sblock+(blocks-1)] |= XMEM_ENDBLOCK;
 	}
 	
-	
-	//printf("XM: %d %d %8.8X ", size, sblock, ((unsigned int) xmem_blocks + (sblock*XMEM_BLOCKSIZE))); 
 	return (void *) ((unsigned int) xmem_blocks + (sblock*XMEM_BLOCKSIZE));
-
 }
+
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))
+#endif
+
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 void *Xcalloc(const int size, const int count) {
 
 	void *temp;
@@ -155,16 +178,24 @@ void *Xcalloc(const int size, const int count) {
 	return temp;
 
 }
+
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))
+#endif
+
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 void Xfree(const void *ptr) {
 
 	int block,sblock;
 	
 	while (1) {
-		if ((unsigned char*)ptr < xmem_blocks) {
+		if (ptr < xmem_blocks) {
 			//printf("XM: Free: NXML %8.8X ",(unsigned int)ptr);
 			break;
 		}
-		if ((unsigned char*)ptr > (xmem_blocks+(XMEM_BLOCKCOUNT*XMEM_BLOCKSIZE))) {
+		if (ptr > (xmem_blocks+(XMEM_BLOCKCOUNT*XMEM_BLOCKSIZE))) {
 			//printf("XM: Free: NXMG %8.8X ",(u32)ptr);
 			break;
 		}
@@ -193,6 +224,13 @@ void Xfree(const void *ptr) {
 
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))
+#endif
+
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 unsigned int XMEM_FreeMem(void) {
 
 	int i,j;

@@ -96,7 +96,7 @@ void Game::reset()
 	#ifdef ARM9
 	soundGameOverEmitted = false;
     BgMusicOff();
-	BgMusic();
+	BgMusic("0:/stud.ima");
 	#endif
     tick = 30;
     tick2 = 10;
@@ -447,11 +447,12 @@ void keyboardInput(unsigned int key, int x, int y)
             scene->snake.set_direction(UP);
             game->key_pressed = true;
         break;
-        case SNAKEGL_KEY_RIGHT:
-            if (!game->is_running || game->key_pressed) return ;
+        case SNAKEGL_KEY_RIGHT:{
+			if (!game->is_running || game->key_pressed) return ;
             scene->snake.set_direction(RIGHT);
             game->key_pressed = true;
-        break;
+		}
+		break;
         case SNAKEGL_KEY_DOWN:
             if (!game->is_running && !game->is_game_over)
             {

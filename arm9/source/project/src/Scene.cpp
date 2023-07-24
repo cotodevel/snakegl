@@ -961,19 +961,26 @@ int startTGDSProject(int argc, char *argv[])
 	startTimerCounter(tUnitsMilliseconds, 1);
     glMaterialShinnyness();
 	glReset(); //Depend on GX stack to render scene
+	TWLPrintf("-- game loop start\n");
+	
 	while(1==1){
 		//Handle Input & game logic
 		scanKeys();
 		if(keysDown()&KEY_TOUCH){
-			scanKeys();
 			while(keysHeld() & KEY_TOUCH){
 				scanKeys();
 			}
 			NDSDual3DCameraFlag = !NDSDual3DCameraFlag;
 			menuShow();
 		}
-		keyboardInput((int)keysHeld(), 0, 0);
+		u32 keys = keysDown()&(KEY_UP|KEY_DOWN|KEY_LEFT|KEY_RIGHT|KEY_SELECT|KEY_START);
+		keyboardInput(keys, 0, 0);
 		
+		if((keys & KEY_RIGHT) == KEY_RIGHT){
+			TWLPrintf("-- keypad D-PAD RIGHT\n"); //TWL mode keypad broken
+			printf("-- keypad D-PAD RIGHT");
+		}
+
 		//sound (ARM7)
 		
 		//Render
