@@ -116,10 +116,8 @@ void MunchFoodSound(){
 	playSoundStreamFromFile((char*)&filen[2], false, streamType);
 }
 
-void BgMusic(){
+void BgMusic(char * filename){
 	//ARM7 ADPCM playback 
-	char filename[256];
-	strcpy(filename, "0:/stud.wav");
 	char * filen = FS_getFileName(filename);
 	strcat(filen, ".ima");
 	u32 streamType = FIFO_PLAYSOUNDSTREAM_FILE;
@@ -157,13 +155,14 @@ u32 playSoundStreamFromFile(char * videoStructFDFilename, bool loop, u32 streamT
 	fifomsg[34] = (uint32)loop;
 	fifomsg[35] = (uint32)streamType;
 	SendFIFOWords(FIFO_PLAYSOUNDSTREAM_FILE, 0xFF);
+
 	//If audio stream track... reset everytime entirely. Otherwise for sound effects play right away
 	if(streamType != FIFO_PLAYSOUNDEFFECT_FILE){
 		while(fifomsg[33] == (uint32)0xFFFFCCAA){
 			swiDelay(1);
 		}
-		return fifomsg[33];
 	}
+	return fifomsg[33];
 }
 
 #endif

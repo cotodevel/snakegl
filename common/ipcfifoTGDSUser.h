@@ -74,7 +74,7 @@ extern void gameoverSound();
 
 extern void MunchFoodSound();
 
-extern void BgMusic();
+extern void BgMusic(char * filename);
 extern void BgMusicOff();
 extern bool bgMusicEnabled;
 
