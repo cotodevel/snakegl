@@ -677,6 +677,9 @@ int InitGL(int argc, char *argv[]){
 	}
 #endif
 
+	glEnable(GL_COLOR_MATERIAL);	//allow to mix both glColor3f + light sources when lighting is enabled (glVertex + glNormal3f)
+
+
 	glDisable(GL_CULL_FACE); 
 	glCullFace (GL_NONE);
 
