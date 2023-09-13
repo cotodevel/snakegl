@@ -196,9 +196,7 @@ int main(int argc, char *argv[])
 	MPUSet();
 	//TGDS-Projects -> legacy NTR TSC compatibility
 	if(__dsimode == true){
-		TWLSetTouchscreenTWLMode();
-		
-		TWLSetTouchscreenNTRMode(); //required when WoopsiSDK TWL mode is NOT used, because of TWL mode keypad
+		TWLSetTouchscreenTWLMode(); //guaranteed TSC on TWL Mode through Unlaunch
 	}
 	REG_IME = 1;
 	
