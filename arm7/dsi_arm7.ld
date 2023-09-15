@@ -12,9 +12,9 @@ PHDRS {
 
 
 MEMORY {
-	ewram  : ORIGIN = 0x023C0000, LENGTH = 64K
+	ewram  : ORIGIN = 0x03800000, LENGTH = 64K
 	rom    : ORIGIN = 0x08000000, LENGTH = 32M
-	iwram  : ORIGIN = 0x023C0000, LENGTH = 64K	/* copying sections is WIP on TWL */
+	iwram  : ORIGIN = 0x03800000, LENGTH = 64K	/* copying sections is WIP on TWL */
 
 	twl_ewram : ORIGIN = 0x02e80000, LENGTH = 512K - 64K
 	twl_iwram : ORIGIN = 0x03000000, LENGTH = 256K
@@ -30,16 +30,13 @@ __irq_vector	=	0x04000000 - 4;
 _iwram_start =	__iwram_start;
 _iwram_end = __iwram_top;
 
-__arm7_start__ = _iwram_start;
-__arm7_end__ = _iwram_end;
-
 /* ARM ABI says stacks are full decreasing */
-sp_SVC	= 0x03810000 - 0x200; /* reset, swi exception*/
-sp_IRQ	= sp_SVC - 0x200;	/*irq exception*/
-sp_FIQ	= sp_IRQ - 0x200;	/* fiq exception */
-sp_ABT	= sp_FIQ - 0x200;	/* prefetch / data aborts exception */
-sp_UND	= sp_ABT - 0x200;	/* undefined exception */
-sp_USR	= sp_UND - 0x200;	/* usr / sys stacks */
+sp_SVC	= 0x03810000 - 0x120; /* reset, swi exception*/
+sp_IRQ	= sp_SVC - 0x120;	/*irq exception*/
+sp_FIQ	= sp_IRQ - 0x120;	/* fiq exception */
+sp_ABT	= sp_FIQ - 0x120;	/* prefetch / data aborts exception */
+sp_UND	= sp_ABT - 0x120;	/* undefined exception */
+sp_USR	= sp_UND - 0x120;	/* usr / sys stacks */
 sp_SYS = sp_USR;
 /* ARM7 Specific */
 _arm7_irqcheckbits = 0x0380FFF8;	/* __irq_flags */
@@ -64,7 +61,6 @@ SECTIONS
 	
 	.text :
 	{
-		__arm7_lma__ = LOADADDR(.text);
 		KEEP (*(SORT_NONE(.init)))
 		*(.plt)
 		*(.text .stub .text.* .gnu.linkonce.t.*)
@@ -184,9 +180,6 @@ SECTIONS
 		*.twl.*(COMMON)
 		*(.bss*)
 		*(.twl_bss)
-		*.twl.*(.dynbss)
-		*.twl.*(.gnu.linkonce.b*)
-		*.twl.*(.bss*)
 		. = ALIGN(4);
 		__data_end = ABSOLUTE(.) ;
 	} >iwram AT>ewram
@@ -199,7 +192,16 @@ SECTIONS
 		__bss_end__ = ABSOLUTE(.);
 		__end__ = ABSOLUTE(.);
 	} >iwram
-
+	
+	/* stubbed for ARM7i binaries */
+	__arm7i_lma__ = __end__ + 4;
+	__arm7i_start__ = __arm7i_lma__ + 4;
+	__arm7i_end__ = __arm7i_start__ + 4;
+	
+	__arm7_lma__ = __arm7i_end__ + 4;
+	__arm7_start__ = __arm7_lma__ + 4;
+	__arm7_end__ = __arm7_start__ + 4;
+	
 	/* Stabs debugging sections.  */
 	.stab 0 : { *(.stab) }
 	.stabstr 0 : { *(.stabstr) }
