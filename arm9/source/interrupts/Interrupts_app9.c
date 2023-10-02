@@ -24,7 +24,7 @@ USA
 #include "dsregs_asm.h"
 #include "main.h"
 #include "keypadTGDS.h"
-#include "VideoGL.h"
+#include "videoGL.h"
 #include "videoTGDS.h"
 #include "math.h"
 #include "imagepcx.h"
