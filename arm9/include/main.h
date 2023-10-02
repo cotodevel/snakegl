@@ -25,7 +25,7 @@ USA
 #include "dsregs.h"
 #include "fatfslayerTGDS.h"
 #include "utilsTGDS.h"
-#include "VideoGL.h"
+#include "videoGL.h"
 
 //project 1 multimedia list
 #define videoIntro ((char*)"0:/sth1.tvs") //video intro
