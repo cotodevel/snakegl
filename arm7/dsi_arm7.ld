@@ -31,12 +31,12 @@ _iwram_start =	__iwram_start;
 _iwram_end = __iwram_top;
 
 /* ARM ABI says stacks are full decreasing */
-sp_SVC	= 0x03810000 - 0x120; /* reset, swi exception*/
-sp_IRQ	= sp_SVC - 0x120;	/*irq exception*/
-sp_FIQ	= sp_IRQ - 0x120;	/* fiq exception */
-sp_ABT	= sp_FIQ - 0x120;	/* prefetch / data aborts exception */
-sp_UND	= sp_ABT - 0x120;	/* undefined exception */
-sp_USR	= sp_UND - 0x120;	/* usr / sys stacks */
+sp_SVC	= 0x03810000 - 0x100; /* reset, swi exception*/
+sp_IRQ	= sp_SVC - 0x100;	/*irq exception*/
+sp_FIQ	= sp_IRQ - 0x100;	/* fiq exception */
+sp_ABT	= sp_FIQ - 0x100;	/* prefetch / data aborts exception */
+sp_UND	= sp_ABT - 0x100;	/* undefined exception */
+sp_USR	= sp_UND - 0x100;	/* usr / sys stacks */
 sp_SYS = sp_USR;
 /* ARM7 Specific */
 _arm7_irqcheckbits = 0x0380FFF8;	/* __irq_flags */
