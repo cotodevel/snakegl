@@ -18,9 +18,8 @@
 
 #TGDS1.6 compatible Makefile
 
-#ToolchainGenericDS specific: Use Makefiles from either TGDS, or custom
-#Note: Woopsi template mostly targets ARM9 SDK. Thus the default ARM7 template is used
-export SOURCE_MAKEFILE7 = custom
+#ToolchainGenericDS specific: 
+export SOURCE_MAKEFILE7 = default
 export SOURCE_MAKEFILE9 = custom
 
 #Shared
@@ -39,11 +38,9 @@ export EXECUTABLE_FNAME = $(TGDSPROJECTNAME).nds
 export EXECUTABLE_VERSION_HEADER =	0.1
 export EXECUTABLE_VERSION =	"$(EXECUTABLE_VERSION_HEADER)"
 export TGDSPKG_TARGET_PATH := '//'
-export TGDSREMOTEBOOTER_SERVER_IP_ADDR := '192.168.1.83'
+export TGDSREMOTEBOOTER_SERVER_IP_ADDR := '192.168.43.185'
 export TGDSREMOTEBOOTER_SERVER_PORT := 1040
 #The ndstool I use requires to have the elf section removed, so these rules create elf headerless- binaries.
-export BINSTRIP_RULE_7 =	arm7.bin
-export BINSTRIP_RULE_9 =	arm9.bin
 export DIR_ARM7 = arm7
 export BUILD_ARM7	=	build
 export DIR_ARM9 = arm9
@@ -53,10 +50,24 @@ export ELF_ARM9 = arm9.elf
 export NONSTRIPELF_ARM7 = arm7-nonstripped.elf
 export NONSTRIPELF_ARM9 = arm9-nonstripped.elf
 
+export DECOMPRESSOR_BOOTCODE_9 = tgds_multiboot_payload
+export DECOMPRESSOR_BOOTCODE_9i = tgds_multiboot_payload_twl
+
+export BINSTRIP_RULE_7 :=	$(DIR_ARM7).bin
+export BINSTRIP_RULE_arm7bootldr =	arm7bootldr.bin
+
+export BINSTRIP_RULE_9 :=	$(DIR_ARM9).bin
+
+export BINSTRIP_RULE_COMPRESSED_9 :=	$(DECOMPRESSOR_BOOTCODE_9).bin
+export BINSTRIP_RULE_COMPRESSED_9i :=	$(DECOMPRESSOR_BOOTCODE_9i).bin
+
 export TARGET_LIBRARY_CRT0_FILE_7 = nds_arm_ld_crt0
 export TARGET_LIBRARY_CRT0_FILE_9 = nds_arm_ld_crt0
+export TARGET_LIBRARY_CRT0_FILE_COMPRESSED_9 = nds_arm_ld_crt0
+
 export TARGET_LIBRARY_LINKER_FILE_7 = $(TARGET_LIBRARY_PATH)$(TARGET_LIBRARY_LINKER_SRC)/$(TARGET_LIBRARY_CRT0_FILE_7).S
 export TARGET_LIBRARY_LINKER_FILE_9 = $(TARGET_LIBRARY_PATH)$(TARGET_LIBRARY_LINKER_SRC)/$(TARGET_LIBRARY_CRT0_FILE_9).S
+export TARGET_LIBRARY_LINKER_FILE_COMPRESSED_9 = ../$(DECOMPRESSOR_BOOTCODE_9)/$(TARGET_LIBRARY_CRT0_FILE_COMPRESSED_9).S
 
 export TARGET_LIBRARY_TGDS_NTR_7 = toolchaingen7
 export TARGET_LIBRARY_TGDS_NTR_9 = toolchaingen9
@@ -133,7 +144,7 @@ endif
 $(EXECUTABLE_FNAME)	:	compile
 	-@echo 'ndstool begin'
 	$(NDSTOOL)	-v	-c $@	-7  $(CURDIR)/arm7/$(BINSTRIP_RULE_7)	-e7  0x03800000	-9 $(CURDIR)/arm9/$(BINSTRIP_RULE_9) -e9  0x02000000	-b	icon.bmp "ToolchainGenericDS SDK;$(TGDSPROJECTNAME) NDS Binary; "
-	$(NDSTOOL)	-c 	${@:.nds=.srl} -7 arm7/arm7-nonstripped_dsi.elf	-9 $(CURDIR)/arm9/arm9_twl.bin -e9  0x02000800	\
+	$(NDSTOOL)	-c 	${@:.nds=.srl} -7 $(CURDIR)/arm7/arm7_twl.bin -e7  0x02380000	-9 $(CURDIR)/arm9/arm9_twl.bin -e9  0x02000800	\
 	-g "TGDS" "NN" "NDS.TinyFB"	\
 	-z 80040000 -u 00030004 -a 00000138 \
 	-b icon.bmp "$(TGDSPROJECTNAME);$(TGDSPROJECTNAME) TWL Binary;" \
@@ -159,7 +170,7 @@ ifeq ($(SOURCE_MAKEFILE9),default)
 endif
 	-@rm -rf $(CURDIR)/$(PosIndCodeDIR_FILENAME)/$(DIR_ARM7)/Makefile
 	-@rm -rf $(CURDIR)/$(PosIndCodeDIR_FILENAME)/$(DIR_ARM9)/Makefile
-	-@rm -fr $(EXECUTABLE_FNAME)	$(TGDSPROJECTNAME).srl	$(CURDIR)/common/templateCode/	../release/arm7dldi-ntr/$(TGDSPROJECTNAME).nds	../release/arm7dldi-twl/$(TGDSPROJECTNAME).srl
+	-@rm -fr $(EXECUTABLE_FNAME)	$(TGDSPROJECTNAME).srl	$(CURDIR)/common/templateCode/	../Release/arm7dldi-ntr/$(TGDSPROJECTNAME).nds	../Release/arm7dldi-twl/$(TGDSPROJECTNAME).srl
 
 rebase:
 	git reset --hard HEAD
@@ -185,29 +196,29 @@ switchMaster:
 #ToolchainGenericDS Package deploy format required by ToolchainGenericDS-OnlineApp.
 BuildTGDSPKG:
 	-@echo 'Build TGDS Package. '
-	-$(TGDSPKGBUILDER) $(TGDSPROJECTNAME) $(TGDSPKG_TARGET_PATH) $(LIBPATH) /release/arm7dldi-ntr/
+	-$(TGDSPKGBUILDER) $(TGDSPROJECTNAME) $(TGDSPKG_TARGET_PATH) $(LIBPATH) /Release/arm7dldi-ntr/
 
 #---------------------------------------------------------------------------------
 remotebootTWL:
-	-mv $(TGDSPROJECTNAME).srl	$(CURDIR)/release/arm7dldi-twl
-	-chmod 777 -R $(CURDIR)/release/arm7dldi-twl
-	-$(TGDSREMOTEBOOTER) /release/arm7dldi-twl $(TGDSREMOTEBOOTER_SERVER_IP_ADDR) twl_mode $(TGDSPROJECTNAME) $(TGDSPKG_TARGET_PATH) $(LIBPATH) remotepackage	nogdb	$(TGDSREMOTEBOOTER_SERVER_PORT)
+	-mv $(TGDSPROJECTNAME).srl	$(CURDIR)/Release/arm7dldi-twl
+	-chmod 777 -R $(CURDIR)/Release/arm7dldi-twl
+	-$(TGDSREMOTEBOOTER) /Release/arm7dldi-twl $(TGDSREMOTEBOOTER_SERVER_IP_ADDR) twl_mode $(TGDSPROJECTNAME) $(TGDSPKG_TARGET_PATH) $(LIBPATH) remotepackage	nogdb	$(TGDSREMOTEBOOTER_SERVER_PORT)
 	-rm -rf remotepackage.zip
 
 remotegdbTWL:
-	-mv $(TGDSPROJECTNAME).srl	$(CURDIR)/release/arm7dldi-twl
-	-chmod 777 -R $(CURDIR)/release/arm7dldi-twl
-	-$(TGDSREMOTEBOOTER) /release/arm7dldi-twl $(TGDSREMOTEBOOTER_SERVER_IP_ADDR) twl_mode $(TGDSPROJECTNAME) $(TGDSPKG_TARGET_PATH) $(LIBPATH) remotepackage	gdbenable	$(TGDSREMOTEBOOTER_SERVER_PORT)
+	-mv $(TGDSPROJECTNAME).srl	$(CURDIR)/Release/arm7dldi-twl
+	-chmod 777 -R $(CURDIR)/Release/arm7dldi-twl
+	-$(TGDSREMOTEBOOTER) /Release/arm7dldi-twl $(TGDSREMOTEBOOTER_SERVER_IP_ADDR) twl_mode $(TGDSPROJECTNAME) $(TGDSPKG_TARGET_PATH) $(LIBPATH) remotepackage	gdbenable	$(TGDSREMOTEBOOTER_SERVER_PORT)
 	-rm -rf remotepackage.zip
 
 remotebootNTR:
-	-mv $(TGDSPROJECTNAME).nds	$(CURDIR)/release/arm7dldi-ntr
-	-chmod 777 -R $(CURDIR)/release/arm7dldi-ntr
-	-$(TGDSREMOTEBOOTER) /release/arm7dldi-ntr $(TGDSREMOTEBOOTER_SERVER_IP_ADDR) ntr_mode $(TGDSPROJECTNAME) $(TGDSPKG_TARGET_PATH) $(LIBPATH) remotepackage	nogdb	$(TGDSREMOTEBOOTER_SERVER_PORT)
+	-mv $(TGDSPROJECTNAME).nds	$(CURDIR)/Release/arm7dldi-ntr
+	-chmod 777 -R $(CURDIR)/Release/arm7dldi-ntr
+	-$(TGDSREMOTEBOOTER) /Release/arm7dldi-ntr $(TGDSREMOTEBOOTER_SERVER_IP_ADDR) ntr_mode $(TGDSPROJECTNAME) $(TGDSPKG_TARGET_PATH) $(LIBPATH) remotepackage	nogdb	$(TGDSREMOTEBOOTER_SERVER_PORT)
 	-rm -rf remotepackage.zip
 
 remotegdbNTR:
-	-mv $(TGDSPROJECTNAME).nds	$(CURDIR)/release/arm7dldi-ntr
-	-chmod 777 -R $(CURDIR)/release/arm7dldi-ntr
-	-$(TGDSREMOTEBOOTER) /release/arm7dldi-ntr $(TGDSREMOTEBOOTER_SERVER_IP_ADDR) ntr_mode $(TGDSPROJECTNAME) $(TGDSPKG_TARGET_PATH) $(LIBPATH) remotepackage	gdbenable	$(TGDSREMOTEBOOTER_SERVER_PORT)
+	-mv $(TGDSPROJECTNAME).nds	$(CURDIR)/Release/arm7dldi-ntr
+	-chmod 777 -R $(CURDIR)/Release/arm7dldi-ntr
+	-$(TGDSREMOTEBOOTER) /Release/arm7dldi-ntr $(TGDSREMOTEBOOTER_SERVER_IP_ADDR) ntr_mode $(TGDSPROJECTNAME) $(TGDSPKG_TARGET_PATH) $(LIBPATH) remotepackage	gdbenable	$(TGDSREMOTEBOOTER_SERVER_PORT)
 	-rm -rf remotepackage.zip
