@@ -830,62 +830,39 @@ void setupTGDSProjectOpenGLDisplayLists(){
 			glEnd();
 		}
 	}
-
 	glEndList();
-	DLSPHERE=glGenLists(1);
-
-	glNewList(DLSPHERE, GL_COMPILE);	// 4: draw sphere
+	
+	DLSPHERE = (GLint)glGenLists(1);
+	//drawSphere(); -> NDS GX Implementation
+	glNewList(DLSPHERE, GL_COMPILE); //recompile a light-based sphere as OpenGL DisplayList for rendering on upper screen later
 	{
-		#define TWOPI ((double)((3.141592f)*2))
-		double r=0.6,faces=12;
-		double PID2 = 6*5; //6*4 move tex to upper sphere end
-		double ex=0,ey=0,ez=0,px=0,py=0,pz=0,cx=0,cy=0,cz=0;
-   
-		//internal
-		int i,j;
-		double theta1,theta2,theta3;
-		if (r < 0)
-			r = -r;
-		if (faces < 0)
-			faces = -faces;
-		if (faces < 4 || r <= 0) {
-			return;
-		}
-		for (j=0;j<faces/2;j++) {
-			theta1 = j * TWOPI / faces - PID2;
-			theta2 = (j + 1) * TWOPI / faces - PID2;
+		float r=1; 
+		int lats=8; 
+		int longs=8;
+		int i, j;
+		for (i = 0; i <= lats; i++) {
+			float lat0 = PI * (-0.5 + (float)(i - 1) / lats);
+			float z0 = sin((float)lat0);
+			float zr0 = cos((float)lat0);
 
+			float lat1 = PI * (-0.5 + (float)i / lats);
+			float z1 = sin((float)lat1);
+			float zr1 = cos((float)lat1);
 			glBegin(GL_TRIANGLE_STRIP);
-			
-			for (i=0;i<=faces;i++) {
-				theta3 = i * TWOPI / faces;
-				ex = cos(theta2) * cos(theta3);
-				ey = sin(theta2);
-				ez = cos(theta2) * sin(theta3);
-				px = cx + r * ex;
-				py = cy + r * ey;
-				pz = cz + r * ez;
-				
-				glNormal3f(ex,ey,ez);
-				
-				glTexCoord2f(-i/(double)faces,2*(j+1)/(double)faces);
-				glVertex3f(px,py,pz);
-				
-				ex = cos(theta1) * cos(theta3);
-				ey = sin(theta1);
-				ez = cos(theta1) * sin(theta3);
-				px = cx + r * ex;
-				py = cy + r * ey;
-				pz = cz + r * ez;
-
-				glNormal3f(ex,ey,ez);
-				glTexCoord2f(-i/(double)faces,2*j/(double)faces);
-				glVertex3f(px,py,pz);
+			for (j = 0; j <= longs; j++) {
+				float lng = 2 * PI * (float)(j - 1) / longs;
+				float x = cos(lng);
+				float y = sin(lng);
+				glNormal3f(x * zr0, y * zr0, z0);
+				glVertex3f(r * x * zr0, r * y * zr0, r * z0);
+				glNormal3f(x * zr1, y * zr1, z1);
+				glVertex3f(r * x * zr1, r * y * zr1, r * z1);
 			}
 			glEnd();
 		}
 	}
 	glEndList();
+	
 }
 
 #ifdef ARM9

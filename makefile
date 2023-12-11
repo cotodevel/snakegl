@@ -170,7 +170,7 @@ ifeq ($(SOURCE_MAKEFILE9),default)
 endif
 	-@rm -rf $(CURDIR)/$(PosIndCodeDIR_FILENAME)/$(DIR_ARM7)/Makefile
 	-@rm -rf $(CURDIR)/$(PosIndCodeDIR_FILENAME)/$(DIR_ARM9)/Makefile
-	-@rm -fr $(EXECUTABLE_FNAME)	$(TGDSPROJECTNAME).srl	$(CURDIR)/common/templateCode/	../Release/arm7dldi-ntr/$(TGDSPROJECTNAME).nds	../Release/arm7dldi-twl/$(TGDSPROJECTNAME).srl
+	-@rm -fr $(EXECUTABLE_FNAME)	$(TGDSPROJECTNAME).srl	$(CURDIR)/common/templateCode/	../release/arm7dldi-ntr/$(TGDSPROJECTNAME).nds	../release/arm7dldi-twl/$(TGDSPROJECTNAME).srl
 
 rebase:
 	git reset --hard HEAD
@@ -196,29 +196,29 @@ switchMaster:
 #ToolchainGenericDS Package deploy format required by ToolchainGenericDS-OnlineApp.
 BuildTGDSPKG:
 	-@echo 'Build TGDS Package. '
-	-$(TGDSPKGBUILDER) $(TGDSPROJECTNAME) $(TGDSPKG_TARGET_PATH) $(LIBPATH) /Release/arm7dldi-ntr/
+	-$(TGDSPKGBUILDER) $(TGDSPROJECTNAME) $(TGDSPKG_TARGET_PATH) $(LIBPATH) /release/arm7dldi-ntr/
 
 #---------------------------------------------------------------------------------
 remotebootTWL:
-	-mv $(TGDSPROJECTNAME).srl	$(CURDIR)/Release/arm7dldi-twl
-	-chmod 777 -R $(CURDIR)/Release/arm7dldi-twl
-	-$(TGDSREMOTEBOOTER) /Release/arm7dldi-twl $(TGDSREMOTEBOOTER_SERVER_IP_ADDR) twl_mode $(TGDSPROJECTNAME) $(TGDSPKG_TARGET_PATH) $(LIBPATH) remotepackage	nogdb	$(TGDSREMOTEBOOTER_SERVER_PORT)
+	-mv $(TGDSPROJECTNAME).srl	$(CURDIR)/release/arm7dldi-twl
+	-chmod 777 -R $(CURDIR)/release/arm7dldi-twl
+	-$(TGDSREMOTEBOOTER) /release/arm7dldi-twl $(TGDSREMOTEBOOTER_SERVER_IP_ADDR) twl_mode $(TGDSPROJECTNAME) $(TGDSPKG_TARGET_PATH) $(LIBPATH) remotepackage	nogdb	$(TGDSREMOTEBOOTER_SERVER_PORT)
 	-rm -rf remotepackage.zip
 
 remotegdbTWL:
-	-mv $(TGDSPROJECTNAME).srl	$(CURDIR)/Release/arm7dldi-twl
-	-chmod 777 -R $(CURDIR)/Release/arm7dldi-twl
-	-$(TGDSREMOTEBOOTER) /Release/arm7dldi-twl $(TGDSREMOTEBOOTER_SERVER_IP_ADDR) twl_mode $(TGDSPROJECTNAME) $(TGDSPKG_TARGET_PATH) $(LIBPATH) remotepackage	gdbenable	$(TGDSREMOTEBOOTER_SERVER_PORT)
+	-mv $(TGDSPROJECTNAME).srl	$(CURDIR)/release/arm7dldi-twl
+	-chmod 777 -R $(CURDIR)/release/arm7dldi-twl
+	-$(TGDSREMOTEBOOTER) /release/arm7dldi-twl $(TGDSREMOTEBOOTER_SERVER_IP_ADDR) twl_mode $(TGDSPROJECTNAME) $(TGDSPKG_TARGET_PATH) $(LIBPATH) remotepackage	gdbenable	$(TGDSREMOTEBOOTER_SERVER_PORT)
 	-rm -rf remotepackage.zip
 
 remotebootNTR:
-	-mv $(TGDSPROJECTNAME).nds	$(CURDIR)/Release/arm7dldi-ntr
-	-chmod 777 -R $(CURDIR)/Release/arm7dldi-ntr
-	-$(TGDSREMOTEBOOTER) /Release/arm7dldi-ntr $(TGDSREMOTEBOOTER_SERVER_IP_ADDR) ntr_mode $(TGDSPROJECTNAME) $(TGDSPKG_TARGET_PATH) $(LIBPATH) remotepackage	nogdb	$(TGDSREMOTEBOOTER_SERVER_PORT)
+	-mv $(TGDSPROJECTNAME).nds	$(CURDIR)/release/arm7dldi-ntr
+	-chmod 777 -R $(CURDIR)/release/arm7dldi-ntr
+	-$(TGDSREMOTEBOOTER) /release/arm7dldi-ntr $(TGDSREMOTEBOOTER_SERVER_IP_ADDR) ntr_mode $(TGDSPROJECTNAME) $(TGDSPKG_TARGET_PATH) $(LIBPATH) remotepackage	nogdb	$(TGDSREMOTEBOOTER_SERVER_PORT)
 	-rm -rf remotepackage.zip
 
 remotegdbNTR:
-	-mv $(TGDSPROJECTNAME).nds	$(CURDIR)/Release/arm7dldi-ntr
-	-chmod 777 -R $(CURDIR)/Release/arm7dldi-ntr
-	-$(TGDSREMOTEBOOTER) /Release/arm7dldi-ntr $(TGDSREMOTEBOOTER_SERVER_IP_ADDR) ntr_mode $(TGDSPROJECTNAME) $(TGDSPKG_TARGET_PATH) $(LIBPATH) remotepackage	gdbenable	$(TGDSREMOTEBOOTER_SERVER_PORT)
+	-mv $(TGDSPROJECTNAME).nds	$(CURDIR)/release/arm7dldi-ntr
+	-chmod 777 -R $(CURDIR)/release/arm7dldi-ntr
+	-$(TGDSREMOTEBOOTER) /release/arm7dldi-ntr $(TGDSREMOTEBOOTER_SERVER_IP_ADDR) ntr_mode $(TGDSPROJECTNAME) $(TGDSPKG_TARGET_PATH) $(LIBPATH) remotepackage	gdbenable	$(TGDSREMOTEBOOTER_SERVER_PORT)
 	-rm -rf remotepackage.zip
