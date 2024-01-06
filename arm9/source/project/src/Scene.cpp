@@ -785,9 +785,10 @@ int InitGL(int argc, char *argv[]){
 	for(i = 0; i < texturesInSlot; i++){
 		printf("Tex. index: %d: Tex. name[%d]", i, getTextureNameFromIndex(i));
 	}
-#endif
 	printf("Free Mem: %d KB", ((int)TGDSARM9MallocFreeMemory()/1024));
 	glCallListGX((u32*)&GXPayload); //Run this payload once to force cache flushes on DMA GXFIFO
+#endif
+	
 	glEnable(GL_COLOR_MATERIAL);	//allow to mix both glColor3f + light sources when lighting is enabled (glVertex + glNormal3f)
 	glDisable(GL_CULL_FACE); 
 	glCullFace (GL_NONE);
