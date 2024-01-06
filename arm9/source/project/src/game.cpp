@@ -23,7 +23,6 @@
 #include "grass.h"
 #include "menu.h"
 #include "snakegfx.h"
-#include "Texture_Cube.h"
 #endif
 
 #include "Scene.h"
@@ -33,7 +32,12 @@ __attribute__ ((optnone))
 #endif
 Game* game = NULL;
 
-
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("Ofast")))
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 float to_fps(float fps, int value)
 {
     if (fps < 1)
@@ -41,6 +45,12 @@ float to_fps(float fps, int value)
     return value * fps / 60;
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("Ofast")))
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 Game::Game(int argc, char *argv[]):
 	scenario(argc, argv)
 {
@@ -62,21 +72,45 @@ Game::Game(int argc, char *argv[]):
     tick2 = 10;
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("Ofast")))
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 Game::~Game()
 {
     
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("Ofast")))
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 void Game::pause()
 {
     paused = true;
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("Ofast")))
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 void Game::start()
 {
     paused = false;
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("Ofast")))
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 void Game::stop()
 {
     is_running = false;
@@ -84,6 +118,12 @@ void Game::stop()
     paused = false;
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("Ofast")))
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 void Game::reset()
 {
     m = to_fps(fps, 30);
@@ -105,17 +145,23 @@ void Game::reset()
     is_running = true;
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("Ofast")))
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 void Game::draw_menu(){
     enable_2D_texture();
 		glPushMatrix();
 		glBindTexture(
 		#ifdef WIN32
-			GL_TEXTURE_2D
+			GL_TEXTURE_2D, texturesSnakeGL[MENU_TEXTURE]
 		#endif
 		#ifdef ARM9
-		0
+		    0,  textureSizePixelCoords[MENU_TEXTURE].textureIndex
 		#endif
-		, texturesSnakeGL[MENU_TEXTURE]);
+		);
 		glBegin(GL_QUADS);
             glNormal3f(0.0, 1.0, 0.0);
             glTexCoord2f(0, 1);
@@ -205,6 +251,12 @@ void Game::draw_menu(){
     }
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("Ofast")))
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 void Game::run()
 {
 	Scene * scene = &game->scenario;
@@ -271,6 +323,12 @@ void Game::run()
     }
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("Ofast")))
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 bool Game::wait()
 {
     bool wait = m > 0 && m < to_fps(fps, 30);
@@ -279,6 +337,12 @@ bool Game::wait()
     return wait;
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("Ofast")))
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 bool Game::wait2()
 {
     bool wait = m2 > 0 && m2 < to_fps(fps, 10);
@@ -287,6 +351,12 @@ bool Game::wait2()
     return wait;
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("Ofast")))
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 void Game::calculateFPS(void)
 {
     //  Increase frame count
@@ -330,6 +400,12 @@ void Game::calculateFPS(void)
 	#endif
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("Ofast")))
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 bool Game::clock()
 {
     // Speed up every time grows.
@@ -339,6 +415,12 @@ bool Game::clock()
     return !wait;
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("Ofast")))
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 bool Game::clock2()
 {
     tick2++;
@@ -362,10 +444,17 @@ void keyboardSpecial(int key, int x, int y)
 #endif
 
 /// Handles keyboard input for normal keys
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 void keyboardInput(unsigned int key, int x, int y)
 {
 	Scene * scene = &game->scenario;
 	switch(key) {
+		#ifdef _MSC_VER
 		case '1':{	// toggles light 0 on / off
 			scene->light0On = !scene->light0On;
 			if (scene->light0On){
@@ -390,7 +479,6 @@ void keyboardInput(unsigned int key, int x, int y)
 			}
 		}break;
 		
-		#ifdef _MSC_VER
 		case '3':{	// toggles Fullscreen (WIN32 VS2012, GLUT)
 			scene->fullScreen = !scene->fullScreen;
 			if (scene->fullScreen){
@@ -463,12 +551,8 @@ void keyboardInput(unsigned int key, int x, int y)
             scene->snake.set_direction(DOWN);
             game->key_pressed = true;
         break;
-        default:{
-            //printf("key = %d", key);
-        }
-        break;
 	}
-
+	
 	#if defined(_MSC_VER)
 	glutPostRedisplay();
 	#endif

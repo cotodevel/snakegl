@@ -69,12 +69,12 @@ void Snake::draw()
     enable_2D_texture();
 	glBindTexture(
 		#ifdef WIN32
-		GL_TEXTURE_2D,
+		GL_TEXTURE_2D, texturesSnakeGL[SNAKE_TEXTURE]
 		#endif
 		#ifdef ARM9
-		0, 
+		0, textureSizePixelCoords[SNAKE_TEXTURE].textureIndex
 		#endif
-	texturesSnakeGL[SNAKE_TEXTURE]);
+	);
 	
 	for (size_t i = 1; i < points.size(); ++i)
     {
@@ -184,13 +184,12 @@ void draw_cube(float size, Point p, int res_id)
     enable_2D_texture();
 	glPushMatrix();
 		glBindTexture(
-			#ifdef ARM9
-			0, 
-			#endif
 			#ifdef WIN32
-			GL_TEXTURE_2D,
+			    GL_TEXTURE_2D, texturesSnakeGL[res_id]
 			#endif
-			texturesSnakeGL[res_id]
+            #ifdef ARM9
+			    0, textureSizePixelCoords[res_id].textureIndex
+			#endif
 		);
 		glTranslatef(p.x, p.y, p.z);
 		glut2SolidCubeSlow(size);

@@ -69,17 +69,16 @@ extern "C"{
 #endif
 
 // light 0 colours
-extern GLfloat ambient0Scene[4];
-extern GLfloat diffuse0Scene[4];
-extern GLfloat specular0Scene[4];
-extern GLfloat position0Scene[4];
+extern GLfloat light_ambient0Scene[4];
+extern GLfloat light_diffuse0Scene[4];
+extern GLfloat light_specular0Scene[4];
+extern GLfloat light_position0Scene[4];
 
 // light 1 colours
-extern GLfloat ambient1Scene[4];
-extern GLfloat diffuse1Scene[4];
-extern GLfloat specular1Scene[4];
-extern GLfloat position1Scene[4];
-extern GLfloat direction1Scene[4];
+extern GLfloat light_ambient1Scene[4];
+extern GLfloat light_diffuse1Scene[4];
+extern GLfloat light_specular1Scene[4];
+extern GLfloat light_position1Scene[4];
 
 extern int widthScene;	/// the width of the window
 extern int heightScene;	/// the height of the window
@@ -101,8 +100,9 @@ extern void render3DUpperScreen();
 extern void render3DBottomScreen();
 extern int startTGDSProject(int argc, char *argv[]);
 extern void TGDSAPPExit(u32 fn_address);
+#ifdef WIN32
 extern GLuint texturesSnakeGL[TEXTURE_COUNT+1];
-
+#endif
 extern void load_resources();
 extern void unload_resources();
 extern void setVSync(bool sync);
