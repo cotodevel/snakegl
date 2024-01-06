@@ -13,6 +13,7 @@
 #include "ipcfifoTGDSUser.h"
 #include "imagepcx.h"
 #include "main.h"
+#include "GXPayload.h" //required to flush the GX<->DMA<->FIFO circuit on real hardware
 
 //Textures
 #include "apple.h"
@@ -21,7 +22,6 @@
 #include "grass.h"
 #include "menu.h"
 #include "snakegfx.h"
-#include "Texture_Cube.h"
 #endif
 
 //
@@ -31,6 +31,12 @@
 //Global because TGDSVideo initialization happens much earlier than game context creation
 bool TGDSProjectDual3DEnabled;
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))  
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 Scene::Scene(int argc, char *argv[])
 {
 	TWLPrintf("-- Creating scene\n");
@@ -40,15 +46,15 @@ Scene::Scene(int argc, char *argv[])
 	// set up our directional overhead lights
 	light0On = false;
 	light1On = false;
-	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient0Scene);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse0Scene);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, specular0Scene);
-	glLightfv(GL_LIGHT0, GL_POSITION, position0Scene);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient0Scene);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse0Scene);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular0Scene);
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position0Scene);
 	
-	glLightfv(GL_LIGHT1, GL_AMBIENT, ambient1Scene);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse1Scene);
-	glLightfv(GL_LIGHT1, GL_SPECULAR, specular1Scene);
-	glLightfv(GL_LIGHT1, GL_POSITION, position1Scene);
+	glLightfv(GL_LIGHT1, GL_AMBIENT, light_ambient1Scene);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse1Scene);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, light_specular1Scene);
+	glLightfv(GL_LIGHT1, GL_POSITION, light_position1Scene);
 	
 	fogMode = false;
 	wireMode = false;		/// wireframe mode on / off
@@ -60,6 +66,12 @@ Scene::Scene(int argc, char *argv[])
 	#endif
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))  
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 void Scene::reset()
 {
     barriers.clear();
@@ -71,6 +83,12 @@ void Scene::reset()
     add_barrier();
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))  
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 void Scene::add_barrier()
 {
     Point p = random_point();
@@ -84,6 +102,12 @@ void Scene::add_barrier()
     barriers.push_back(p);
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))  
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 void Scene::change_food_pos()
 {
     Point p = random_point();
@@ -96,6 +120,12 @@ void Scene::change_food_pos()
     food = p;
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))  
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 void Scene::draw_board()
 {
     enable_2D_texture();
@@ -103,12 +133,12 @@ void Scene::draw_board()
 	
 		glBindTexture(
         #ifdef WIN32
-            GL_TEXTURE_2D,
+            GL_TEXTURE_2D, texturesSnakeGL[GROUND_TEXTURE]
         #endif
         #ifdef ARM9
-        0,
+        	0, textureSizePixelCoords[GROUND_TEXTURE].textureIndex
         #endif
-         texturesSnakeGL[GROUND_TEXTURE]);
+         );
         glBegin(GL_QUADS);
             glNormal3i(0.0, 1.0, 0.0);
             glTexCoord2f(0, 0);
@@ -156,6 +186,12 @@ void Scene::draw_board()
 	disable_2D_texture();
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))  
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 void Scene::draw_food()
 {
     Point p = food;
@@ -188,12 +224,11 @@ void Scene::draw_food()
     glPushMatrix();
 		glBindTexture(
             #ifdef WIN32
-                GL_TEXTURE_2D,
+                GL_TEXTURE_2D, texturesSnakeGL[FOOD_TEXTURE]
             #endif
             #ifdef ARM9
-                0, 
-            #endif    
-            texturesSnakeGL[FOOD_TEXTURE]
+                0, textureSizePixelCoords[FOOD_TEXTURE].textureIndex
+            #endif
         );
 		glTranslatef(p.x, p.y + m, p.z);
         glRotatef(a, 0.0, 1.0, 0.0);
@@ -212,6 +247,12 @@ void Scene::draw_food()
 	disable_2D_texture();
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))  
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 void Scene::draw_barrier()
 {
     for (size_t i = 0; i < barriers.size(); ++i)
@@ -221,6 +262,12 @@ void Scene::draw_barrier()
     }
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))  
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 void Scene::draw_objects()
 {
     draw_board();
@@ -229,6 +276,12 @@ void Scene::draw_objects()
     snake.draw();
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))  
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 ObjectType Scene::has_collision(Point p)
 {
     if (p.x >  5.0f ||
@@ -262,6 +315,12 @@ ObjectType Scene::has_collision(Point p)
     return NONE;
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))  
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 void Scene::change_camera_pos(){
     #ifdef WIN32
 	camera_mode += 1;
@@ -275,6 +334,12 @@ void Scene::change_camera_pos(){
 	#endif
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))  
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 void Scene::set_camera()
 {
 	glMatrixMode(GL_PROJECTION);
@@ -393,40 +458,57 @@ void Scene::set_camera()
 //VS2012 WIN32 GLUT defs
 #ifdef WIN32
 int width  = 640, height = 640;
+GLuint texturesSnakeGL[TEXTURE_COUNT+1];
 #endif
 
-GLuint texturesSnakeGL[TEXTURE_COUNT+1];
 
 int widthScene;	/// the width of the window
 int heightScene;	/// the height of the window
 
 // light 0 colours
+
+//https://www.glprogramming.com/red/chapter05.html
+//The GL_DIFFUSE parameter probably most closely correlates with what you naturally think of as "the color of a light." 
+//It defines the RGBA color of the diffuse light that a particular light source adds to a scene. By default, GL_DIFFUSE is (1.0, 1.0, 1.0, 1.0) for GL_LIGHT0, 
+//which produces a bright, white light as shown in the left side of "Plate 13" in Appendix I. 
+//The default value for any other light (GL_LIGHT1, ... , GL_LIGHT7) is (0.0, 0.0, 0.0, 0.0).
+GLfloat light_diffuse0Scene[4]	= {0.4f, 0.4f, 0.4f, 1.01f}; //WIN32
+
 #ifdef WIN32
-GLfloat ambient0Scene[4]	= {0.1f, 0.1f, 0.1f, 1.0f}; //WIN32
-GLfloat diffuse0Scene[4]	= {0.4f, 0.4f, 0.4f, 1.01f}; //WIN32
-GLfloat specular0Scene[4]	= {0.2f, 0.2f, 0.2f, 1.0f}; //WIN32
-GLfloat position0Scene[4]	= {0.0f, -1.0f, 0.0f, 0.0f}; //WIN32
+GLfloat light_ambient0Scene[4]	= {0.1f, 0.1f, 0.1f, 1.0f}; //WIN32
+GLfloat light_specular0Scene[4]	= {0.2f, 0.2f, 0.2f, 1.0f}; //WIN32
+GLfloat light_position0Scene[4]	= {0.0f, -1.0f, 0.0f, 0.0f}; //WIN32
 #endif
 #ifdef ARM9
-GLfloat ambient0Scene[]  = { 0.0f, 0.0f, 0.0f, 1.0f }; //NDS
-GLfloat diffuse0Scene[]  = { 1.0f, 1.0f, 1.0f, 1.0f }; //NDS
-GLfloat specular0Scene[] = { 1.0f, 1.0f, 1.0f, 1.0f }; //NDS
-GLfloat position0Scene[] = { 2.0f, 5.0f, 5.0f, 0.0f }; //NDS
+GLfloat light_ambient0Scene[]  = { 1.0f, 1.0f, 1.0f, 1.0f }; //NDS
+GLfloat light_specular0Scene[] = { 1.0f, 1.0f, 1.0f, 1.0f }; //NDS
+GLfloat light_position0Scene[] = { 0.0f, -1.0f, 0.0f, 0.0f }; //NDS
 #endif
 
 // light 1 colours
-GLfloat ambient1Scene[4]	= {0.1f, 0.1f, 0.1f, 1.0f};
-GLfloat diffuse1Scene[4]	= {0.45f, 0.45f, 0.45f, 1.0f};
-GLfloat specular1Scene[4]	= {0.5f, 0.5f, 0.5f, 1.0f};
-GLfloat position1Scene[4]	= {-2.0f, -5.0f, -5.0f, -1.0f};
-GLfloat direction1Scene[4]	= {0.0f, 0.0f, -1.0f};
+GLfloat light_ambient1Scene[4]	= {0.1f, 0.1f, 0.1f, 1.0f};
+GLfloat light_diffuse1Scene[4]	= {0.45f, 0.45f, 0.45f, 1.0f};
+GLfloat light_specular1Scene[4]	= {0.5f, 0.5f, 0.5f, 1.0f};
+GLfloat light_position1Scene[4]	= {-2.0f, -5.0f, -5.0f, -1.0f};
 
 #ifdef ARM9
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))  
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 void render3DUpperScreen(){
 	//Update camera for NintendoDS Upper 3D Screen:
 	game->scenario.close_camera_mode = NDSDual3DCameraFlag;
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))  
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 void render3DBottomScreen(){
 	//Update camera for NintendoDS Bottom 3D Screen
 	game->scenario.close_camera_mode = !NDSDual3DCameraFlag;
@@ -434,6 +516,12 @@ void render3DBottomScreen(){
 #endif
 
 /// Renders a single frame of the scene
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))  
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 void drawScene(){
 	Scene * scene = &game->scenario;
 
@@ -452,11 +540,14 @@ void drawScene(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 	#endif
 
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
 	// draw element(s) in the scene + light source(s)
 	#ifdef ARM9
+		glMatrixMode(GL_TEXTURE); //GX 3D hardware needs this to enable texturing on a frame basis
+		glLoadIdentity();	
+		glMatrixMode(GL_MODELVIEW);
+		
+		glMaterialShinnyness();
+		
 		updateGXLights(); //Update GX 3D light scene!
 		glColor3f(1.0, 1.0, 1.0); //clear last scene color/light vectors
 	#endif
@@ -580,6 +671,12 @@ GLint DLEN2DTEX = -1;
 GLint DLDIS2DTEX = -1;
 GLint DLSOLIDCUBE05F = -1;
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))  
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 void enable_2D_texture(){
 	glCallList(DLEN2DTEX);
 	#ifdef WIN32
@@ -587,6 +684,12 @@ void enable_2D_texture(){
 	#endif
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))  
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 void disable_2D_texture(){
 	glCallList(DLDIS2DTEX);
 	#ifdef WIN32
@@ -595,6 +698,12 @@ void disable_2D_texture(){
 }
 
 //hardcoded below function at 0.5f to speedup drawing
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))  
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 void glut2SolidCube05f(){
 	//(snake body object)
 	glColor3f(1.0f, 1.0f, 14.0f);
@@ -654,36 +763,39 @@ int InitGL(int argc, char *argv[]){
 		menuShow();
 	}
 	REG_IE |= IRQ_VBLANK;
-	glReset(); //Depend on GX stack to render scene
 	glClearColor(0,35,195);		// blue green background colour
-
+	
+	setOrientation(ORIENTATION_0, true);
+	//set mode 0, enable BG0 and set it to 3D
+	SETDISPCNT_MAIN(MODE_0_3D);
+	
 	/* TGDS 1.65 OpenGL 1.1 Initialization */
 	ReSizeGLScene(255, 191);
 	glMaterialShinnyness();
 
 	//#1: Load a texture and map each one to a texture slot
-	u32 arrayOfTextures[7];
+	u32 arrayOfTextures[5];
 	arrayOfTextures[0] = (u32)&apple; //0: apple.bmp  
 	arrayOfTextures[1] = (u32)&boxbitmap; //1: boxbitmap.bmp  
 	arrayOfTextures[2] = (u32)&brick; //2: brick.bmp  
 	arrayOfTextures[3] = (u32)&grass; //3: grass.bmp
-	arrayOfTextures[4] = (u32)&menu; //4: menu.bmp
-	arrayOfTextures[5] = (u32)&snakegfx; //5: snakegfx.bmp
-	arrayOfTextures[6] = (u32)&Texture_Cube; //6: Texture_Cube.bmp
-	int texturesInSlot = LoadLotsOfGLTextures((u32*)&arrayOfTextures, (int*)&texturesSnakeGL, 7); //Implements both glBindTexture and glTexImage2D 
+	arrayOfTextures[4] = (u32)&snakegfx; //5: snakegfx.bmp
+	int texturesInSlot = LoadLotsOfGLTextures((u32*)&arrayOfTextures, (sizeof(arrayOfTextures)/sizeof(u32)) ); //Implements both glBindTexture and glTexImage2D 
 	int i = 0;
 	for(i = 0; i < texturesInSlot; i++){
-		printf("Texture loaded: %d:textID[%d] Size: %d", i, texturesSnakeGL[i], getTextureBaseFromTextureSlot(activeTexture));
+		printf("Tex. index: %d: Tex. name[%d]", i, getTextureNameFromIndex(i));
 	}
 #endif
-
+	printf("Free Mem: %d KB", ((int)TGDSARM9MallocFreeMemory()/1024));
+	glCallListGX((u32*)&GXPayload); //Run this payload once to force cache flushes on DMA GXFIFO
 	glEnable(GL_COLOR_MATERIAL);	//allow to mix both glColor3f + light sources when lighting is enabled (glVertex + glNormal3f)
-
-
 	glDisable(GL_CULL_FACE); 
 	glCullFace (GL_NONE);
-
 	setupTGDSProjectOpenGLDisplayLists();
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0|GL_LIGHT1);
+	
 	return 0;
 }
 
@@ -707,11 +819,14 @@ void setupTGDSProjectOpenGLDisplayLists(){
 		GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f }; 
 		GLfloat light_position[] = { 2.0f, 5.0f, 5.0f, 0.0f }; 
 
+		//DS doesn't support filtering.
+		#ifdef WIN32
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	   
+	   	#endif
+
 		glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient); 
         glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse); 
         glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular); 
@@ -749,16 +864,18 @@ void setupTGDSProjectOpenGLDisplayLists(){
         GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
         GLfloat light_position[] = { 2.0f, 5.0f, 5.0f, 0.0f };
 
+		//DS doesn't support filtering.
+		#ifdef WIN32
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		
+		#endif
+
 		glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient); 
         glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse); 
         glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular); 
         glLightfv(GL_LIGHT0, GL_POSITION, light_position); 
-
 		
 		{
 			#ifdef ARM9
@@ -875,7 +992,7 @@ __attribute__((optnone))
 #endif
 GLvoid ReSizeGLScene(GLsizei widthIn, GLsizei heightIn)		// resizes the window (GLUT & TGDS GL)
 {
-	#ifdef WIN32 //todo: does this work on NDS?
+	#ifdef WIN32
 	if (heightIn==0)										// Prevent A Divide By Zero By
 	{
 		heightIn=1;										// Making Height Equal One
@@ -912,6 +1029,12 @@ GLvoid ReSizeGLScene(GLsizei widthIn, GLsizei heightIn)		// resizes the window (
 	#endif
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 int startTGDSProject(int argc, char *argv[])
 {
 	time_t time1 = time(NULL);
@@ -940,7 +1063,6 @@ int startTGDSProject(int argc, char *argv[])
 #if defined(ARM9)
 	startTimerCounter(tUnitsMilliseconds, 1);
     glMaterialShinnyness();
-	glReset(); //Depend on GX stack to render scene
 	TWLPrintf("-- game loop start\n");
 	
 	while(1==1){
@@ -956,11 +1078,6 @@ int startTGDSProject(int argc, char *argv[])
 		u32 keys = keysDown()&(KEY_UP|KEY_DOWN|KEY_LEFT|KEY_RIGHT|KEY_SELECT|KEY_START);
 		keyboardInput(keys, 0, 0);
 		
-		if((keys & KEY_RIGHT) == KEY_RIGHT){
-			TWLPrintf("-- keypad D-PAD RIGHT\n"); //TWL mode keypad broken
-			printf("-- keypad D-PAD RIGHT");
-		}
-
 		//sound (ARM7)
 		
 		//Render
@@ -973,6 +1090,12 @@ int startTGDSProject(int argc, char *argv[])
 /*
     http://www.dbfinteractive.com/forum/index.php?topic=5998.0
 */
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))  
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 void setVSync(bool sync)
 {
 #ifdef _MSC_VER
@@ -1022,14 +1145,32 @@ void setVSync(bool sync)
 
 #if defined(ARM9)
 //false to enable TGDS Single 3D Screen + Console; true to enable TGDS Dual 3D Screen mode
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))  
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 void enableDual3DTGDS(){
 	TGDSProjectDual3DEnabled = true; 
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))  
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 void disableDual3DTGDS(){
 	TGDSProjectDual3DEnabled = false;
 }
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))  
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 bool getDual3DTGDSStatus(){
 	return TGDSProjectDual3DEnabled;
 }
