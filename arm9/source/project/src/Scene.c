@@ -5,8 +5,6 @@
 
 
 #include "Scene.h"
-#include "snake.h"
-#include "game.h"
 
 #ifdef ARM9
 #include "Sphere008.h"
@@ -128,6 +126,8 @@ __attribute__ ((optnone))
 #endif
 void draw_board(struct Scene * sceneInst)
 {
+	struct Point p;
+	double size = 0;
     enable_2D_texture();
 	glPushMatrix();
 	
@@ -151,8 +151,7 @@ void draw_board(struct Scene * sceneInst)
             glVertex3f(-BOARD_SIZE, 0, -BOARD_SIZE);
         glEnd();
 		
-        struct Point p;
-        double size = -BOARD_SIZE - 0.1;
+        size = -BOARD_SIZE - 0.1;
         // Draw bordes. TODO: It's better use a rectangle.
         while (size < BOARD_SIZE + 0.1)
         {
@@ -255,7 +254,8 @@ __attribute__ ((optnone))
 #endif
 void draw_barrier(struct Scene * sceneInst)
 {
-    for (size_t i = 0; i < size(&sceneInst->barriers); ++i)
+	size_t i = 0;
+    for (i = 0; i < size(&sceneInst->barriers); ++i)
     {
 		struct Point p = sceneInst->barriers.points[i];
         draw_cube(0.5f, p, BARRIER_TEXTURE);
@@ -297,16 +297,18 @@ enum ObjectType has_collision(struct Scene * sceneInst, struct Point p)
         return FOOD;
     }
 
-    for (size_t i = 0; i < size(&sceneInst->barriers); ++i)
-    {
-		struct Point b = sceneInst->barriers.points[i];
+	{
+		size_t i = 0;
+		for (i = 0; i < size(&sceneInst->barriers); ++i)
+		{
+			struct Point b = sceneInst->barriers.points[i];
 
-        if (p.x == b.x && p.z == b.z)
-        {
-            return BARRIER;
-        }
-    }
-
+			if (p.x == b.x && p.z == b.z)
+			{
+				return BARRIER;
+			}
+		}
+	}
 	
     if (has_collisionSnake(&game.scenario.snake, p))
     {
@@ -524,8 +526,9 @@ __attribute__((optimize("O0")))
 __attribute__ ((optnone))
 #endif
 void drawScene(){
-	Scene * scene = &game.scenario;
-
+	int old_cam = 0;
+	struct Scene * sceneInst = &game.scenario;
+	
 	#ifdef ARM9
 	//NDS: Dual 3D Render implementation. Must be called right before a new 3D scene is drawn
 	if(TGDSProjectDual3DEnabled == true){
@@ -555,10 +558,10 @@ void drawScene(){
 
 	//draw objects
 	#ifdef WIN32
-    int old_cam = scene->camera_mode;
-    scene->camera_mode = 3;
+    old_cam = sceneInst->camera_mode;
+    sceneInst->camera_mode = 3;
 	#endif
-    set_camera(scene);
+    set_camera(sceneInst);
     calculateFPS(&game);
     {
 		char s [50];
@@ -566,9 +569,9 @@ void drawScene(){
     
 		if (game.is_running){
 			#ifdef WIN32
-			scene->camera_mode = old_cam;
+			sceneInst->camera_mode = old_cam;
 			#endif
-			set_camera(scene);
+			set_camera(sceneInst);
 			#ifdef ARM9
 			if (1==1)
 			#endif
@@ -576,34 +579,34 @@ void drawScene(){
 			if (clock2(&game))
 			#endif
 			{
-				if (scene->a > 360)
+				if (sceneInst->a > 360)
 				{
-					scene->a = 0;
+					sceneInst->a = 0;
 				}
 
-				scene->a += 5;
+				sceneInst->a += 5;
 
-				if (scene->m > 0.1f)
+				if (sceneInst->m > 0.1f)
 				{
-					scene->m = 0.0;
+					sceneInst->m = 0.0;
 				}
 
-				scene->m += 0.05;
+				sceneInst->m += 0.05;
 			}
 
-			draw_objects(scene);
+			draw_objects(sceneInst);
 			#ifdef WIN32
 			glColor3f(0.0f, 0.0f, 0.0f);
 			glRectf(0,0, 0.75f, -0.1f);
-			scene->camera_mode = 3;
+			sceneInst->camera_mode = 3;
 			#endif
-			set_camera(scene);
+			set_camera(sceneInst);
 
 			#ifdef ARM9
 			if (1==1)
 			#endif
 			#ifdef WIN32
-			if (clock(&game))
+			if (clockGame(&game))
 			#endif
 			{
 				run(&game);
@@ -611,7 +614,7 @@ void drawScene(){
 
 			if (game.is_game_over)
 			{
-				if (wait(&game))
+				if (waitGame(&game))
 				{
 					p.x = -1.25f;
 					p.y = 0.5f;
@@ -651,7 +654,7 @@ void drawScene(){
 			#endif
 		}
 		#ifdef WIN32
-		scene->camera_mode = old_cam;
+		sceneInst->camera_mode = old_cam;
 		#endif
 
 	}
@@ -723,8 +726,8 @@ __attribute__((optnone))
 #endif
 #endif
 int InitGL(int argc, char *argv[]){
-	TWLPrintf("-- Setting up OpenGL context\n");
 #ifdef _MSC_VER
+	float pos_light[4] = { 5.0f, 5.0f, 10.0f, 0.0f };
 	// initialise glut
 	glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE);
@@ -737,7 +740,6 @@ int InitGL(int argc, char *argv[]){
     glutSpecialFunc(keyboardSpecial);
 	setVSync(true);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    float pos_light[4] = { 5.0f, 5.0f, 10.0f, 0.0f };
     glLightfv(GL_LIGHT0, GL_POSITION, pos_light);
     glEnable(GL_LIGHT0);
 	glEnable(GL_CULL_FACE);

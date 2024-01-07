@@ -1,13 +1,8 @@
-#ifdef _MSC_VER
-#include <windows.h>
-#endif
 
 #ifdef WIN32
 //disable _CRT_SECURE_NO_WARNINGS message to build this in VC++
 #pragma warning(disable:4996)
 #endif
-
-#include "game.h"
 
 #ifdef ARM9
 #include "main.h"
@@ -136,7 +131,8 @@ __attribute__((optimize("Ofast")))
 __attribute__ ((optnone))
 #endif
 void draw_menu(struct Game * instGame){
-    enable_2D_texture();
+    struct Point p;
+	enable_2D_texture();
 		glPushMatrix();
 		glBindTexture(
 		#ifdef WIN32
@@ -163,8 +159,7 @@ void draw_menu(struct Game * instGame){
             #endif
         );
 	disable_2D_texture();
-    struct Point p;
-
+    
     p.x = -2.3f;
     p.y = 0.5f;
     p.z = -3.5f;
@@ -226,7 +221,7 @@ void draw_menu(struct Game * instGame){
         draw_text("CHUCK NORRIS", p, 0.0f, 0.0f, 0.0f);
     }
 
-    if (wait(&game))
+    if (waitGame(&game))
     {
         p.x = -2.6f;
         p.y = 0.5f;
@@ -243,17 +238,17 @@ __attribute__ ((optnone))
 #endif
 void run(struct Game * instGame)
 {
-	Scene * scene = &instGame->scenario;
+	enum ObjectType o;
+	struct Scene * sceneInst = &instGame->scenario;
     if (instGame->paused || instGame->is_game_over || !instGame->is_running) return;
-
-    enum ObjectType o = has_collision(scene, head(&scene->snake));
+    o = has_collision(sceneInst, head(&sceneInst->snake));
     instGame->ate = false;
     instGame->key_pressed = false;
 
     switch (o)
     {
         case NONE:
-            move(&scene->snake);
+            move(&sceneInst->snake);
         break;
         case FOOD:
 			#ifdef ARM9
@@ -261,40 +256,42 @@ void run(struct Game * instGame)
 			#endif
             instGame->ate = true;
             instGame->score++;
-            grow(&scene->snake, true);
-            move(&scene->snake);
-            change_food_pos(scene);
+            grow(&sceneInst->snake, true);
+            move(&sceneInst->snake);
+            change_food_pos(sceneInst);
             switch (instGame->level)
             {
                 case VIRGIN:
-                    if (size(&scene->snake) % 6 == 0)
+                    if (size(&sceneInst->snake) % 6 == 0)
                     {
-                        add_barrier(scene);
+                        add_barrier(sceneInst);
                     }
                 break;
                 case JEDI:
-                    if (size(&scene->snake) % 4 == 0)
+                    if (size(&sceneInst->snake) % 4 == 0)
                     {
-                        add_barrier(scene);
+                        add_barrier(sceneInst);
                     }
                 break;
-                case ASIAN:
-                    if (size(&scene->snake) % 4 == 0)
+                case ASIAN:{
+                    if (size(&sceneInst->snake) % 4 == 0)
                     {
                         int v = random_range(1, 3);
-                        for (int i = 0; i < v; ++i)
+                        int i = 0;
+						for (i = 0; i < v; ++i)
                         {
-                            add_barrier(scene);
+                            add_barrier(sceneInst);
                         }
                     }
-                break;
-                case CHUCK_NORRIS:
+				}break;
+                case CHUCK_NORRIS:{
                     int v = random_range(1, 5);
-                    for (int i = 0; i < v; ++i)
+                    int i = 0;
+					for (i = 0; i < v; ++i)
                     {
-                        add_barrier(scene);
+                        add_barrier(sceneInst);
                     }
-                break;
+				}break;
             }
         break;
         case BARRIER:
@@ -307,18 +304,13 @@ void run(struct Game * instGame)
     }
 }
 
-#if (defined(__GNUC__) && !defined(__clang__))
-__attribute__((optimize("Ofast")))
-#endif
-#if (!defined(__GNUC__) && defined(__clang__))
-__attribute__ ((optnone))
-#endif
-bool wait(struct Game * instGame)
+
+bool waitGame(struct Game * instGame)
 {
-    bool wait = instGame->m > 0 && instGame->m < to_fps(instGame->fps, 30);
+    bool waitVal = instGame->m > 0 && instGame->m < to_fps(instGame->fps, 30);
     instGame->m++;
     if (instGame->m > to_fps(instGame->fps, 30)) instGame->m = -to_fps(instGame->fps, 30);
-    return wait;
+    return waitVal;
 }
 
 #if (defined(__GNUC__) && !defined(__clang__))
@@ -357,31 +349,33 @@ void calculateFPS(struct Game * instGame)
     instGame->currentTime = getTimerCounter();
 	#endif
 	
-    //  Calculate time passed
-    int timeInterval = instGame->currentTime - instGame->previousTime;
+	{
+		//  Calculate time passed
+		int timeInterval = instGame->currentTime - instGame->previousTime;
 	
-	#ifdef WIN32
-    if(timeInterval > 1000)
-    {
-        //  calculate the number of frames per second
-        instGame->fps = instGame->frameCount / (timeInterval / 1000.0f);
-        //  Set time
-        instGame->previousTime = instGame->currentTime;
-        //  Reset frame count
-        instGame->frameCount = 0;
-    }
-	#endif
-	#ifdef ARM9
-	if(timeInterval > 10)
-    {
-        //  calculate the number of frames per second
-        instGame->fps = instGame->frameCount / (timeInterval / 10);
-        //  Set time
-        instGame->previousTime = instGame->currentTime;
-        //  Reset frame count
-        instGame->frameCount = 0;
-    }
-	#endif
+		#ifdef WIN32
+		if(timeInterval > 1000)
+		{
+			//  calculate the number of frames per second
+			instGame->fps = instGame->frameCount / (timeInterval / 1000.0f);
+			//  Set time
+			instGame->previousTime = instGame->currentTime;
+			//  Reset frame count
+			instGame->frameCount = 0;
+		}
+		#endif
+		#ifdef ARM9
+		if(timeInterval > 10)
+		{
+			//  calculate the number of frames per second
+			instGame->fps = instGame->frameCount / (timeInterval / 10);
+			//  Set time
+			instGame->previousTime = instGame->currentTime;
+			//  Reset frame count
+			instGame->frameCount = 0;
+		}
+		#endif
+	}
 }
 
 #if (defined(__GNUC__) && !defined(__clang__))
@@ -390,11 +384,12 @@ __attribute__((optimize("Ofast")))
 #if (!defined(__GNUC__) && defined(__clang__))
 __attribute__ ((optnone))
 #endif
-bool clock(struct Game * instGame)
+bool clockGame(struct Game * instGame)
 {
+	bool wait;
     // Speed up every time grows.
 	instGame->tick += (instGame->level + (size(&instGame->scenario.snake) / 10));
-    bool wait = instGame->tick < to_fps(instGame->fps, 30);
+    wait = instGame->tick < to_fps(instGame->fps, 30);
     if (instGame->tick > to_fps(instGame->fps, 30)) instGame->tick = 0;
     return !wait;
 }
@@ -407,8 +402,9 @@ __attribute__ ((optnone))
 #endif
 bool clock2(struct Game * instGame)
 {
-    instGame->tick2++;
-    bool wait = instGame->tick2 < to_fps(instGame->fps, 10);
+    bool wait = false;
+	instGame->tick2++;
+    wait = instGame->tick2 < to_fps(instGame->fps, 10);
     if (instGame->tick2 > to_fps(instGame->fps, 10)) instGame->tick2 = 0;
     return !wait;
 }
@@ -436,7 +432,7 @@ __attribute__ ((optnone))
 #endif
 void keyboardInput(unsigned int key, int x, int y)
 {
-	Scene * scene = &game.scenario;
+	struct Scene * scene = &game.scenario;
 	switch(key) {
 		#ifdef _MSC_VER
 		case '1':{	// toggles light 0 on / off

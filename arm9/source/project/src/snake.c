@@ -1,9 +1,7 @@
-#include "snake.h"
 #include "Scene.h"
 
 #ifdef ARM9
 #include "debugNocash.h"
-#include "game.h"
 #include "timerTGDS.h"
 #include "Sphere008.h"
 #endif
@@ -17,12 +15,12 @@ void SnakeInit(struct DequeObject * snakeInst)
 
 void resetSnake(struct DequeObject * snakeInst)
 {
+	struct Point p;
+    int d = (rand() % 4) + 1;
 	SnakeInit(snakeInst);
 	clear(snakeInst);
-    int d = (rand() % 4) + 1;
     set_directionSnake(snakeInst, d);
 
-    struct Point p;
     p.x = 0.0f;
     p.y = GROUND_DIFF;
     p.z = 0.0f;
@@ -52,10 +50,11 @@ void set_directionSnake(struct DequeObject * snakeInst, int d)
 
 bool has_collisionSnake(struct DequeObject * snakeInst, struct Point p)
 {
+	size_t i = 0;
     // Skip head. It's the same point.
-    for (size_t i = 1; i < count((struct Point *)&snakeInst->points); ++i)
+    for (i = 1; i < count((struct Point *)&snakeInst->points); ++i)
     {
-        Point b = snakeInst->points[i];
+        struct Point b = snakeInst->points[i];
 
         if (p.x == b.x && p.z == b.z)
         {
@@ -71,7 +70,7 @@ void draw(struct DequeObject * snakeInst)
     // TODO: Draw cylindric snake.
     // It's more hard.
     // Use glut2Cylinder. 
-    Point h = snakeInst->points[0];
+    struct Point h = snakeInst->points[0];
 
 	glColor3f(1.0, 1.0, 0.6);
     glPushMatrix();
@@ -92,29 +91,32 @@ void draw(struct DequeObject * snakeInst)
 		#endif
 	);
 	
-	for (size_t i = 1; i < count((struct Point *)&snakeInst->points); ++i)
-    {
-        Point p = snakeInst->points[i];
+	{
+		size_t i = 0;
+		for (i = 1; i < count((struct Point *)&snakeInst->points); ++i)
+		{
+			struct Point p = snakeInst->points[i];
 
-		glPushMatrix();
-            glTranslatef(p.x, p.y, p.z);
-		    glut2SolidCube05f();
-		glPopMatrix(
-			#ifdef ARM9
-			1
-			#endif
-		);
-    }
+			glPushMatrix();
+				glTranslatef(p.x, p.y, p.z);
+				glut2SolidCube05f();
+			glPopMatrix(
+				#ifdef ARM9
+				1
+				#endif
+			);
+		}
+	}
 
     disable_2D_texture();
 }
 
-Point head(struct DequeObject * snakeInst)
+struct Point head(struct DequeObject * snakeInst)
 {
     return snakeInst->points[0];
 }
 
-Point tail(struct DequeObject * snakeInst)
+struct Point tail(struct DequeObject * snakeInst)
 {
     return snakeInst->points[count((struct Point *)&snakeInst->points) - 1];
 }
@@ -169,9 +171,9 @@ float random_pos()
     return (rand() % 20 / 2.0f) - 5.0f;
 }
 
-Point random_point()
+struct Point random_point()
 {
-    Point p;
+    struct Point p;
     p.x = random_pos();
     p.y = GROUND_DIFF;
     p.z = random_pos();
@@ -179,7 +181,7 @@ Point random_point()
     return p;
 }
 
-void draw_cube(float size, Point p, int res_id)
+void draw_cube(float size, struct Point p, int res_id)
 {
     enable_2D_texture();
 	glPushMatrix();
@@ -202,15 +204,15 @@ void draw_cube(float size, Point p, int res_id)
 }
 
 //Todo DS: use WoopsiSDK instead
-void draw_text(std::string s, Point p, float r, float g, float b)
+void draw_text(char * s, struct Point p, float r, float g, float b)
 {
+    int len, i;
     glDisable(GL_LIGHTING);
 
 	#ifdef WIN32
-    int len, i;
     glColor3f(r, g, b);
     glRasterPos3f(p.x, p.y,p.z);
-    len = (int) s.length();
+    len = (int) strlen(s) + 1;
 
     for (i = 0; i < len; i++)
     {
