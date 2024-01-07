@@ -17,23 +17,22 @@ Snake::Snake()
 
 void Snake::reset()
 {
-    points.clear();
+	clear(this);
     int d = (rand() % 4) + 1;
     set_direction(d);
 
-    Point p;
+    struct Point p;
     p.x = 0.0f;
     p.y = GROUND_DIFF;
     p.z = 0.0f;
 
-    points.push_front(p);
-
+	pushFront((struct Point*)&points, p, &front, &rear);
     grow();
 }
 
 void Snake::move()
 {
-    points.pop_back();
+	popBack((struct Point*)&points, &front, &rear);
     grow();
 }
 
@@ -76,9 +75,9 @@ void Snake::draw()
 		#endif
 	);
 	
-	for (size_t i = 1; i < points.size(); ++i)
+	for (size_t i = 1; i < count((struct Point *)&points); ++i)
     {
-        Point p = points.at(i);
+        Point p = points[i];
 
 		glPushMatrix();
             glTranslatef(p.x, p.y, p.z);
@@ -100,7 +99,7 @@ Point Snake::head()
 
 Point Snake::tail()
 {
-    return points[points.size() - 1];
+    return points[count((struct Point *)&points) - 1];
 }
 
 void Snake::grow(bool back)
@@ -128,20 +127,20 @@ void Snake::grow(bool back)
 
     if (back)
     {
-        points.push_back(p);
+		pushBack((struct Point*)&points, p, &front, &rear);
     }
     else
     {
-        points.push_front(p);
+		pushFront((struct Point*)&points, p, &front, &rear);
     }
 }
 
 bool Snake::has_collision(Point p)
 {
     // Skip head. It's the same point.
-    for (size_t i = 1; i < points.size(); ++i)
+    for (size_t i = 1; i < count((struct Point *)&points); ++i)
     {
-        Point b = points.at(i);
+        Point b = points[i];
 
         if (p.x == b.x && p.z == b.z)
         {
@@ -154,7 +153,7 @@ bool Snake::has_collision(Point p)
 
 int Snake::size()
 {
-    return points.size();
+    return count((struct Point *)&points);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -226,4 +225,165 @@ void draw_text(std::string s, Point p, float r, float g, float b)
     #endif
 	
 	glEnable(GL_LIGHTING);
+}
+
+/*
+int main() {
+  int arr[MAX];
+  int front, rear, i, n;
+
+  front = rear = -1;
+  for (i = 0; i < MAX; i++)
+    arr[i] = 0;
+
+  pushRear(arr, 5, &front, &rear);
+  pushFront(arr, 12, &front, &rear);
+  pushRear(arr, 11, &front, &rear);
+  pushFront(arr, 5, &front, &rear);
+  pushRear(arr, 6, &front, &rear);
+  pushFront(arr, 8, &front, &rear);
+
+  printf("\nElements in a deque: ");
+  display(arr);
+
+  i = delFront(arr, &front, &rear);
+  printf("\nremoved item: %d", i);
+
+  printf("\nElements in a deque after deletion: ");
+  display(arr);
+
+  pushRear(arr, 16, &front, &rear);
+  pushRear(arr, 7, &front, &rear);
+
+  printf("\nElements in a deque after addition: ");
+  display(arr);
+
+  i = delRear(arr, &front, &rear);
+  printf("\nremoved item: %d", i);
+
+  printf("\nElements in a deque after deletion: ");
+  display(arr);
+
+  n = count(arr);
+  printf("\nTotal number of elements in deque: %d", n);
+}
+*/
+
+//Deque implementation in C
+void pushFront(struct Point *arr, struct Point item, int *pfront, int *prear) {
+  int i, k, c;
+
+  if (*pfront == 0 && *prear == MAX - 1) {
+    return;
+  }
+
+  if (*pfront == -1) {
+    *pfront = *prear = 0;
+    arr[*pfront] = item;
+    return;
+  }
+
+  if (*prear != MAX - 1) {
+    c = count(arr);
+    k = *prear + 1;
+    for (i = 1; i <= c; i++) {
+      arr[k] = arr[k - 1];
+      k--;
+    }
+    arr[k] = item;
+    *pfront = k;
+    (*prear)++;
+  } else {
+    (*pfront)--;
+    arr[*pfront] = item;
+  }
+}
+
+void pushBack(struct Point *arr, struct Point item, int *pfront, int *prear) {
+  int i, k;
+
+  if (*pfront == 0 && *prear == MAX - 1) {
+    return;
+  }
+
+  if (*pfront == -1) {
+    *prear = *pfront = 0;
+    arr[*prear] = item;
+    return;
+  }
+
+  if (*prear == MAX - 1) {
+    k = *pfront - 1;
+    for (i = *pfront - 1; i < *prear; i++) {
+      k = i;
+      if (k == MAX - 1)
+		  arr[k].index = INVALID_DEQUE_ENTRY;
+      else
+        arr[k] = arr[i + 1];
+    }
+    (*prear)--;
+    (*pfront)--;
+  }
+  (*prear)++;
+  arr[*prear] = item;
+}
+
+//if ret == INVALID_DEQUE_ENTRY, failed to delete front record
+struct Point popFront(struct Point *arr, int *pfront, int *prear) {
+  struct Point item;
+
+  if (*pfront == -1) {
+	  item.index = INVALID_DEQUE_ENTRY;
+	 return item;
+  }
+
+  item = arr[*pfront];
+  arr[*pfront].index = INVALID_DEQUE_ENTRY;
+
+  if (*pfront == *prear)
+    *pfront = *prear = -1;
+  else
+    (*pfront)++;
+
+  return item;
+}
+
+//if ret == INVALID_DEQUE_ENTRY, failed to delete rear record
+struct Point popBack(struct Point *arr, int *pfront, int *prear) {
+  struct Point item;
+
+  if (*pfront == -1) {
+     item.index = INVALID_DEQUE_ENTRY;
+	 return item;
+  }
+
+  item = arr[*prear];
+  arr[*prear].index = INVALID_DEQUE_ENTRY;
+  (*prear)--;
+  if (*prear == -1)
+    *pfront = -1;
+  return item;
+}
+
+int count(struct Point *arr) {
+  int c = 0, i;
+
+  for (i = 0; i < MAX; i++) {
+	  if (arr[i].index != INVALID_DEQUE_ENTRY)
+      c++;
+  }
+  return c;
+}
+
+void clear(class Snake * inst){
+	int c = 0, i;
+	memset((u8*)&inst->points, 0, sizeof(inst->points));
+	inst->front = inst->rear = -1;
+	for (i = 0; i < MAX; i++) {
+		struct Point * ref = &inst->points[i];
+		ref->index = INVALID_DEQUE_ENTRY;
+		ref->x = 0;
+		ref->y = 0;
+		ref->z = 0;
+	}
 }

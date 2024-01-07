@@ -49,7 +49,6 @@ using namespace std;
 #ifdef __cplusplus
 #include <ctime>
 #include <cstdio>
-#include <deque>
 #include <iostream>
 #include <vector>
 #endif
@@ -60,6 +59,12 @@ using namespace std;
 
 #define SIGN(x) (x < 0 ? (-1) : 1)
 #define PI 3.14159
+
+//Deque implementation in C
+#include <stdio.h>
+#define MAX 30
+
+#define INVALID_DEQUE_ENTRY ((int)-1)
 
 ////////////////////////////////////////////////Game specifics////////////////////////////////////////////////
 
@@ -145,25 +150,29 @@ enum Level
 struct Point
 {
     float x, y, z;
+	int index; //deque: if -1 non-allocated, otherwise index number, until MAX
 };
 
 
 #ifdef __cplusplus
 
 class Snake
-{
-private:
-    std::deque<Point> points;
-    int direction;
+{ 
 public:
     Snake();
-    void  move();
+	
+	//deque impl.
+	struct Point points[MAX];
+	int front, rear;
+
+    int direction;
+	void  move();
     void  set_direction(int d);
-    bool  has_collision(Point p);
+    bool  has_collision(struct Point p);
     void  draw();
     void  grow(bool back = false);
-    Point head();
-    Point tail();
+    struct Point head();
+    struct Point tail();
     void  reset();
     int   size();
 };
@@ -177,6 +186,14 @@ extern void draw_cube(float size, struct Point p, int res_id);
 
 #ifdef __cplusplus
 extern void draw_text(std::string s, struct Point p, float r, float g, float b);
+extern void clear(class Snake *arr);
 #endif
 
+//Deque implementation in C
+extern void pushFront(struct Point *, struct Point, int *pfront, int *prear);
+extern void pushBack(struct Point *, struct Point, int *pfront, int *prear);
+extern struct Point popFront(struct Point *arr, int *pfront, int *prear);
+extern struct Point popBack(struct Point *arr, int *pfront, int *prear);
+extern void display(struct Point *arr);
+extern int count(struct Point *arr);
 #endif
