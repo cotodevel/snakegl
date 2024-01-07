@@ -4,14 +4,10 @@
 #ifdef WIN32
 #include "TGDSTypes.h"
 #endif
-
 #include "Scene.h"
 
-#ifdef __cplusplus
-
-class Game
+struct Game
 {
-public:
 	bool      is_game_over;
     bool      is_running;
     bool      paused;
@@ -25,27 +21,23 @@ public:
     int       tick2;
     int       level;
     float     fps;
-    bool      wait();
-    bool      wait2();
-    bool      clock();
-    bool      clock2();
-    void      calculateFPS();
-    void      run();
-    void      draw_menu();
     struct Scene scenario; /// the scene we render
     int       currentTime;
-	Game(int argc, char *argv[]);
-    ~Game();
-    void display();
-    void pause();
-    void start();
-    void stop();
-    void reset();
 };
 
-extern Game* game;
-
-#endif
+extern struct Game game;
+extern void initGame(struct Game * instGame, int argc, char *argv[]);
+extern void pause(struct Game * instGame);
+extern void start(struct Game * instGame);
+extern void stop(struct Game * instGame);
+extern void reset(struct Game * instGame);
+extern void      draw_menu(struct Game * instGame);
+extern void      run(struct Game * instGame);
+extern bool      wait(struct Game * instGame);
+extern bool      wait2(struct Game * instGame);
+extern void      calculateFPS(struct Game * instGame);
+extern bool      clock(struct Game * instGame);
+extern bool      clock2(struct Game * instGame);
 
 #endif
 

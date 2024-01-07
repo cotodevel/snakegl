@@ -24,13 +24,9 @@
 #include "menu.h"
 #include "snakegfx.h"
 #endif
-
 #include "Scene.h"
 
-#if (!defined(__GNUC__) && defined(__clang__))
-__attribute__ ((optnone))
-#endif
-Game* game = NULL;
+struct Game game;
 
 #if (defined(__GNUC__) && !defined(__clang__))
 __attribute__((optimize("Ofast")))
@@ -51,24 +47,24 @@ __attribute__((optimize("Ofast")))
 #if (!defined(__GNUC__) && defined(__clang__))
 __attribute__ ((optnone))
 #endif
-Game::Game(int argc, char *argv[]){
-	initScene(&scenario, argc, argv);
-    fps = 0;
-    frameCount = 0;
-    currentTime = 0,
-    previousTime = 0;
+void initGame(struct Game * instGame, int argc, char *argv[]){
+	initScene(&instGame->scenario, argc, argv);
+    instGame->fps = 0;
+    instGame->frameCount = 0;
+    instGame->currentTime = 0,
+    instGame->previousTime = 0;
 
-    is_game_over = false;
-    is_running = false;
-    paused = false;
+    instGame->is_game_over = false;
+    instGame->is_running = false;
+    instGame->paused = false;
 
-    level = 1;
+    instGame->level = 1;
 
-    m = to_fps(fps, 30);
-    m2 = to_fps(fps, 10);
+    instGame->m = to_fps(instGame->fps, 30);
+    instGame->m2 = to_fps(instGame->fps, 10);
 
-    tick = 30;
-    tick2 = 10;
+    instGame->tick = 30;
+    instGame->tick2 = 10;
 }
 
 #if (defined(__GNUC__) && !defined(__clang__))
@@ -77,9 +73,9 @@ __attribute__((optimize("Ofast")))
 #if (!defined(__GNUC__) && defined(__clang__))
 __attribute__ ((optnone))
 #endif
-Game::~Game()
+void pause(struct Game * instGame)
 {
-    
+    instGame->paused = true;
 }
 
 #if (defined(__GNUC__) && !defined(__clang__))
@@ -88,9 +84,9 @@ __attribute__((optimize("Ofast")))
 #if (!defined(__GNUC__) && defined(__clang__))
 __attribute__ ((optnone))
 #endif
-void Game::pause()
+void start(struct Game * instGame)
 {
-    paused = true;
+    instGame->paused = false;
 }
 
 #if (defined(__GNUC__) && !defined(__clang__))
@@ -99,9 +95,11 @@ __attribute__((optimize("Ofast")))
 #if (!defined(__GNUC__) && defined(__clang__))
 __attribute__ ((optnone))
 #endif
-void Game::start()
+void stop(struct Game * instGame)
 {
-    paused = false;
+    instGame->is_running = false;
+    instGame->is_game_over = false;
+    instGame->paused = false;
 }
 
 #if (defined(__GNUC__) && !defined(__clang__))
@@ -110,38 +108,25 @@ __attribute__((optimize("Ofast")))
 #if (!defined(__GNUC__) && defined(__clang__))
 __attribute__ ((optnone))
 #endif
-void Game::stop()
+void reset(struct Game * instGame)
 {
-    is_running = false;
-    is_game_over = false;
-    paused = false;
-}
+    instGame->m = to_fps(instGame->fps, 30);
+    instGame->m2 = to_fps(instGame->fps, 10);
 
-#if (defined(__GNUC__) && !defined(__clang__))
-__attribute__((optimize("Ofast")))
-#endif
-#if (!defined(__GNUC__) && defined(__clang__))
-__attribute__ ((optnone))
-#endif
-void Game::reset()
-{
-    m = to_fps(fps, 30);
-    m2 = to_fps(fps, 10);
-
-    score = 0;
-    ate = false;
-    is_game_over = false;
-    paused = false;
+    instGame->score = 0;
+    instGame->ate = false;
+    instGame->is_game_over = false;
+    instGame->paused = false;
 	#ifdef ARM9
-	soundGameOverEmitted = false;
+	instGame->soundGameOverEmitted = false;
     BgMusicOff();
 	BgMusic("0:/stud.ima");
 	#endif
-    tick = 30;
-    tick2 = 10;
+    instGame->tick = 30;
+    instGame->tick2 = 10;
 
-	resetScene(&game->scenario);
-    is_running = true;
+	resetScene(&instGame->scenario);
+    instGame->is_running = true;
 }
 
 #if (defined(__GNUC__) && !defined(__clang__))
@@ -150,7 +135,7 @@ __attribute__((optimize("Ofast")))
 #if (!defined(__GNUC__) && defined(__clang__))
 __attribute__ ((optnone))
 #endif
-void Game::draw_menu(){
+void draw_menu(struct Game * instGame){
     enable_2D_texture();
 		glPushMatrix();
 		glBindTexture(
@@ -178,7 +163,7 @@ void Game::draw_menu(){
             #endif
         );
 	disable_2D_texture();
-    Point p;
+    struct Point p;
 
     p.x = -2.3f;
     p.y = 0.5f;
@@ -189,7 +174,7 @@ void Game::draw_menu(){
     p.y = 0.5f;
     p.z = -2.0f;
 
-    if (level == VIRGIN)
+    if (instGame->level == VIRGIN)
     {
         p.x -= 0.3;
         draw_text("< VIRGIN >", p, 1.0f, 0.0f, 0.0f);
@@ -203,7 +188,7 @@ void Game::draw_menu(){
     p.y = 0.5f;
     p.z = -1.0f;
 
-    if (level == JEDI)
+    if (instGame->level == JEDI)
     {
         p.x -= 0.3;
         draw_text("< JEDI >", p, 1.0f, 0.0f, 0.0f);
@@ -217,7 +202,7 @@ void Game::draw_menu(){
     p.y = 0.5f;
     p.z = 0.0f;
 
-    if (level == ASIAN)
+    if (instGame->level == ASIAN)
     {
         p.x -= 0.3;
         draw_text("< ASIAN >", p, 1.0f, 0.0f, 0.0f);
@@ -231,7 +216,7 @@ void Game::draw_menu(){
     p.y = 0.5f;
     p.z = 1.0f;
 
-    if (level == CHUCK_NORRIS)
+    if (instGame->level == CHUCK_NORRIS)
     {
         p.x -= 0.3;
         draw_text("< CHUCK NORRIS >", p, 1.0f, 0.0f, 0.0f);
@@ -241,7 +226,7 @@ void Game::draw_menu(){
         draw_text("CHUCK NORRIS", p, 0.0f, 0.0f, 0.0f);
     }
 
-    if (wait())
+    if (wait(&game))
     {
         p.x = -2.6f;
         p.y = 0.5f;
@@ -256,14 +241,14 @@ __attribute__((optimize("Ofast")))
 #if (!defined(__GNUC__) && defined(__clang__))
 __attribute__ ((optnone))
 #endif
-void Game::run()
+void run(struct Game * instGame)
 {
-	Scene * scene = &game->scenario;
-    if (paused || is_game_over || !is_running) return;
+	Scene * scene = &instGame->scenario;
+    if (instGame->paused || instGame->is_game_over || !instGame->is_running) return;
 
     enum ObjectType o = has_collision(scene, head(&scene->snake));
-    ate = false;
-    key_pressed = false;
+    instGame->ate = false;
+    instGame->key_pressed = false;
 
     switch (o)
     {
@@ -274,12 +259,12 @@ void Game::run()
 			#ifdef ARM9
 			MunchFoodSound();
 			#endif
-            ate = true;
-            score++;
+            instGame->ate = true;
+            instGame->score++;
             grow(&scene->snake, true);
             move(&scene->snake);
             change_food_pos(scene);
-            switch (level)
+            switch (instGame->level)
             {
                 case VIRGIN:
                     if (size(&scene->snake) % 6 == 0)
@@ -315,7 +300,7 @@ void Game::run()
         case BARRIER:
         case BOARD:
         case SNAKE:
-            is_game_over = true;
+            instGame->is_game_over = true;
         break;
         default:
         break;
@@ -328,11 +313,11 @@ __attribute__((optimize("Ofast")))
 #if (!defined(__GNUC__) && defined(__clang__))
 __attribute__ ((optnone))
 #endif
-bool Game::wait()
+bool wait(struct Game * instGame)
 {
-    bool wait = m > 0 && m < to_fps(fps, 30);
-    m++;
-    if (m > to_fps(fps, 30)) m = -to_fps(fps, 30);
+    bool wait = instGame->m > 0 && instGame->m < to_fps(instGame->fps, 30);
+    instGame->m++;
+    if (instGame->m > to_fps(instGame->fps, 30)) instGame->m = -to_fps(instGame->fps, 30);
     return wait;
 }
 
@@ -342,11 +327,11 @@ __attribute__((optimize("Ofast")))
 #if (!defined(__GNUC__) && defined(__clang__))
 __attribute__ ((optnone))
 #endif
-bool Game::wait2()
+bool wait2(struct Game * instGame)
 {
-    bool wait = m2 > 0 && m2 < to_fps(fps, 10);
-    m2++;
-    if (m2 > to_fps(fps, 10)) m2 = -to_fps(fps, 10);
+    bool wait = instGame->m2 > 0 && instGame->m2 < to_fps(instGame->fps, 10);
+    instGame->m2++;
+    if (instGame->m2 > to_fps(instGame->fps, 10)) instGame->m2 = -to_fps(instGame->fps, 10);
     return wait;
 }
 
@@ -356,45 +341,45 @@ __attribute__((optimize("Ofast")))
 #if (!defined(__GNUC__) && defined(__clang__))
 __attribute__ ((optnone))
 #endif
-void Game::calculateFPS(void)
+void calculateFPS(struct Game * instGame)
 {
     //  Increase frame count
-    frameCount++;
+    instGame->frameCount++;
 	
 	#if defined(WIN32)
     //  Get the number of milliseconds since glutInit called
     //  (or first call to glutGet(GLUT ELAPSED TIME)).
-    currentTime = glutGet(GLUT_ELAPSED_TIME);
+    instGame->currentTime = glutGet(GLUT_ELAPSED_TIME);
 	#endif
 	
 	
 	#if defined(ARM9)
-    currentTime = getTimerCounter();
+    instGame->currentTime = getTimerCounter();
 	#endif
 	
     //  Calculate time passed
-    int timeInterval = currentTime - previousTime;
+    int timeInterval = instGame->currentTime - instGame->previousTime;
 	
 	#ifdef WIN32
     if(timeInterval > 1000)
     {
         //  calculate the number of frames per second
-        fps = frameCount / (timeInterval / 1000.0f);
+        instGame->fps = instGame->frameCount / (timeInterval / 1000.0f);
         //  Set time
-        previousTime = currentTime;
+        instGame->previousTime = instGame->currentTime;
         //  Reset frame count
-        frameCount = 0;
+        instGame->frameCount = 0;
     }
 	#endif
 	#ifdef ARM9
 	if(timeInterval > 10)
     {
         //  calculate the number of frames per second
-        fps = frameCount / (timeInterval / 10);
+        instGame->fps = instGame->frameCount / (timeInterval / 10);
         //  Set time
-        previousTime = currentTime;
+        instGame->previousTime = instGame->currentTime;
         //  Reset frame count
-        frameCount = 0;
+        instGame->frameCount = 0;
     }
 	#endif
 }
@@ -405,12 +390,12 @@ __attribute__((optimize("Ofast")))
 #if (!defined(__GNUC__) && defined(__clang__))
 __attribute__ ((optnone))
 #endif
-bool Game::clock()
+bool clock(struct Game * instGame)
 {
     // Speed up every time grows.
-	tick += (level + (size(&game->scenario.snake) / 10));
-    bool wait = tick < to_fps(fps, 30);
-    if (tick > to_fps(fps, 30)) tick = 0;
+	instGame->tick += (instGame->level + (size(&instGame->scenario.snake) / 10));
+    bool wait = instGame->tick < to_fps(instGame->fps, 30);
+    if (instGame->tick > to_fps(instGame->fps, 30)) instGame->tick = 0;
     return !wait;
 }
 
@@ -420,11 +405,11 @@ __attribute__((optimize("Ofast")))
 #if (!defined(__GNUC__) && defined(__clang__))
 __attribute__ ((optnone))
 #endif
-bool Game::clock2()
+bool clock2(struct Game * instGame)
 {
-    tick2++;
-    bool wait = tick2 < to_fps(fps, 10);
-    if (tick2 > to_fps(fps, 10)) tick2 = 0;
+    instGame->tick2++;
+    bool wait = instGame->tick2 < to_fps(instGame->fps, 10);
+    if (instGame->tick2 > to_fps(instGame->fps, 10)) instGame->tick2 = 0;
     return !wait;
 }
 
@@ -451,7 +436,7 @@ __attribute__ ((optnone))
 #endif
 void keyboardInput(unsigned int key, int x, int y)
 {
-	Scene * scene = &game->scenario;
+	Scene * scene = &game.scenario;
 	switch(key) {
 		#ifdef _MSC_VER
 		case '1':{	// toggles light 0 on / off
@@ -493,62 +478,62 @@ void keyboardInput(unsigned int key, int x, int y)
 		#endif
 
 		case SNAKEGL_KEY_CAMERA:
-            if (!game->is_running) return ;
+            if (!game.is_running) return ;
             change_camera_pos(scene);
         break;
         case SNAKEGL_KEY_PAUSE:
-            if (!game->is_running) return ;
-            game->pause();
+            if (!game.is_running) return ;
+            pause(&game);
         break;
         case SNAKEGL_KEY_QUIT:{
             exit(0);
 		}
         break;
         case SNAKEGL_KEY_SELECT:
-            game->reset();
+            reset(&game);
         break;
         case SNAKEGL_KEY_START:
-            if (!game->paused) return ;
-            game->start();
+            if (!game.paused) return ;
+            start(&game);
         break;
         case SNAKEGL_KEY_STOP:
-            if (!game->is_running) return ;
-            game->stop();
+            if (!game.is_running) return ;
+            stop(&game);
         break;
         case SNAKEGL_KEY_RESET:
-            if (!game->is_running) return ;
-            game->reset();
+            if (!game.is_running) return ;
+            reset(&game);
         break;
         case SNAKEGL_KEY_LEFT:
-            if (!game->is_running || game->key_pressed) return ;
+            if (!game.is_running || game.key_pressed) return ;
             set_directionSnake(&scene->snake, LEFT);
-            game->key_pressed = true;
+            game.key_pressed = true;
         break;
         case SNAKEGL_KEY_UP:
-            if (!game->is_running && !game->is_game_over)
+            if (!game.is_running && !game.is_game_over)
             {
-                game->level--;
-                if (game->level < 1) game->level = 4;
+                game.level--;
+                if (game.level < 1) game.level = 4;
             }
-            if (!game->is_running || game->key_pressed) return ;
+            if (!game.is_running || game.key_pressed) return ;
             set_directionSnake(&scene->snake, UP);
-            game->key_pressed = true;
+            game.key_pressed = true;
         break;
         case SNAKEGL_KEY_RIGHT:{
-			if (!game->is_running || game->key_pressed) return ;
+			if (!game.is_running || game.key_pressed) return ;
             set_directionSnake(&scene->snake, RIGHT);
-            game->key_pressed = true;
+            game.key_pressed = true;
 		}
 		break;
         case SNAKEGL_KEY_DOWN:
-            if (!game->is_running && !game->is_game_over)
+            if (!game.is_running && !game.is_game_over)
             {
-                game->level++;
-                if (game->level > 4) game->level = 1;
+                game.level++;
+                if (game.level > 4) game.level = 1;
             }
-            if (!game->is_running || game->key_pressed) return ;
+            if (!game.is_running || game.key_pressed) return ;
             set_directionSnake(&scene->snake, DOWN);
-            game->key_pressed = true;
+            game.key_pressed = true;
         break;
 	}
 	

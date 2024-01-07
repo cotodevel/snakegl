@@ -308,7 +308,7 @@ enum ObjectType has_collision(struct Scene * sceneInst, struct Point p)
     }
 
 	
-    if (has_collisionSnake(&game->scenario.snake, p))
+    if (has_collisionSnake(&game.scenario.snake, p))
     {
         return SNAKE;
     }
@@ -524,7 +524,7 @@ __attribute__((optimize("O0")))
 __attribute__ ((optnone))
 #endif
 void drawScene(){
-	Scene * scene = &game->scenario;
+	Scene * scene = &game.scenario;
 
 	#ifdef ARM9
 	//NDS: Dual 3D Render implementation. Must be called right before a new 3D scene is drawn
@@ -559,12 +559,12 @@ void drawScene(){
     scene->camera_mode = 3;
 	#endif
     set_camera(scene);
-    game->calculateFPS();
+    calculateFPS(&game);
     {
 		char s [50];
 		struct Point p;
     
-		if (game->is_running){
+		if (game.is_running){
 			#ifdef WIN32
 			scene->camera_mode = old_cam;
 			#endif
@@ -573,7 +573,7 @@ void drawScene(){
 			if (1==1)
 			#endif
 			#ifdef WIN32
-			if (game->clock2())
+			if (clock2(&game))
 			#endif
 			{
 				if (scene->a > 360)
@@ -603,15 +603,15 @@ void drawScene(){
 			if (1==1)
 			#endif
 			#ifdef WIN32
-			if (game->clock())
+			if (clock(&game))
 			#endif
 			{
-				game->run();
+				run(&game);
 			}
 
-			if (game->is_game_over)
+			if (game.is_game_over)
 			{
-				if (game->wait())
+				if (wait(&game))
 				{
 					p.x = -1.25f;
 					p.y = 0.5f;
@@ -626,15 +626,15 @@ void drawScene(){
 				#endif
 			}
 
-			sprintf(s, "SCORE: %d", game->score * 10);
+			sprintf(s, "SCORE: %d", game.score * 10);
 
 			p.x = -1.0f;
 			p.y = 0.5f;
 			p.z = -7.0f;
 
-			if (game->ate)
+			if (game.ate)
 			{
-				if (game->wait2())
+				if (wait2(&game))
 				{
 					draw_text(s, p, 0.0f, 0.0f, 0.0f);
 				}
@@ -647,7 +647,7 @@ void drawScene(){
 		else
 		{
 			#ifdef WIN32
-			game->draw_menu();
+			draw_menu(&game);
 			#endif
 		}
 		#ifdef WIN32
@@ -1046,7 +1046,8 @@ int startTGDSProject(int argc, char *argv[])
 	// register our call-back functions
 	TWLPrintf("-- Registering callbacks\n");
 	
-	game = new Game(argc, argv);
+	memset(&game, 0, sizeof(game));
+	initGame(&game, argc, argv);
 
 	// 'fake' keys being pressed to enable the state to
 	// setup lighting and fog
