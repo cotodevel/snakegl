@@ -262,14 +262,14 @@ void Game::run()
 	Scene * scene = &game->scenario;
     if (paused || is_game_over || !is_running) return;
 
-    ObjectType o = scene->has_collision(scene->snake.head());
+    ObjectType o = scene->has_collision(head(&scene->snake));
     ate = false;
     key_pressed = false;
 
     switch (o)
     {
         case NONE:
-            scene->snake.move();
+            move(&scene->snake);
         break;
         case FOOD:
 			#ifdef ARM9
@@ -277,25 +277,25 @@ void Game::run()
 			#endif
             ate = true;
             score++;
-            scene->snake.grow(true);
-            scene->snake.move();
+            grow(&scene->snake, true);
+            move(&scene->snake);
             scene->change_food_pos();
             switch (level)
             {
                 case VIRGIN:
-                    if (scene->snake.size() % 6 == 0)
+                    if (size(&scene->snake) % 6 == 0)
                     {
                         scene->add_barrier();
                     }
                 break;
                 case JEDI:
-                    if (scene->snake.size() % 4 == 0)
+                    if (size(&scene->snake) % 4 == 0)
                     {
                         scene->add_barrier();
                     }
                 break;
                 case ASIAN:
-                    if (scene->snake.size() % 4 == 0)
+                    if (size(&scene->snake) % 4 == 0)
                     {
                         int v = random_range(1, 3);
                         for (int i = 0; i < v; ++i)
@@ -409,7 +409,7 @@ __attribute__ ((optnone))
 bool Game::clock()
 {
     // Speed up every time grows.
-	tick += (level + (game->scenario.snake.size() / 10));
+	tick += (level + (size(&game->scenario.snake) / 10));
     bool wait = tick < to_fps(fps, 30);
     if (tick > to_fps(fps, 30)) tick = 0;
     return !wait;
@@ -522,7 +522,7 @@ void keyboardInput(unsigned int key, int x, int y)
         break;
         case SNAKEGL_KEY_LEFT:
             if (!game->is_running || game->key_pressed) return ;
-            scene->snake.set_direction(LEFT);
+            set_directionSnake(&scene->snake, LEFT);
             game->key_pressed = true;
         break;
         case SNAKEGL_KEY_UP:
@@ -532,12 +532,12 @@ void keyboardInput(unsigned int key, int x, int y)
                 if (game->level < 1) game->level = 4;
             }
             if (!game->is_running || game->key_pressed) return ;
-            scene->snake.set_direction(UP);
+            set_directionSnake(&scene->snake, UP);
             game->key_pressed = true;
         break;
         case SNAKEGL_KEY_RIGHT:{
 			if (!game->is_running || game->key_pressed) return ;
-            scene->snake.set_direction(RIGHT);
+            set_directionSnake(&scene->snake, RIGHT);
             game->key_pressed = true;
 		}
 		break;
@@ -548,7 +548,7 @@ void keyboardInput(unsigned int key, int x, int y)
                 if (game->level > 4) game->level = 1;
             }
             if (!game->is_running || game->key_pressed) return ;
-            scene->snake.set_direction(DOWN);
+            set_directionSnake(&scene->snake, DOWN);
             game->key_pressed = true;
         break;
 	}

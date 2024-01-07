@@ -11,50 +11,67 @@
 //
 // Snake implementation
 //
-Snake::Snake()
+void SnakeInit(struct Snake * snakeInst)
 {
 }
 
-void Snake::reset()
+void resetSnake(struct Snake * snakeInst)
 {
-	clear(this);
+	SnakeInit(snakeInst);
+	clear(snakeInst);
     int d = (rand() % 4) + 1;
-    set_direction(d);
+    set_directionSnake(snakeInst, d);
 
     struct Point p;
     p.x = 0.0f;
     p.y = GROUND_DIFF;
     p.z = 0.0f;
 
-	pushFront((struct Point*)&points, p, &front, &rear);
-    grow();
+	pushFront((struct Point*)&snakeInst->points, p, &snakeInst->front, &snakeInst->rear);
+    grow(snakeInst, false); //default: bool back = false
 }
 
-void Snake::move()
+void move(struct Snake * snakeInst)
 {
-	popBack((struct Point*)&points, &front, &rear);
-    grow();
+	popBack((struct Point*)&snakeInst->points, &snakeInst->front, &snakeInst->rear);
+    grow(snakeInst, false); //default: bool back = false
 }
 
-void Snake::set_direction(int d)
+void set_directionSnake(struct Snake * snakeInst, int d)
 {
-    if ((d == DOWN && direction == UP) ||
-        (direction == DOWN && d == UP) ||
-        (d == LEFT && direction == RIGHT) ||
-        (direction == LEFT && d == RIGHT))
+    if ((d == DOWN && snakeInst->direction == UP) ||
+        (snakeInst->direction == DOWN && d == UP) ||
+        (d == LEFT && snakeInst->direction == RIGHT) ||
+        (snakeInst->direction == LEFT && d == RIGHT))
     {
         return;
     }
 
-    direction = d;
+    snakeInst->direction = d;
 }
 
-void Snake::draw()
+bool has_collisionSnake(struct Snake * snakeInst, struct Point p)
+{
+    // Skip head. It's the same point.
+    for (size_t i = 1; i < count((struct Point *)&snakeInst->points); ++i)
+    {
+        Point b = snakeInst->points[i];
+
+        if (p.x == b.x && p.z == b.z)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void draw(struct Snake * snakeInst)
 {
     // TODO: Draw cylindric snake.
     // It's more hard.
     // Use glut2Cylinder. 
-    Point h = points[0];
+    Point h = snakeInst->points[0];
 
 	glColor3f(1.0, 1.0, 0.6);
     glPushMatrix();
@@ -75,9 +92,9 @@ void Snake::draw()
 		#endif
 	);
 	
-	for (size_t i = 1; i < count((struct Point *)&points); ++i)
+	for (size_t i = 1; i < count((struct Point *)&snakeInst->points); ++i)
     {
-        Point p = points[i];
+        Point p = snakeInst->points[i];
 
 		glPushMatrix();
             glTranslatef(p.x, p.y, p.z);
@@ -92,24 +109,24 @@ void Snake::draw()
     disable_2D_texture();
 }
 
-Point Snake::head()
+Point head(struct Snake * snakeInst)
 {
-    return points[0];
+    return snakeInst->points[0];
 }
 
-Point Snake::tail()
+Point tail(struct Snake * snakeInst)
 {
-    return points[count((struct Point *)&points) - 1];
+    return snakeInst->points[count((struct Point *)&snakeInst->points) - 1];
 }
 
-void Snake::grow(bool back)
+void grow(struct Snake * snakeInst, bool back) //default: bool back = false
 {
-    Point p;
-    p.x = points[0].x;
-    p.y = points[0].y;
-    p.z = points[0].z;
+    struct Point p;
+    p.x = snakeInst->points[0].x;
+    p.y = snakeInst->points[0].y;
+    p.z = snakeInst->points[0].z;
 
-    switch (direction)
+    switch (snakeInst->direction)
     {
         case DOWN:
             p.z += 0.5f;
@@ -127,33 +144,17 @@ void Snake::grow(bool back)
 
     if (back)
     {
-		pushBack((struct Point*)&points, p, &front, &rear);
+		pushBack((struct Point*)&snakeInst->points, p, &snakeInst->front, &snakeInst->rear);
     }
     else
     {
-		pushFront((struct Point*)&points, p, &front, &rear);
+		pushFront((struct Point*)&snakeInst->points, p, &snakeInst->front, &snakeInst->rear);
     }
 }
 
-bool Snake::has_collision(Point p)
+int size(struct Snake * snakeInst)
 {
-    // Skip head. It's the same point.
-    for (size_t i = 1; i < count((struct Point *)&points); ++i)
-    {
-        Point b = points[i];
-
-        if (p.x == b.x && p.z == b.z)
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-int Snake::size()
-{
-    return count((struct Point *)&points);
+    return count((struct Point *)&snakeInst->points);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

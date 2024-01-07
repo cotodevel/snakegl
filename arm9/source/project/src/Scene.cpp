@@ -78,7 +78,7 @@ void Scene::reset()
 	#ifdef WIN32
     camera_mode = 3;
     #endif
-	snake.reset();
+	resetSnake(&snake);
     change_food_pos();
     add_barrier();
 }
@@ -273,7 +273,7 @@ void Scene::draw_objects()
     draw_board();
     draw_food();
     draw_barrier();
-    snake.draw();
+    draw(&snake);
 }
 
 #if (defined(__GNUC__) && !defined(__clang__))
@@ -307,7 +307,8 @@ ObjectType Scene::has_collision(Point p)
         }
     }
 
-    if (snake.has_collision(p))
+	
+    if (has_collisionSnake(&game->scenario.snake, p))
     {
         return SNAKE;
     }

@@ -66,6 +66,9 @@ using namespace std;
 
 #define INVALID_DEQUE_ENTRY ((int)-1)
 
+#define TYPEDEF_NULL ((int)-1)
+#define TYPEDEF_STRUCT_POINT ((int)0)
+
 ////////////////////////////////////////////////Game specifics////////////////////////////////////////////////
 
 // Objects can navigate from -5.0f to 5.0f.
@@ -154,30 +157,28 @@ struct Point
 };
 
 
-#ifdef __cplusplus
-
-class Snake
+struct Snake
 { 
-public:
-    Snake();
-	
+    
 	//deque impl.
 	struct Point points[MAX];
 	int front, rear;
-
     int direction;
-	void  move();
-    void  set_direction(int d);
-    bool  has_collision(struct Point p);
-    void  draw();
-    void  grow(bool back = false);
-    struct Point head();
-    struct Point tail();
-    void  reset();
-    int   size();
+	//
+
 };
 
-#endif
+extern void SnakeInit(struct Snake * snakeInst);
+extern void  grow(struct Snake * snakeInst, bool back);
+extern void  resetSnake(struct Snake * snakeInst);
+extern void  move(struct Snake * snakeInst);
+extern void  set_directionSnake(struct Snake * snakeInst, int d);
+extern bool  has_collisionSnake(struct Snake * snakeInst, struct Point p);
+extern void  draw(struct Snake * snakeInst);
+extern struct Point head(struct Snake * snakeInst);
+extern struct Point tail(struct Snake * snakeInst);
+extern int   size(struct Snake * snakeInst);
+
 
 extern int random_range(int min, int max);
 extern float random_pos();
