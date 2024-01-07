@@ -22,11 +22,8 @@ struct Camera{
 };
 
 
-#ifdef __cplusplus
-
-class Scene
+struct Scene
 {
-public:
 	bool fogMode;
 	bool light0On;
 	bool light1On;
@@ -35,13 +32,13 @@ public:
 	bool fullScreen;
 
 	//game specific
-    Point food;
-    std::vector<struct Point> barriers;
-    Camera camera;
-    void draw_food();
-    void draw_barrier();
-    void draw_background();
-	#ifdef WIN32
+    struct Point food;
+    
+	//barrier
+	struct DequeObject barriers;
+	
+    struct Camera camera;
+    #ifdef WIN32
     int camera_mode;
     #endif
 	#ifdef ARM9
@@ -49,24 +46,28 @@ public:
 	#endif
 	float m;
     float a;
-    Snake snake;
-    Scene(int argc, char *argv[]);
-    void add_barrier();
-    void change_food_pos();
-    void draw_board();
-    void draw_objects();
-    void change_camera_pos();
-    void set_camera();
-    void reset();
-    ObjectType has_collision(Point p);
+
+	//snake
+    struct DequeObject snake;
 };
-#endif
 
 #endif
 
 #ifdef __cplusplus
 extern "C"{
 #endif
+
+extern void initScene(struct Scene * sceneInst, int argc, char *argv[]);
+extern void resetScene(struct Scene * sceneInst);
+extern void add_barrier(struct Scene * sceneInst);
+extern void change_food_pos(struct Scene * sceneInst);
+extern void draw_board(struct Scene * sceneInst);
+extern void draw_food(struct Scene * sceneInst);
+extern void draw_barrier(struct Scene * sceneInst);
+extern void draw_objects(struct Scene * sceneInst);
+extern enum ObjectType has_collision(struct Scene * sceneInst, struct Point p);
+extern void change_camera_pos(struct Scene * sceneInst);
+extern void set_camera(struct Scene * sceneInst);
 
 // light 0 colours
 extern GLfloat light_ambient0Scene[4];

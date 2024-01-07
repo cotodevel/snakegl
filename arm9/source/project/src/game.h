@@ -32,7 +32,7 @@ public:
     void      calculateFPS();
     void      run();
     void      draw_menu();
-    Scene	  scenario; /// the scene we render
+    struct Scene scenario; /// the scene we render
     int       currentTime;
 	Game(int argc, char *argv[]);
     ~Game();

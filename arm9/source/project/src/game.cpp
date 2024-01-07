@@ -51,9 +51,8 @@ __attribute__((optimize("Ofast")))
 #if (!defined(__GNUC__) && defined(__clang__))
 __attribute__ ((optnone))
 #endif
-Game::Game(int argc, char *argv[]):
-	scenario(argc, argv)
-{
+Game::Game(int argc, char *argv[]){
+	initScene(&scenario, argc, argv);
     fps = 0;
     frameCount = 0;
     currentTime = 0,
@@ -141,7 +140,7 @@ void Game::reset()
     tick = 30;
     tick2 = 10;
 
-	game->scenario.reset();
+	resetScene(&game->scenario);
     is_running = true;
 }
 
@@ -262,7 +261,7 @@ void Game::run()
 	Scene * scene = &game->scenario;
     if (paused || is_game_over || !is_running) return;
 
-    ObjectType o = scene->has_collision(head(&scene->snake));
+    enum ObjectType o = has_collision(scene, head(&scene->snake));
     ate = false;
     key_pressed = false;
 
@@ -279,19 +278,19 @@ void Game::run()
             score++;
             grow(&scene->snake, true);
             move(&scene->snake);
-            scene->change_food_pos();
+            change_food_pos(scene);
             switch (level)
             {
                 case VIRGIN:
                     if (size(&scene->snake) % 6 == 0)
                     {
-                        scene->add_barrier();
+                        add_barrier(scene);
                     }
                 break;
                 case JEDI:
                     if (size(&scene->snake) % 4 == 0)
                     {
-                        scene->add_barrier();
+                        add_barrier(scene);
                     }
                 break;
                 case ASIAN:
@@ -300,7 +299,7 @@ void Game::run()
                         int v = random_range(1, 3);
                         for (int i = 0; i < v; ++i)
                         {
-                            scene->add_barrier();
+                            add_barrier(scene);
                         }
                     }
                 break;
@@ -308,7 +307,7 @@ void Game::run()
                     int v = random_range(1, 5);
                     for (int i = 0; i < v; ++i)
                     {
-                        scene->add_barrier();
+                        add_barrier(scene);
                     }
                 break;
             }
@@ -495,7 +494,7 @@ void keyboardInput(unsigned int key, int x, int y)
 
 		case SNAKEGL_KEY_CAMERA:
             if (!game->is_running) return ;
-            scene->change_camera_pos();
+            change_camera_pos(scene);
         break;
         case SNAKEGL_KEY_PAUSE:
             if (!game->is_running) return ;

@@ -37,15 +37,15 @@ __attribute__((optimize("O0")))
 #if (!defined(__GNUC__) && defined(__clang__))
 __attribute__ ((optnone))
 #endif
-Scene::Scene(int argc, char *argv[])
+void initScene(struct Scene * sceneInst, int argc, char *argv[])
 {
 	TWLPrintf("-- Creating scene\n");
 	InitGL(argc, argv);
 	load_resources(); // InitGL(); must be called before this
 
 	// set up our directional overhead lights
-	light0On = false;
-	light1On = false;
+	sceneInst->light0On = false;
+	sceneInst->light1On = false;
 	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient0Scene);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse0Scene);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular0Scene);
@@ -56,13 +56,13 @@ Scene::Scene(int argc, char *argv[])
 	glLightfv(GL_LIGHT1, GL_SPECULAR, light_specular1Scene);
 	glLightfv(GL_LIGHT1, GL_POSITION, light_position1Scene);
 	
-	fogMode = false;
-	wireMode = false;		/// wireframe mode on / off
-	flatShading = false;	/// flat shading on / off
-    a = 0;
-    m = 0.1;
+	sceneInst->fogMode = false;
+	sceneInst->wireMode = false;		/// wireframe mode on / off
+	sceneInst->flatShading = false;	/// flat shading on / off
+    sceneInst->a = 0;
+    sceneInst->m = 0.1;
 	#ifdef ARM9
-	close_camera_mode = false;
+	sceneInst->close_camera_mode = false;
 	#endif
 }
 
@@ -72,15 +72,15 @@ __attribute__((optimize("O0")))
 #if (!defined(__GNUC__) && defined(__clang__))
 __attribute__ ((optnone))
 #endif
-void Scene::reset()
+void resetScene(struct Scene * sceneInst)
 {
-    barriers.clear();
-	#ifdef WIN32
-    camera_mode = 3;
+	clear(&sceneInst->barriers);
+    #ifdef WIN32
+    sceneInst->camera_mode = 3;
     #endif
-	resetSnake(&snake);
-    change_food_pos();
-    add_barrier();
+	resetSnake(&sceneInst->snake);
+    change_food_pos(sceneInst);
+    add_barrier(sceneInst);
 }
 
 #if (defined(__GNUC__) && !defined(__clang__))
@@ -89,17 +89,17 @@ __attribute__((optimize("O0")))
 #if (!defined(__GNUC__) && defined(__clang__))
 __attribute__ ((optnone))
 #endif
-void Scene::add_barrier()
+void add_barrier(struct Scene * sceneInst)
 {
-    Point p = random_point();
+    struct Point p = random_point();
     bool b = false;
 
-    while (b || has_collision(p) != NONE)
+    while (b || has_collision(sceneInst, p) != NONE)
     {
         p = random_point();
     }
 
-    barriers.push_back(p);
+	pushBack((struct Point*)&sceneInst->barriers, p, &sceneInst->barriers.front, &sceneInst->barriers.rear);
 }
 
 #if (defined(__GNUC__) && !defined(__clang__))
@@ -108,16 +108,16 @@ __attribute__((optimize("O0")))
 #if (!defined(__GNUC__) && defined(__clang__))
 __attribute__ ((optnone))
 #endif
-void Scene::change_food_pos()
+void change_food_pos(struct Scene * sceneInst)
 {
-    Point p = random_point();
+    struct Point p = random_point();
 
-    while (has_collision(p) != NONE)
+    while (has_collision(sceneInst, p) != NONE)
     {
         p = random_point();
     }
 
-    food = p;
+    sceneInst->food = p;
 }
 
 #if (defined(__GNUC__) && !defined(__clang__))
@@ -126,7 +126,7 @@ __attribute__((optimize("O0")))
 #if (!defined(__GNUC__) && defined(__clang__))
 __attribute__ ((optnone))
 #endif
-void Scene::draw_board()
+void draw_board(struct Scene * sceneInst)
 {
     enable_2D_texture();
 	glPushMatrix();
@@ -151,7 +151,7 @@ void Scene::draw_board()
             glVertex3f(-BOARD_SIZE, 0, -BOARD_SIZE);
         glEnd();
 		
-        Point p;
+        struct Point p;
         double size = -BOARD_SIZE - 0.1;
         // Draw bordes. TODO: It's better use a rectangle.
         while (size < BOARD_SIZE + 0.1)
@@ -192,15 +192,15 @@ __attribute__((optimize("O0")))
 #if (!defined(__GNUC__) && defined(__clang__))
 __attribute__ ((optnone))
 #endif
-void Scene::draw_food()
+void draw_food(struct Scene * sceneInst)
 {
-    Point p = food;
+    struct Point p = sceneInst->food;
     //draw_sphere(0.25f, p, FOOD_TEXTURE);
 
     // "leaf"
 	glPushMatrix();
-        glTranslatef(p.x, p.y + m + 0.45, p.z);
-        glRotatef(a, 0.0, 1.0, 0.0);
+        glTranslatef(p.x, p.y + sceneInst->m + 0.45, p.z);
+        glRotatef(sceneInst->a, 0.0, 1.0, 0.0);
 		//(leaf object)
         glColor3f(0.0f, 200.4f, 0.0f);
          glBegin(GL_TRIANGLE_STRIP);
@@ -230,8 +230,8 @@ void Scene::draw_food()
                 0, textureSizePixelCoords[FOOD_TEXTURE].textureIndex
             #endif
         );
-		glTranslatef(p.x, p.y + m, p.z);
-        glRotatef(a, 0.0, 1.0, 0.0);
+		glTranslatef(p.x, p.y + sceneInst->m, p.z);
+        glRotatef(sceneInst->a, 0.0, 1.0, 0.0);
 		//(fruit object)
 		glColor3f(1.0f, 1.0f, 14.0f);
 		
@@ -253,11 +253,11 @@ __attribute__((optimize("O0")))
 #if (!defined(__GNUC__) && defined(__clang__))
 __attribute__ ((optnone))
 #endif
-void Scene::draw_barrier()
+void draw_barrier(struct Scene * sceneInst)
 {
-    for (size_t i = 0; i < barriers.size(); ++i)
+    for (size_t i = 0; i < size(&sceneInst->barriers); ++i)
     {
-        Point p = barriers.at(i);
+		struct Point p = sceneInst->barriers.points[i];
         draw_cube(0.5f, p, BARRIER_TEXTURE);
     }
 }
@@ -268,12 +268,12 @@ __attribute__((optimize("O0")))
 #if (!defined(__GNUC__) && defined(__clang__))
 __attribute__ ((optnone))
 #endif
-void Scene::draw_objects()
+void draw_objects(struct Scene * sceneInst)
 {
-    draw_board();
-    draw_food();
-    draw_barrier();
-    draw(&snake);
+    draw_board(sceneInst);
+    draw_food(sceneInst);
+    draw_barrier(sceneInst);
+    draw(&sceneInst->snake);
 }
 
 #if (defined(__GNUC__) && !defined(__clang__))
@@ -282,7 +282,7 @@ __attribute__((optimize("O0")))
 #if (!defined(__GNUC__) && defined(__clang__))
 __attribute__ ((optnone))
 #endif
-ObjectType Scene::has_collision(Point p)
+enum ObjectType has_collision(struct Scene * sceneInst, struct Point p)
 {
     if (p.x >  5.0f ||
         p.x < -5.0f ||
@@ -292,14 +292,14 @@ ObjectType Scene::has_collision(Point p)
         return BOARD;
     }
 
-    if (p.x == food.x && p.z == food.z)
+    if (p.x == sceneInst->food.x && p.z == sceneInst->food.z)
     {
         return FOOD;
     }
 
-    for (size_t i = 0; i < barriers.size(); ++i)
+    for (size_t i = 0; i < size(&sceneInst->barriers); ++i)
     {
-        Point b = barriers.at(i);
+		struct Point b = sceneInst->barriers.points[i];
 
         if (p.x == b.x && p.z == b.z)
         {
@@ -322,16 +322,16 @@ __attribute__((optimize("O0")))
 #if (!defined(__GNUC__) && defined(__clang__))
 __attribute__ ((optnone))
 #endif
-void Scene::change_camera_pos(){
+void change_camera_pos(struct Scene * sceneInst){
     #ifdef WIN32
-	camera_mode += 1;
-    if (camera_mode > 3)
+	sceneInst->camera_mode += 1;
+    if (sceneInst->camera_mode > 3)
     {
-        camera_mode = 0;
+        sceneInst->camera_mode = 0;
     }
 	#endif
 	#ifdef ARM9
-	close_camera_mode = !close_camera_mode;
+	sceneInst->close_camera_mode = !sceneInst->close_camera_mode;
 	#endif
 }
 
@@ -341,114 +341,114 @@ __attribute__((optimize("O0")))
 #if (!defined(__GNUC__) && defined(__clang__))
 __attribute__ ((optnone))
 #endif
-void Scene::set_camera()
+void set_camera(struct Scene * sceneInst)
 {
 	glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-	camera.upX    = 0.0f;
-    camera.upY    = 1.0f;
-    camera.upZ    = 0.0f;
+	sceneInst->camera.upX    = 0.0f;
+    sceneInst->camera.upY    = 1.0f;
+    sceneInst->camera.upZ    = 0.0f;
 	#ifdef WIN32
-    camera.aspect = 1;
+    sceneInst->camera.aspect = 1;
 
-    if (camera_mode == 0)
+    if (sceneInst->camera_mode == 0)
     {
-        camera.eyeX    = 0.0f;
-        camera.eyeY    = 10.0f;
-        camera.eyeZ    = 15.0f;
-        camera.centerX = 0.0f;
-        camera.centerY = 0.0f;
-        camera.centerZ = 0.0f;
-        camera.fovy    = 45;
-        camera.zNear   = 0.1f;
-        camera.zFar    = 50;
+        sceneInst->camera.eyeX    = 0.0f;
+        sceneInst->camera.eyeY    = 10.0f;
+        sceneInst->camera.eyeZ    = 15.0f;
+        sceneInst->camera.centerX = 0.0f;
+        sceneInst->camera.centerY = 0.0f;
+        sceneInst->camera.centerZ = 0.0f;
+        sceneInst->camera.fovy    = 45;
+        sceneInst->camera.zNear   = 0.1f;
+        sceneInst->camera.zFar    = 50;
     }
-    else if (camera_mode == 1)
+    else if (sceneInst->camera_mode == 1)
     {
-        camera.eyeX    = 0.0f;
-        camera.eyeY    = 1.0f;
-        camera.eyeZ    = 20.0f;
-        camera.centerX = 0.0f;
-        camera.centerY = 0.0f;
-        camera.centerZ = 0.0f;
-        camera.fovy    = 45;
-        camera.zNear   = 0.1f;
-        camera.zFar    = 50;
+        sceneInst->camera.eyeX    = 0.0f;
+        sceneInst->camera.eyeY    = 1.0f;
+        sceneInst->camera.eyeZ    = 20.0f;
+        sceneInst->camera.centerX = 0.0f;
+        sceneInst->camera.centerY = 0.0f;
+        sceneInst->camera.centerZ = 0.0f;
+        sceneInst->camera.fovy    = 45;
+        sceneInst->camera.zNear   = 0.1f;
+        sceneInst->camera.zFar    = 50;
     }
-    else if (camera_mode == 2)
+    else if (sceneInst->camera_mode == 2)
     {
         #ifdef DEBUG
-            camera.eyeX    = 0.0f;
-            camera.eyeY    = -10.0f;
-            camera.eyeZ    = 15.0f;
-            camera.centerX = 0.0f;
-            camera.centerY = 0.0f;
-            camera.centerZ = 0.0f;
-            camera.fovy    = 45;
-            camera.zNear   = 0.1f;
-            camera.zFar    = 50;
+            sceneInst->camera.eyeX    = 0.0f;
+            sceneInst->camera.eyeY    = -10.0f;
+            sceneInst->camera.eyeZ    = 15.0f;
+            sceneInst->camera.centerX = 0.0f;
+            sceneInst->camera.centerY = 0.0f;
+            sceneInst->camera.centerZ = 0.0f;
+            sceneInst->camera.fovy    = 45;
+            sceneInst->camera.zNear   = 0.1f;
+            sceneInst->camera.zFar    = 50;
         #else
-            camera.eyeX    = -2.0f;
-            camera.eyeY    = 5.0f;
-            camera.eyeZ    = 20.0f;
-            camera.centerX = 0.0f;
-            camera.centerY = 0.0f;
-            camera.centerZ = 0.0f;
-            camera.fovy    = 45;
-            camera.zNear   = 1.0f;
-            camera.zFar    = 50;
+            sceneInst->camera.eyeX    = -2.0f;
+            sceneInst->camera.eyeY    = 5.0f;
+            sceneInst->camera.eyeZ    = 20.0f;
+            sceneInst->camera.centerX = 0.0f;
+            sceneInst->camera.centerY = 0.0f;
+            sceneInst->camera.centerZ = 0.0f;
+            sceneInst->camera.fovy    = 45;
+            sceneInst->camera.zNear   = 1.0f;
+            sceneInst->camera.zFar    = 50;
         #endif
     }
-    else if (camera_mode == 3)
+    else if (sceneInst->camera_mode == 3)
     {
-        camera.eyeX    = 0.0f;
-        camera.eyeY    = 45.0f;
-        camera.eyeZ    = 1.0f;
-        camera.centerX = 0.0f;
-        camera.centerY = 0.0f;
-        camera.centerZ = 0.0f;
-        camera.fovy    = 20;
-        camera.zNear   = 1.0f;
-        camera.zFar    = 100;
+        sceneInst->camera.eyeX    = 0.0f;
+        sceneInst->camera.eyeY    = 45.0f;
+        sceneInst->camera.eyeZ    = 1.0f;
+        sceneInst->camera.centerX = 0.0f;
+        sceneInst->camera.centerY = 0.0f;
+        sceneInst->camera.centerZ = 0.0f;
+        sceneInst->camera.fovy    = 20;
+        sceneInst->camera.zNear   = 1.0f;
+        sceneInst->camera.zFar    = 100;
     }
 
-    gluPerspective(camera.fovy, camera.aspect, camera.zNear, camera.zFar);
-    gluLookAt(camera.eyeX, camera.eyeY, camera.eyeZ, camera.centerX, camera.centerY, camera.centerZ, camera.upX, camera.upY, camera.upZ);
+    gluPerspective(sceneInst->camera.fovy, sceneInst->camera.aspect, sceneInst->camera.zNear, sceneInst->camera.zFar);
+    gluLookAt(sceneInst->camera.eyeX, sceneInst->camera.eyeY, sceneInst->camera.eyeZ, sceneInst->camera.centerX, sceneInst->camera.centerY, sceneInst->camera.centerZ, sceneInst->camera.upX, sceneInst->camera.upY, sceneInst->camera.upZ);
 	glMatrixMode(GL_MODELVIEW);
 	#endif
 	
 	#ifdef ARM9
-	if (close_camera_mode == true){
-        Point snak = game->scenario.snake.head();
-        camera.eyeX    = snak.x;
-        camera.eyeY    = 1.0f;
-        camera.eyeZ    = 5.0f + snak.z;
-        camera.centerX = 0.0f;
-        camera.centerY = 45.0f;
-        camera.centerZ = -90.0f;
-        camera.upX = 0.0f;
-        camera.upY = 0.0f;
-        camera.upZ = 45.0f;
+	if (sceneInst->close_camera_mode == true){
+        struct Point snak = game->scenario.snake.head();
+        sceneInst->camera.eyeX    = snak.x;
+        sceneInst->camera.eyeY    = 1.0f;
+        sceneInst->camera.eyeZ    = 5.0f + snak.z;
+        sceneInst->camera.centerX = 0.0f;
+        sceneInst->camera.centerY = 45.0f;
+        sceneInst->camera.centerZ = -90.0f;
+        sceneInst->camera.upX = 0.0f;
+        sceneInst->camera.upY = 0.0f;
+        sceneInst->camera.upZ = 45.0f;
     }
     else {
-        camera.eyeX    = 0.0f;
-        camera.eyeY    = 0.0f;
-        camera.eyeZ    = 16.0f;
-        camera.centerX = 0.0f;
-        camera.centerY = 0.0f;
-        camera.centerZ = 0.0f;
-        camera.upX = 1.0f;
-        camera.upY = 1.0f;
-        camera.upZ = 1.0f;
+        sceneInst->camera.eyeX    = 0.0f;
+        sceneInst->camera.eyeY    = 0.0f;
+        sceneInst->camera.eyeZ    = 16.0f;
+        sceneInst->camera.centerX = 0.0f;
+        sceneInst->camera.centerY = 0.0f;
+        sceneInst->camera.centerZ = 0.0f;
+        sceneInst->camera.upX = 1.0f;
+        sceneInst->camera.upY = 1.0f;
+        sceneInst->camera.upZ = 1.0f;
     }
     
     //Set initial view to look at
     gluPerspective(20, 256.0 / 192.0, 0.1, 140);
-    gluLookAt(camera.eyeX, camera.eyeY, camera.eyeZ,		//camera possition / eye
-                camera.centerX, camera.centerY, camera.centerZ,		//look at / center 
-                camera.upX, camera.upY, camera.upZ);		//up X,Y,Z
+    gluLookAt(sceneInst->camera.eyeX, sceneInst->camera.eyeY, sceneInst->camera.eyeZ,		//camera possition / eye
+                sceneInst->camera.centerX, sceneInst->camera.centerY, sceneInst->camera.centerZ,		//look at / center 
+                sceneInst->camera.upX, sceneInst->camera.upY, sceneInst->camera.upZ);		//up X,Y,Z
 
-	if (close_camera_mode != true){
+	if (sceneInst->close_camera_mode != true){
 		glRotateX(90.0f);
 	    glRotateY(45.0f);
 	}
@@ -558,7 +558,7 @@ void drawScene(){
     int old_cam = scene->camera_mode;
     scene->camera_mode = 3;
 	#endif
-    scene->set_camera();
+    set_camera(scene);
     game->calculateFPS();
     {
 		char s [50];
@@ -568,7 +568,7 @@ void drawScene(){
 			#ifdef WIN32
 			scene->camera_mode = old_cam;
 			#endif
-			scene->set_camera();
+			set_camera(scene);
 			#ifdef ARM9
 			if (1==1)
 			#endif
@@ -591,13 +591,13 @@ void drawScene(){
 				scene->m += 0.05;
 			}
 
-			scene->draw_objects();
+			draw_objects(scene);
 			#ifdef WIN32
 			glColor3f(0.0f, 0.0f, 0.0f);
 			glRectf(0,0, 0.75f, -0.1f);
 			scene->camera_mode = 3;
 			#endif
-			scene->set_camera();
+			set_camera(scene);
 
 			#ifdef ARM9
 			if (1==1)

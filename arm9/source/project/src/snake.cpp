@@ -11,11 +11,11 @@
 //
 // Snake implementation
 //
-void SnakeInit(struct Snake * snakeInst)
+void SnakeInit(struct DequeObject * snakeInst)
 {
 }
 
-void resetSnake(struct Snake * snakeInst)
+void resetSnake(struct DequeObject * snakeInst)
 {
 	SnakeInit(snakeInst);
 	clear(snakeInst);
@@ -31,13 +31,13 @@ void resetSnake(struct Snake * snakeInst)
     grow(snakeInst, false); //default: bool back = false
 }
 
-void move(struct Snake * snakeInst)
+void move(struct DequeObject * snakeInst)
 {
 	popBack((struct Point*)&snakeInst->points, &snakeInst->front, &snakeInst->rear);
     grow(snakeInst, false); //default: bool back = false
 }
 
-void set_directionSnake(struct Snake * snakeInst, int d)
+void set_directionSnake(struct DequeObject * snakeInst, int d)
 {
     if ((d == DOWN && snakeInst->direction == UP) ||
         (snakeInst->direction == DOWN && d == UP) ||
@@ -50,7 +50,7 @@ void set_directionSnake(struct Snake * snakeInst, int d)
     snakeInst->direction = d;
 }
 
-bool has_collisionSnake(struct Snake * snakeInst, struct Point p)
+bool has_collisionSnake(struct DequeObject * snakeInst, struct Point p)
 {
     // Skip head. It's the same point.
     for (size_t i = 1; i < count((struct Point *)&snakeInst->points); ++i)
@@ -66,7 +66,7 @@ bool has_collisionSnake(struct Snake * snakeInst, struct Point p)
     return false;
 }
 
-void draw(struct Snake * snakeInst)
+void draw(struct DequeObject * snakeInst)
 {
     // TODO: Draw cylindric snake.
     // It's more hard.
@@ -109,17 +109,17 @@ void draw(struct Snake * snakeInst)
     disable_2D_texture();
 }
 
-Point head(struct Snake * snakeInst)
+Point head(struct DequeObject * snakeInst)
 {
     return snakeInst->points[0];
 }
 
-Point tail(struct Snake * snakeInst)
+Point tail(struct DequeObject * snakeInst)
 {
     return snakeInst->points[count((struct Point *)&snakeInst->points) - 1];
 }
 
-void grow(struct Snake * snakeInst, bool back) //default: bool back = false
+void grow(struct DequeObject * snakeInst, bool back) //default: bool back = false
 {
     struct Point p;
     p.x = snakeInst->points[0].x;
@@ -152,7 +152,7 @@ void grow(struct Snake * snakeInst, bool back) //default: bool back = false
     }
 }
 
-int size(struct Snake * snakeInst)
+int size(struct DequeObject * snakeInst)
 {
     return count((struct Point *)&snakeInst->points);
 }
@@ -274,7 +274,7 @@ int main() {
 void pushFront(struct Point *arr, struct Point item, int *pfront, int *prear) {
   int i, k, c;
 
-  if (*pfront == 0 && *prear == MAX - 1) {
+  if (*pfront == 0 && *prear == MAX_DEQUE_OBJECTS - 1) {
     return;
   }
 
@@ -284,7 +284,7 @@ void pushFront(struct Point *arr, struct Point item, int *pfront, int *prear) {
     return;
   }
 
-  if (*prear != MAX - 1) {
+  if (*prear != MAX_DEQUE_OBJECTS - 1) {
     c = count(arr);
     k = *prear + 1;
     for (i = 1; i <= c; i++) {
@@ -303,7 +303,7 @@ void pushFront(struct Point *arr, struct Point item, int *pfront, int *prear) {
 void pushBack(struct Point *arr, struct Point item, int *pfront, int *prear) {
   int i, k;
 
-  if (*pfront == 0 && *prear == MAX - 1) {
+  if (*pfront == 0 && *prear == MAX_DEQUE_OBJECTS - 1) {
     return;
   }
 
@@ -313,11 +313,11 @@ void pushBack(struct Point *arr, struct Point item, int *pfront, int *prear) {
     return;
   }
 
-  if (*prear == MAX - 1) {
+  if (*prear == MAX_DEQUE_OBJECTS - 1) {
     k = *pfront - 1;
     for (i = *pfront - 1; i < *prear; i++) {
       k = i;
-      if (k == MAX - 1)
+      if (k == MAX_DEQUE_OBJECTS - 1)
 		  arr[k].index = INVALID_DEQUE_ENTRY;
       else
         arr[k] = arr[i + 1];
@@ -369,18 +369,18 @@ struct Point popBack(struct Point *arr, int *pfront, int *prear) {
 int count(struct Point *arr) {
   int c = 0, i;
 
-  for (i = 0; i < MAX; i++) {
+  for (i = 0; i < MAX_DEQUE_OBJECTS; i++) {
 	  if (arr[i].index != INVALID_DEQUE_ENTRY)
       c++;
   }
   return c;
 }
 
-void clear(class Snake * inst){
+void clear(struct DequeObject * inst){
 	int c = 0, i;
 	memset((u8*)&inst->points, 0, sizeof(inst->points));
 	inst->front = inst->rear = -1;
-	for (i = 0; i < MAX; i++) {
+	for (i = 0; i < MAX_DEQUE_OBJECTS; i++) {
 		struct Point * ref = &inst->points[i];
 		ref->index = INVALID_DEQUE_ENTRY;
 		ref->x = 0;

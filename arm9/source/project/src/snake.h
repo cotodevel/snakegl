@@ -62,7 +62,7 @@ using namespace std;
 
 //Deque implementation in C
 #include <stdio.h>
-#define MAX 30
+#define MAX_DEQUE_OBJECTS 600
 
 #define INVALID_DEQUE_ENTRY ((int)-1)
 
@@ -157,27 +157,25 @@ struct Point
 };
 
 
-struct Snake
+struct DequeObject
 { 
-    
 	//deque impl.
-	struct Point points[MAX];
+	struct Point points[MAX_DEQUE_OBJECTS];
 	int front, rear;
     int direction;
 	//
-
 };
 
-extern void SnakeInit(struct Snake * snakeInst);
-extern void  grow(struct Snake * snakeInst, bool back);
-extern void  resetSnake(struct Snake * snakeInst);
-extern void  move(struct Snake * snakeInst);
-extern void  set_directionSnake(struct Snake * snakeInst, int d);
-extern bool  has_collisionSnake(struct Snake * snakeInst, struct Point p);
-extern void  draw(struct Snake * snakeInst);
-extern struct Point head(struct Snake * snakeInst);
-extern struct Point tail(struct Snake * snakeInst);
-extern int   size(struct Snake * snakeInst);
+extern void SnakeInit(struct DequeObject * snakeInst);
+extern void  grow(struct DequeObject * snakeInst, bool back);
+extern void  resetSnake(struct DequeObject * snakeInst);
+extern void  move(struct DequeObject * snakeInst);
+extern void  set_directionSnake(struct DequeObject * snakeInst, int d);
+extern bool  has_collisionSnake(struct DequeObject * snakeInst, struct Point p);
+extern void  draw(struct DequeObject * snakeInst);
+extern struct Point head(struct DequeObject * snakeInst);
+extern struct Point tail(struct DequeObject * snakeInst);
+extern int   size(struct DequeObject * snakeInst);
 
 
 extern int random_range(int min, int max);
@@ -187,7 +185,6 @@ extern void draw_cube(float size, struct Point p, int res_id);
 
 #ifdef __cplusplus
 extern void draw_text(std::string s, struct Point p, float r, float g, float b);
-extern void clear(class Snake *arr);
 #endif
 
 //Deque implementation in C
@@ -197,4 +194,6 @@ extern struct Point popFront(struct Point *arr, int *pfront, int *prear);
 extern struct Point popBack(struct Point *arr, int *pfront, int *prear);
 extern void display(struct Point *arr);
 extern int count(struct Point *arr);
+extern void clear(struct DequeObject *arr);
+
 #endif
