@@ -12,20 +12,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\toolchaingenericds\src\common\libutils\arm9\source\ndsDisplayListUtils.h" />
-    <ClInclude Include="..\src\game.h" />
     <ClInclude Include="..\src\Scene.h" />
-    <ClInclude Include="..\src\snake.h" />
     <ClInclude Include="..\src\SOIL.h" />
-    <ClInclude Include="..\src\TGDSTypes.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\..\toolchaingenericds\src\common\libutils\arm9\source\ndsDisplayListUtils.c" />
-    <ClCompile Include="..\src\game.cpp" />
+    <ClCompile Include="..\src\game.c" />
     <ClCompile Include="..\src\image_dxt.c" />
     <ClCompile Include="..\src\image_helper.c" />
     <ClCompile Include="..\src\main.c" />
-    <ClCompile Include="..\src\Scene.cpp" />
-    <ClCompile Include="..\src\snake.cpp" />
+    <ClCompile Include="..\src\Scene.c" />
+    <ClCompile Include="..\src\snake.c" />
     <ClCompile Include="..\src\soil.c" />
     <ClCompile Include="..\src\stb_image_aug.c" />
   </ItemGroup>
