@@ -72,7 +72,7 @@ __attribute__ ((optnone))
 #endif
 void resetScene(struct Scene * sceneInst)
 {
-	clear(&sceneInst->barriers);
+	clearDequeObject(&sceneInst->barriers);
     #ifdef WIN32
     sceneInst->camera_mode = 3;
     #endif
@@ -421,7 +421,7 @@ void set_camera(struct Scene * sceneInst)
 	
 	#ifdef ARM9
 	if (sceneInst->close_camera_mode == true){
-        struct Point snak = game->scenario.snake.head();
+        struct Point snak = head(&game.scenario.snake);
         sceneInst->camera.eyeX    = snak.x;
         sceneInst->camera.eyeY    = 1.0f;
         sceneInst->camera.eyeZ    = 5.0f + snak.z;
@@ -475,15 +475,15 @@ int heightScene;	/// the height of the window
 //It defines the RGBA color of the diffuse light that a particular light source adds to a scene. By default, GL_DIFFUSE is (1.0, 1.0, 1.0, 1.0) for GL_LIGHT0, 
 //which produces a bright, white light as shown in the left side of "Plate 13" in Appendix I. 
 //The default value for any other light (GL_LIGHT1, ... , GL_LIGHT7) is (0.0, 0.0, 0.0, 0.0).
-GLfloat light_diffuse0Scene[4]	= {0.4f, 0.4f, 0.4f, 1.01f}; //WIN32
+GLfloat light_diffuse0Scene[4]	= {0.4f, 0.4f, 0.4f, 1.01f}; 
 
 #ifdef WIN32
 GLfloat light_ambient0Scene[4]	= {0.1f, 0.1f, 0.1f, 1.0f}; //WIN32
 GLfloat light_specular0Scene[4]	= {0.2f, 0.2f, 0.2f, 1.0f}; //WIN32
-GLfloat light_position0Scene[4]	= {0.0f, -1.0f, 0.0f, 0.0f}; //WIN32
+GLfloat light_position0Scene[4]	= {-3.0f, -1.0f, 0.0f, 0.0f}; //WIN32
 #endif
 #ifdef ARM9
-GLfloat light_ambient0Scene[]  = { 1.0f, 1.0f, 1.0f, 1.0f }; //NDS
+GLfloat light_ambient0Scene[]  = { 0.5f, 0.5f, 0.5f, 1.0f }; //NDS
 GLfloat light_specular0Scene[] = { 1.0f, 1.0f, 1.0f, 1.0f }; //NDS
 GLfloat light_position0Scene[] = { 0.0f, -1.0f, 0.0f, 0.0f }; //NDS
 #endif
@@ -503,7 +503,7 @@ __attribute__ ((optnone))
 #endif
 void render3DUpperScreen(){
 	//Update camera for NintendoDS Upper 3D Screen:
-	game->scenario.close_camera_mode = NDSDual3DCameraFlag;
+	game.scenario.close_camera_mode = NDSDual3DCameraFlag;
 }
 
 #if (defined(__GNUC__) && !defined(__clang__))
@@ -514,7 +514,7 @@ __attribute__ ((optnone))
 #endif
 void render3DBottomScreen(){
 	//Update camera for NintendoDS Bottom 3D Screen
-	game->scenario.close_camera_mode = !NDSDual3DCameraFlag;
+	game.scenario.close_camera_mode = !NDSDual3DCameraFlag;
 }
 #endif
 
@@ -1080,7 +1080,8 @@ int startTGDSProject(int argc, char *argv[])
 			NDSDual3DCameraFlag = !NDSDual3DCameraFlag;
 			menuShow();
 		}
-		u32 keys = keysDown()&(KEY_UP|KEY_DOWN|KEY_LEFT|KEY_RIGHT|KEY_SELECT|KEY_START);
+
+		u32 keys = keysDown() & ~(KEY_L | KEY_R);
 		keyboardInput(keys, 0, 0);
 		
 		//sound (ARM7)

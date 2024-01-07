@@ -68,7 +68,7 @@ __attribute__((optimize("Ofast")))
 #if (!defined(__GNUC__) && defined(__clang__))
 __attribute__ ((optnone))
 #endif
-void pause(struct Game * instGame)
+void pauseGame(struct Game * instGame)
 {
     instGame->paused = true;
 }
@@ -113,7 +113,7 @@ void reset(struct Game * instGame)
     instGame->is_game_over = false;
     instGame->paused = false;
 	#ifdef ARM9
-	instGame->soundGameOverEmitted = false;
+	soundGameOverEmitted = false;
     BgMusicOff();
 	BgMusic("0:/stud.ima");
 	#endif
@@ -248,7 +248,7 @@ void run(struct Game * instGame)
     switch (o)
     {
         case NONE:
-            move(&sceneInst->snake);
+            moveDequeObject(&sceneInst->snake);
         break;
         case FOOD:
 			#ifdef ARM9
@@ -257,7 +257,7 @@ void run(struct Game * instGame)
             instGame->ate = true;
             instGame->score++;
             grow(&sceneInst->snake, true);
-            move(&sceneInst->snake);
+            moveDequeObject(&sceneInst->snake);
             change_food_pos(sceneInst);
             switch (instGame->level)
             {
@@ -471,33 +471,38 @@ void keyboardInput(unsigned int key, int x, int y)
 				glutReshapeWindow(width, height);
 			}
 		}break;
+		
+		case SNAKEGL_KEY_PAUSE:
+            if (!game.is_running) return ;
+            pauseGame(&game);
+        break;
+        case SNAKEGL_KEY_QUIT:{
+            exit(0);
+		}
+        break;
+        
+		case SNAKEGL_KEY_STOP:
+            if (!game.is_running) return ;
+            stop(&game);
+        break;
+		
+		case SNAKEGL_KEY_START:
+            if (!game.paused) return ;
+            start(&game);
+        break;
+        
+        case SNAKEGL_KEY_RESET:
+            if (!game.is_running) return ;
+            reset(&game);
+        break;
+		
 		#endif
 
 		case SNAKEGL_KEY_CAMERA:
             if (!game.is_running) return ;
             change_camera_pos(scene);
         break;
-        case SNAKEGL_KEY_PAUSE:
-            if (!game.is_running) return ;
-            pause(&game);
-        break;
-        case SNAKEGL_KEY_QUIT:{
-            exit(0);
-		}
-        break;
         case SNAKEGL_KEY_SELECT:
-            reset(&game);
-        break;
-        case SNAKEGL_KEY_START:
-            if (!game.paused) return ;
-            start(&game);
-        break;
-        case SNAKEGL_KEY_STOP:
-            if (!game.is_running) return ;
-            stop(&game);
-        break;
-        case SNAKEGL_KEY_RESET:
-            if (!game.is_running) return ;
             reset(&game);
         break;
         case SNAKEGL_KEY_LEFT:

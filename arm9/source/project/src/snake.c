@@ -18,7 +18,7 @@ void resetSnake(struct DequeObject * snakeInst)
 	struct Point p;
     int d = (rand() % 4) + 1;
 	SnakeInit(snakeInst);
-	clear(snakeInst);
+	clearDequeObject(snakeInst);
     set_directionSnake(snakeInst, d);
 
     p.x = 0.0f;
@@ -29,7 +29,7 @@ void resetSnake(struct DequeObject * snakeInst)
     grow(snakeInst, false); //default: bool back = false
 }
 
-void move(struct DequeObject * snakeInst)
+void moveDequeObject(struct DequeObject * snakeInst)
 {
 	popBack((struct Point*)&snakeInst->points, &snakeInst->front, &snakeInst->rear);
     grow(snakeInst, false); //default: bool back = false
@@ -223,7 +223,7 @@ void draw_text(char * s, struct Point p, float r, float g, float b)
 	#ifdef ARM9
     char debugBuf[64];
     //sprintf(debugBuf, "currentTime:%d", game->currentTime);
-    sprintf(debugBuf, "%s--timer:%d", s.c_str(), getTimerCounter());
+    sprintf(debugBuf, "%s--timer:%d", s, getTimerCounter());
     nocashMessage(debugBuf);
     #endif
 	
@@ -378,7 +378,7 @@ int count(struct Point *arr) {
   return c;
 }
 
-void clear(struct DequeObject * inst){
+void clearDequeObject(struct DequeObject * inst){
 	int c = 0, i;
 	memset((u8*)&inst->points, 0, sizeof(inst->points));
 	inst->front = inst->rear = -1;

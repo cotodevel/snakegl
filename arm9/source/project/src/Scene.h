@@ -74,8 +74,8 @@
 #define BARRIER_TEXTURE 1
 #define BRICK_TEXTURE   2
 #define GROUND_TEXTURE  3
-#define MENU_TEXTURE    4
-#define SNAKE_TEXTURE   5
+#define SNAKE_TEXTURE   4
+#define MENU_TEXTURE    5
 #endif
 
 #define TEXTURE_COUNT   6
@@ -96,6 +96,19 @@
 #endif
 
 #ifdef ARM9
+
+//GCC assumes whatever value instead proper u16 value here, override keypad bits to fix it
+#define KEY_A      ((u16)(1 << 0))
+#define KEY_B      ((u16)(1 << 1))
+#define KEY_SELECT ((u16)(1 << 2))
+#define KEY_START  ((u16)(1 << 3))
+#define KEY_RIGHT  ((u16)(1 << 4))
+#define KEY_LEFT   ((u16)(1 << 5))
+#define KEY_UP     ((u16)(1 << 6))
+#define KEY_DOWN   ((u16)(1 << 7))
+#define KEY_R      ((u16)(1 << 8))
+#define KEY_L      ((u16)(1 << 9))
+
 #define SNAKEGL_KEY_CAMERA      KEY_R  // space
 #define SNAKEGL_KEY_PAUSE       KEY_Y // p
 #define SNAKEGL_KEY_QUIT        KEY_L  // esc
@@ -287,7 +300,7 @@ extern bool getDual3DTGDSStatus();
 extern void SnakeInit(struct DequeObject * snakeInst);
 extern void  grow(struct DequeObject * snakeInst, bool back);
 extern void  resetSnake(struct DequeObject * snakeInst);
-extern void  move(struct DequeObject * snakeInst);
+extern void  moveDequeObject(struct DequeObject * snakeInst);
 extern void  set_directionSnake(struct DequeObject * snakeInst, int d);
 extern bool  has_collisionSnake(struct DequeObject * snakeInst, struct Point p);
 extern void  draw(struct DequeObject * snakeInst);
@@ -309,11 +322,11 @@ extern struct Point popFront(struct Point *arr, int *pfront, int *prear);
 extern struct Point popBack(struct Point *arr, int *pfront, int *prear);
 extern void display(struct Point *arr);
 extern int count(struct Point *arr);
-extern void clear(struct DequeObject *arr);
+extern void clearDequeObject(struct DequeObject *arr);
 
 extern struct Game game;
 extern void initGame(struct Game * instGame, int argc, char *argv[]);
-extern void pause(struct Game * instGame);
+extern void pauseGame(struct Game * instGame);
 extern void start(struct Game * instGame);
 extern void stop(struct Game * instGame);
 extern void reset(struct Game * instGame);
