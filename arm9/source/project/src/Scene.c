@@ -44,15 +44,6 @@ void initScene(struct Scene * sceneInst, int argc, char *argv[])
 	// set up our directional overhead lights
 	sceneInst->light0On = false;
 	sceneInst->light1On = false;
-	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient0Scene);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse0Scene);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular0Scene);
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position0Scene);
-	
-	glLightfv(GL_LIGHT1, GL_AMBIENT, light_ambient1Scene);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse1Scene);
-	glLightfv(GL_LIGHT1, GL_SPECULAR, light_specular1Scene);
-	glLightfv(GL_LIGHT1, GL_POSITION, light_position1Scene);
 	
 	sceneInst->fogMode = false;
 	sceneInst->wireMode = false;		/// wireframe mode on / off
@@ -467,32 +458,6 @@ GLuint texturesSnakeGL[TEXTURE_COUNT+1];
 
 int widthScene;	/// the width of the window
 int heightScene;	/// the height of the window
-
-// light 0 colours
-
-//https://www.glprogramming.com/red/chapter05.html
-//The GL_DIFFUSE parameter probably most closely correlates with what you naturally think of as "the color of a light." 
-//It defines the RGBA color of the diffuse light that a particular light source adds to a scene. By default, GL_DIFFUSE is (1.0, 1.0, 1.0, 1.0) for GL_LIGHT0, 
-//which produces a bright, white light as shown in the left side of "Plate 13" in Appendix I. 
-//The default value for any other light (GL_LIGHT1, ... , GL_LIGHT7) is (0.0, 0.0, 0.0, 0.0).
-GLfloat light_diffuse0Scene[4]	= {0.4f, 0.4f, 0.4f, 1.01f}; 
-
-#ifdef WIN32
-GLfloat light_ambient0Scene[4]	= {0.1f, 0.1f, 0.1f, 1.0f}; //WIN32
-GLfloat light_specular0Scene[4]	= {0.2f, 0.2f, 0.2f, 1.0f}; //WIN32
-GLfloat light_position0Scene[4]	= {-3.0f, -1.0f, 0.0f, 0.0f}; //WIN32
-#endif
-#ifdef ARM9
-GLfloat light_ambient0Scene[]  = { 0.5f, 0.5f, 0.5f, 1.0f }; //NDS
-GLfloat light_specular0Scene[] = { 1.0f, 1.0f, 1.0f, 1.0f }; //NDS
-GLfloat light_position0Scene[] = { 0.0f, -1.0f, 0.0f, 0.0f }; //NDS
-#endif
-
-// light 1 colours
-GLfloat light_ambient1Scene[4]	= {0.1f, 0.1f, 0.1f, 1.0f};
-GLfloat light_diffuse1Scene[4]	= {0.45f, 0.45f, 0.45f, 1.0f};
-GLfloat light_specular1Scene[4]	= {0.5f, 0.5f, 0.5f, 1.0f};
-GLfloat light_position1Scene[4]	= {-2.0f, -5.0f, -5.0f, -1.0f};
 
 #ifdef ARM9
 #if (defined(__GNUC__) && !defined(__clang__))
