@@ -81,21 +81,10 @@ int main(int argc, char *argv[])
 	bool isTGDSCustomConsole = true;	//set default console or custom console: custom console 
 	GUI_init(isTGDSCustomConsole);
 	GUI_clear();
-	
-	//xmalloc init removes args, so save them
-	int i = 0;
-	for(i = 0; i < argc; i++){
-		argvs[i] = argv[i];
-	}
 
 	bool isCustomTGDSMalloc = true;
 	setTGDSMemoryAllocator(getProjectSpecificMemoryAllocatorSetup(isCustomTGDSMalloc));
 	sint32 fwlanguage = (sint32)getLanguage();
-	
-	//argv destroyed here because of xmalloc init, thus restore them
-	for(i = 0; i < argc; i++){
-		argv[i] = argvs[i];
-	}
 
 	int ret=FS_init();
 	if (ret != 0){
@@ -126,7 +115,7 @@ int main(int argc, char *argv[])
 		}
 		//Force ARM7 reload once 
 		if( 
-			(argc < 3) 
+			(argc < 2) 
 			&& 
 			(strncmp(argv[1], TGDSProj, strlen(TGDSProj)) != 0) 	
 		){
@@ -154,38 +143,20 @@ int main(int argc, char *argv[])
 			
 			//pass incoming launcher's ARGV0
 			char arg0[256];
-			int newArgc = 3;
-			if (argc > 4) {
-				printf(" ---- test");
-				printf(" ---- test");
-				printf(" ---- test");
-				printf(" ---- test");
-				printf(" ---- test");
-				printf(" ---- test");
-				printf(" ---- test");
-				printf(" ---- test");
-				
-				//arg 0: original NDS caller
-				//arg 1: this NDS binary
-				//arg 2: this NDS binary's ARG0: filepath
+			int newArgc = 2;
+			if (argc > 2) {
+				//Arg0:	Chainload caller: TGDS-MB
+				//Arg1:	This NDS Binary reloaded through ChainLoad
+				//Arg2: This NDS Binary reloaded through ChainLoad's Argument0
 				strcpy(arg0, (const char *)argv[2]);
 				newArgc++;
 			}
-			//or else stub out an incoming arg0 for relaunched TGDS binary
-			else {
-				strcpy(arg0, (const char *)"0:/incomingCommand.bin");
-				newArgc++;
-			}
-			//debug end
 			
-			char thisArgv[5][MAX_TGDSFILENAME_LENGTH];
+			char thisArgv[3][MAX_TGDSFILENAME_LENGTH];
 			memset(thisArgv, 0, sizeof(thisArgv));
-			strcpy(&thisArgv[0][0], thisTGDSProject);	//Arg0:	This Binary loaded
-			strcpy(&thisArgv[1][0], curChosenBrowseFile);	//Arg1:	Chainload caller: TGDS-MB
-			strcpy(&thisArgv[2][0], "0:/stub.bin");			//bugged arg slot
-			strcpy(&thisArgv[3][0], (char*)&arg0[0]);//Arg3: NDS Binary reloaded through ChainLoad's ARG0
-			strcpy(&thisArgv[4][0], thisTGDSProject);	//Arg4:	NDS Binary reloaded through ChainLoad
-			newArgc++;
+			strcpy(&thisArgv[0][0], curChosenBrowseFile);	//Arg0:	Chainload caller: TGDS-MB
+			strcpy(&thisArgv[1][0], thisTGDSProject);	//Arg1:	NDS Binary reloaded through ChainLoad
+			strcpy(&thisArgv[2][0], (char*)arg0);	//Arg2: NDS Binary reloaded through ChainLoad's ARG0
 			addARGV(newArgc, (char*)&thisArgv);				
 			if(TGDSMultibootRunNDSPayload(curChosenBrowseFile) == false){ //should never reach here, nor even return true. Should fail it returns false
 				
@@ -448,9 +419,6 @@ __attribute__ ((optnone))
 void closeSoundUser(){
 	//Stubbed. Gets called when closing an audiostream of a custom audio decoder
 }
-
-char args[8][MAX_TGDSFILENAME_LENGTH];
-char *argvs[8];
 
 bool NDSDual3DCameraFlag = false;
 
