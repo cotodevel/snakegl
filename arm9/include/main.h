@@ -54,9 +54,6 @@ extern struct fd * _FileHandleVideo;
 extern struct fd * _FileHandleAudio;
 extern bool stopSoundStreamUser();
 extern void closeSoundUser();
-
-extern char args[8][MAX_TGDSFILENAME_LENGTH];
-extern char *argvs[8];
 extern bool get_pen_delta( int *dx, int *dy );
 	
 extern int pendPlay;

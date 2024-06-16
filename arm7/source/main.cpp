@@ -1,4 +1,5 @@
 /*
+
 			Copyright (C) 2017  Coto
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,18 +19,22 @@ USA
 
 #include "main.h"
 #include "biosTGDS.h"
-#include "loader.h"
-#include "busTGDS.h"
-#include "dmaTGDS.h"
 #include "spifwTGDS.h"
-#include "wifi_arm7.h"
+#include "posixHandleTGDS.h"
 #include "pff.h"
 #include "ipcfifoTGDSUser.h"
+#include "loader.h"
+#include "dldi.h"
+#include "exceptionTGDS.h"
+#include "dmaTGDS.h"
+#include "busTGDS.h"
+#include "wifi_arm7.h"
 #include "ima_adpcm.h"
 #include "soundTGDS.h"
-#include "biosTGDS.h"
 #include "timerTGDS.h"
 #include "InterruptsARMCores_h.h"
+
+////////////////////////////////TGDS-MB v3 VRAM Bootcode start////////////////////////////////
 
 IMA_Adpcm_Player backgroundMusicPlayer;	//Actual PLAYER Instance. See ima_adpcm.cpp -> [PLAYER: section
 IMA_Adpcm_Player SoundEffect0Player;
@@ -38,7 +43,97 @@ FATFS FatfsFILEBgMusic; //Sound stream handle
 FATFS FatfsFILESoundSample0; //Sound effect handle #0
 
 struct soundPlayerContext soundData;
+FATFS fileHandle;					// Petit-FatFs work area 
 char fname[256];
+char debugBuf7[256];
+
+/*
+//If NTR/TWL Binary
+	int isNTRTWLBinary = isNTROrTWLBinaryTGDSMB7(fh);
+	//Trying to boot a TWL binary in NTR mode? 
+	if(!(isNTRTWLBinary == isNDSBinaryV1) && !(isNTRTWLBinary == isNDSBinaryV2) && !(isNTRTWLBinary == isNDSBinaryV3) && !(isNTRTWLBinary == isTWLBinary) && !(isNTRTWLBinary == isNDSBinaryV1Slot2)){
+	}
+*/
+
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
+int isNTROrTWLBinaryTGDSMB7(FATFS * currentFH){
+	int mode = notTWLOrNTRBinary;
+	return mode;
+}
+
+
+#include <stdio.h>
+
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
+void strrev(char *arr, int start, int end)
+{
+    char temp;
+
+    if (start >= end)
+        return;
+
+    temp = *(arr + start);
+    *(arr + start) = *(arr + end);
+    *(arr + end) = temp;
+
+    start++;
+    end--;
+    strrev(arr, start, end);
+}
+
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
+char *itoa(int number, char *arr, int base)
+{
+    int i = 0, r, negative = 0;
+
+    if (number == 0)
+    {
+        arr[i] = '0';
+        arr[i + 1] = '\0';
+        return arr;
+    }
+
+    if (number < 0 && base == 10)
+    {
+        number *= -1;
+        negative = 1;
+    }
+
+    while (number != 0)
+    {
+        r = number % base;
+        arr[i] = (r > 9) ? (r - 10) + 'a' : r + '0';
+        i++;
+        number /= base;
+    }
+
+    if (negative)
+    {
+        arr[i] = '-';
+        i++;
+    }
+
+    strrev(arr, 0, i - 1);
+
+    arr[i] = '\0';
+
+    return arr;
+}
 
 #if (defined(__GNUC__) && !defined(__clang__))
 __attribute__((optimize("O0")))
@@ -119,7 +214,14 @@ __attribute__((optimize("O0")))
 #if (!defined(__GNUC__) && defined(__clang__))
 __attribute__ ((optnone))
 #endif
-int main(int argc, char **argv)  {
+int main(int argc, char **argv) {
+//---------------------------------------------------------------------------------
+	/*			TGDS 1.6 Standard ARM7 Init code start	*/
+	installWifiFIFO();
+	while(!(*(u8*)0x04000240 & 2) ){} //wait for VRAM_D block
+	ARM7InitDLDI(TGDS_ARM7_MALLOCSTART, TGDS_ARM7_MALLOCSIZE, TGDSDLDI_ARM7_ADDRESS);
+	SendFIFOWords(FIFO_ARM7_RELOAD, 0xFF); //ARM7 Reload OK -> acknowledge ARM9
+    /*			TGDS 1.6 Standard ARM7 Init code end	*/
 	REG_IE|=(IRQ_VBLANK); //X button depends on this
 	while (1) {
 		handleARM7SVC();	/* Do not remove, handles TGDS services */
@@ -158,3 +260,5 @@ void playerStopARM7(){
 		SCHANNEL_REPEAT_POINT(ch) = 0;
 	}
 }
+
+////////////////////////////////TGDS-MB v3 VRAM Bootcode end////////////////////////////////
