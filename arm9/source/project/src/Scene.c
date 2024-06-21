@@ -765,6 +765,13 @@ int InitGL(int argc, char *argv[]){
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0|GL_LIGHT1);
 	
+	//Enable Depth Test for WIN32/NDS (Less)
+	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	glDepthFunc(GL_EQUAL);
+	glDepthFunc(GL_LESS);
+	
 	return 0;
 }
 
