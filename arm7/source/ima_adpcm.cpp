@@ -747,7 +747,7 @@ void timerAudioCallback(){
 
 	//Sound effect mix
 	if(SoundEffect0Player.active == true){
-		s16 * tmpDat = (s16*)workBufferSoundEffect0;
+		s16 * tmpDat = (s16 *)&adpcmWorkBuffer[0];
 		SoundEffect0Player.i_stream_request(ADPCM_SIZE, tmpDat, WAV_FORMAT_IMA_ADPCM);
 		if(SoundEffect0Player.stream.get_channels() == 2){
 			uint i=0;
