@@ -165,12 +165,12 @@ void playSoundStreamARM7(){
 	fresult = pf_open(fname, currentFH);
 	if(streamType == FIFO_PLAYSOUNDEFFECT_FILE){
 		if (fresult != FR_OK) { 
-			//strcpy((char*)0x02000000, "soundeffect failed to open:");
-			//strcat((char*)0x02000000, filename);
+			strcpy((char*)0x02000000, "soundeffect failed to open:");
+			strcat((char*)0x02000000, filename);
 		}
 		else{
-			//strcpy((char*)0x02000000, "soundeffect open OK:"); //ok so far
-			//strcat((char*)0x02000000, filename);
+			strcpy((char*)0x02000000, "soundeffect open OK:"); //ok so far
+			strcat((char*)0x02000000, filename);
 		}
 	}
 	pf_lseek(0, currentFH);

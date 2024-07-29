@@ -47,6 +47,15 @@ USA
 #include "arm7vram.h"
 #include "arm7vram_twl.h"
 
+u32 * getTGDSMBV3ARM7Bootloader(){
+	if(__dsimode == false){
+		return (u32*)&arm7vram[0];	
+	}
+	else{
+		return (u32*)&arm7vram_twl[0];
+	}
+}
+
 #ifdef __cplusplus
 extern "C"{
 #endif
@@ -118,72 +127,6 @@ int main(int argc, char *argv[])
 	flush_dcache_all();	
 	/*			TGDS 1.6 Standard ARM9 Init code end	*/
 	
-	/////////////////////////////////////////////////////////Reload TGDS Proj///////////////////////////////////////////////////////////
-	char tmpName[256];
-	char ext[256];
-	if(__dsimode == true){
-		char TGDSProj[256];
-		char curChosenBrowseFile[256];
-		strcpy(TGDSProj,"0:/");
-		strcat(TGDSProj, "ToolchainGenericDS-multiboot");
-		if(__dsimode == true){
-			strcat(TGDSProj, ".srl");
-		}
-		else{
-			strcat(TGDSProj, ".nds");
-		}
-		//Force ARM7 reload once 
-		if( 
-			(argc < 2) 
-			&& 
-			(strncmp(argv[1], TGDSProj, strlen(TGDSProj)) != 0) 	
-		){
-			REG_IME = 0;
-			MPUSet();
-			REG_IME = 1;
-			char startPath[MAX_TGDSFILENAME_LENGTH+1];
-			strcpy(startPath,"/");
-			strcpy(curChosenBrowseFile, TGDSProj);
-			
-			char thisTGDSProject[MAX_TGDSFILENAME_LENGTH+1];
-			strcpy(thisTGDSProject, "0:/");
-			strcat(thisTGDSProject, TGDSPROJECTNAME);
-			if(__dsimode == true){
-				strcat(thisTGDSProject, ".srl");
-			}
-			else{
-				strcat(thisTGDSProject, ".nds");
-			}
-			
-			//Boot .NDS file! (homebrew only)
-			strcpy(tmpName, curChosenBrowseFile);
-			separateExtension(tmpName, ext);
-			strlwr(ext);
-			
-			//pass incoming launcher's ARGV0
-			char arg0[256];
-			int newArgc = 2;
-			if (argc > 2) {
-				//Arg0:	Chainload caller: TGDS-MB
-				//Arg1:	This NDS Binary reloaded through ChainLoad
-				//Arg2: This NDS Binary reloaded through ChainLoad's Argument0
-				strcpy(arg0, (const char *)argv[2]);
-				newArgc++;
-			}
-			
-			char thisArgv[3][MAX_TGDSFILENAME_LENGTH];
-			memset(thisArgv, 0, sizeof(thisArgv));
-			strcpy(&thisArgv[0][0], curChosenBrowseFile);	//Arg0:	Chainload caller: TGDS-MB
-			strcpy(&thisArgv[1][0], thisTGDSProject);	//Arg1:	NDS Binary reloaded through ChainLoad
-			strcpy(&thisArgv[2][0], (char*)arg0);	//Arg2: NDS Binary reloaded through ChainLoad's ARG0
-			addARGV(newArgc, (char*)&thisArgv);				
-			if(TGDSMultibootRunNDSPayload(curChosenBrowseFile) == false){ //should never reach here, nor even return true. Should fail it returns false
-				
-			}
-		}
-	}
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
 	setupDisabledExceptionHandler();
 	REG_IME = 0;
 	set0xFFFF0000FastMPUSettings();
@@ -226,8 +169,8 @@ int main(int argc, char *argv[])
 		strcpy(&thisArgv[0][0], TGDSPROJECTNAME);	//Arg0:	This Binary loaded
 		strcpy(&thisArgv[1][0], curChosenBrowseFile);	//Arg1:	NDS Binary reloaded
 		strcpy(&thisArgv[2][0], tmpName);					//Arg2: NDS Binary ARG0
-		addARGV(3, (char*)&thisArgv);				
-		if(TGDSMultibootRunNDSPayload(curChosenBrowseFile) == false){ //should never reach here, nor even return true. Should fail it returns false
+		u32 * payload = getTGDSMBV3ARM7Bootloader();
+		if(TGDSMultibootRunNDSPayload(curChosenBrowseFile, (u8*)payload, 3, (char*)&thisArgv) == false){ //should never reach here, nor even return true. Should fail it returns false
 			printf("Invalid NDS/TWL Binary >%d", TGDSPrintfColor_Yellow);
 			printf("or you are in NTR mode trying to load a TWL binary. >%d", TGDSPrintfColor_Yellow);
 			printf("or you are missing the TGDS-multiboot payload in root path. >%d", TGDSPrintfColor_Yellow);
