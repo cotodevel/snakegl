@@ -63,7 +63,7 @@ export TARGET_LIBRARY_CRT0_FILE_7 = nds_arm_ld_crt0
 export TARGET_LIBRARY_CRT0_FILE_9 = nds_arm_ld_crt0
 export TARGET_LIBRARY_CRT0_FILE_COMPRESSED_9 = nds_arm_ld_crt0
 
-export TARGET_LIBRARY_LINKER_FILE_7 = $(TARGET_LIBRARY_PATH)$(TARGET_LIBRARY_LINKER_SRC)/$(TARGET_LIBRARY_CRT0_FILE_7).S
+export TARGET_LIBRARY_LINKER_FILE_7 = ../$(TARGET_LIBRARY_CRT0_FILE_7).S
 export TARGET_LIBRARY_LINKER_FILE_9 = $(TARGET_LIBRARY_PATH)$(TARGET_LIBRARY_LINKER_SRC)/$(TARGET_LIBRARY_CRT0_FILE_9).S
 export TARGET_LIBRARY_LINKER_FILE_COMPRESSED_9 = ../$(DECOMPRESSOR_BOOTCODE_9)/$(TARGET_LIBRARY_CRT0_FILE_COMPRESSED_9).S
 
@@ -141,7 +141,7 @@ compile	:
 	-cp	-r	$(TARGET_LIBRARY_MAKEFILES_SRC9_FPIC)	$(CURDIR)/$(PosIndCodeDIR_FILENAME)/$(DIR_ARM9)
 	-$(MAKE)	-R	-C	$(PosIndCodeDIR_FILENAME)/$(DIR_ARM9)/
 	-cp	-r	$(TARGET_LIBRARY_MAKEFILES_SRC7_NOFPIC)	$(CURDIR)/common/templateCode/stage1_7/
-	-cp	-r	$(TARGET_LIBRARY_MAKEFILES_SRC7VRAM_NOFPIC)	$(CURDIR)/$(DIR_ARM7)/Makefile
+	
 	$(MAKE)	-R	-C	$(CURDIR)/common/templateCode/stage1_7/
 	$(MAKE)	-R	-C	$(DIR_ARM7)/
 	$(MAKE)	-R	-C	$(CURDIR)/common/templateCode/arm7bootldr/
@@ -182,7 +182,7 @@ endif
 	-@rm -rf $(CURDIR)/$(PosIndCodeDIR_FILENAME)/$(DIR_ARM7)/Makefile
 	-@rm -rf $(CURDIR)/$(PosIndCodeDIR_FILENAME)/$(DIR_ARM9)/Makefile
 	-@rm -fr $(EXECUTABLE_FNAME)	$(TGDSPROJECTNAME).srl	$(CURDIR)/common/templateCode/
-	-@rm -rf $(CURDIR)/$(DIR_ARM7)/Makefile	$(DIR_ARM9)/data/arm7vram.bin	$(DIR_ARM9)/data/arm7vram_twl.bin
+	-@rm -rf $(DIR_ARM9)/data/arm7vram.bin	$(DIR_ARM9)/data/arm7vram_twl.bin
 
 rebase:
 	git reset --hard HEAD
