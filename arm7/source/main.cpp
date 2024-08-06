@@ -35,15 +35,22 @@ USA
 #include "InterruptsARMCores_h.h"
 
 ////////////////////////////////TGDS-MB v3 VRAM Bootcode start////////////////////////////////
-
+__attribute__((section(".iwram64K")))
 IMA_Adpcm_Player backgroundMusicPlayer;	//Actual PLAYER Instance. See ima_adpcm.cpp -> [PLAYER: section
+
+__attribute__((section(".iwram64K")))
 IMA_Adpcm_Player SoundEffect0Player;
 
+__attribute__((section(".iwram64K")))
 FATFS FatfsFILEBgMusic; //Sound stream handle
+
+__attribute__((section(".iwram64K")))
 FATFS FatfsFILESoundSample0; //Sound effect handle #0
 
-struct soundPlayerContext soundData;
+__attribute__((section(".iwram64K")))
 FATFS fileHandle;					// Petit-FatFs work area 
+
+struct soundPlayerContext soundData;
 char fname[256];
 char debugBuf7[256];
 
@@ -160,19 +167,24 @@ void playSoundStreamARM7(){
 	}
 	fresult = pf_mount(currentFH);
 	if (fresult != FR_OK) { 
+		
+		//Throw exception
+		int stage = 10;
+		handleDSInitOutputMessage("playSoundStreamARM7(): pf_mount() failed");
+		handleDSInitError7(stage, (u32)savedDSHardware);
+		
 		fifomsg[33] = 0xAABBCCDD;
 	}
 	fresult = pf_open(fname, currentFH);
-	if(streamType == FIFO_PLAYSOUNDEFFECT_FILE){
-		if (fresult != FR_OK) { 
-			strcpy((char*)0x02000000, "soundeffect failed to open:");
-			strcat((char*)0x02000000, filename);
-		}
-		else{
-			strcpy((char*)0x02000000, "soundeffect open OK:"); //ok so far
-			strcat((char*)0x02000000, filename);
-		}
+	if (fresult != FR_OK) { 
+		strcpy((char*)0x02000000, "soundfile failed to open:");
+		strcat((char*)0x02000000, filename);
 	}
+	else{
+		strcpy((char*)0x02000000, "soundfile open OK:"); //ok so far
+		strcat((char*)0x02000000, filename);
+	}
+	
 	pf_lseek(0, currentFH);
 	
 	int argBuffer[MAXPRINT7ARGVCOUNT];
@@ -195,6 +207,7 @@ void playSoundStreamARM7(){
 	fifomsg[33] = (u32)fresult;
 }
 
+
 #if (defined(__GNUC__) && !defined(__clang__))
 __attribute__((optimize("O0")))
 #endif
@@ -216,6 +229,15 @@ __attribute__ ((optnone))
 #endif
 int main(int argc, char **argv) {
 //---------------------------------------------------------------------------------
+	
+	//Copy ARM7i sections from VRAM -> IWRAM if we're already at VRAM
+	extern u32 __arm7iwram_lma__;
+	extern u32 __arm7iwram_lma_end__;
+	extern u32 __iwram_startFast;
+	extern u32 __iwram_topFast;
+	int iwramSectionSize = (int) ((u32)&__arm7iwram_lma_end__ - (u32)&__iwram_startFast);
+	dmaTransferWord(0, (uint32)&__arm7iwram_lma__, (uint32)&__iwram_startFast, iwramSectionSize);
+	
 	/*			TGDS 1.6 Standard ARM7 Init code start	*/
 	installWifiFIFO();
 	while(!(*(u8*)0x04000240 & 2) ){} //wait for VRAM_D block

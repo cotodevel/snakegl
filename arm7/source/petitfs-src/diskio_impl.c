@@ -47,6 +47,7 @@ unsigned char scratchPadSector[512];
 #ifdef ARM7
 __attribute__ ((optnone))
 #endif
+__attribute__((section(".iwram64K")))
 DRESULT disk_readp (
 	BYTE* buff,		/* Pointer to the destination object */
 	DWORD sector,	/* Sector number (LBA) */
