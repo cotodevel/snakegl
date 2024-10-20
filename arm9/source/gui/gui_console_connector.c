@@ -76,8 +76,6 @@ bool InitProjectSpecificConsole(){
 		DefaultSessionConsole = (ConsoleInstance *)(&DefaultConsole);
 		
 		//Set subEngine as TGDS Console
-		GUI.consoleAtTopScreen = false;
-		GUI.consoleBacklightOn = true;	//Backlight On for console
 		SetEngineConsole(subEngine,DefaultSessionConsole);
 		
 		//Set subEngine properties
@@ -118,11 +116,13 @@ bool InitProjectSpecificConsole(){
 		REG_BG3PC_SUB = 0;
 		REG_BG3PD_SUB = 1 << 8;
 		
-		
 		bool mainEngine = true;
 		setOrientation(ORIENTATION_0, mainEngine);
 		mainEngine = false;
 		setOrientation(ORIENTATION_0, mainEngine);
+		
+		GUI.GBAMacroMode = true;	//GUI console at top screen
+		TGDSLCDSwap();
 	}
 
 	//Dual 3D Mode: TGDS Dual 3D Console init
