@@ -31,10 +31,6 @@ USA
 #include "spiTGDS.h"
 #include "clockTGDS.h"
 
-//TGDS-MB v3 bootloader
-void bootfile(){
-}
-
 //User Handler Definitions
 
 #ifdef ARM9
@@ -96,9 +92,7 @@ void VblankUser(){
 __attribute__((section(".itcm")))
 #endif
 void VcounterUser(){
-	struct sIPCSharedTGDS * sIPCSharedTGDSInst = (struct sIPCSharedTGDS *)TGDSIPCStartAddress;
-	//Handle Clock (should this one run on IRQs instead?)
-	sIPCSharedTGDSInst->ndsRTCSeconds = nds_get_time7();
+
 }
 
 //Note: this event is hardware triggered from ARM7, on ARM9 a signal is raised through the FIFO hardware
