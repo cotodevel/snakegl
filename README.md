@@ -28,6 +28,7 @@ Many thanks to original author "alexandrevicenzi: https://github.com/alexandrevi
 -Directional Pad controls Snake direction
 -X button toggles backround music
 
+Note: TGDSProject3D offers Custom ARM7 VRAM Core providing all necessary services for wifi + soundstream + homebrew loader 
 
 ____Remoteboot____
 Also, it's recommended to use the remoteboot feature. It allows to send the current TGDS Project over wifi removing the necessity
