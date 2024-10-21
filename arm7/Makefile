@@ -54,8 +54,8 @@ DIR_SRC			=	$(DIRS_ARM7_SRC)	$(DIRS_ARM7_HEADER)
 
 #--gc-sections: allows relocatable sections linked (already) to be included, otherwise unused sections are discarded.
 #check arm7.map "Discarded input sections" to see --gc-sections in action.
-LDFLAGS	:=	-specs=dsi_arm7_ld_stage2.specs	-Wl,--no-gc-sections,-Map,$(MAPFILE),--fix-v4bx,-z,defs
-LDFLAGS_DSI	:=	-specs=dsi_arm7_ld_stage2.specs	-Wl,--gc-sections,-Map,arm7-nonstripped_dsi.map,--fix-v4bx,-z,defs
+LDFLAGS	:=	-specs=tgds_vp_vram_dsi_arm7_ld_stage2.specs	-Wl,--no-gc-sections,-Map,$(MAPFILE),--fix-v4bx,-z,defs
+LDFLAGS_DSI	:=	-specs=tgds_vp_vram_dsi_arm7_ld_stage2.specs	-Wl,--gc-sections,-Map,arm7-nonstripped_dsi.map,--fix-v4bx,-z,defs
 LIBRARIES_NTR =	-lutils7	-l$(TARGET_LIBRARY_TGDS_NTR_7)	-lhardware7		-lstdc++	-lcnano7	-lgcc
 LIBRARIES_TWL =	-lutils7i	-l$(TARGET_LIBRARY_TGDS_TWL_7)	-lhardware7i	-lstdc++	-lcnano7	-lgcc
 
@@ -140,8 +140,8 @@ $(BINSTRIP_RULE_arm7vram): $(ELF_ARM7)
 	$(OBJCOPY) 	-S -O binary	$<	$@
 	$(OBJCOPY) 	-S -O binary	${<:.elf=-nonstripped_dsi.elf}	${@:.bin=_twl.bin}
 	-rm	$<
-	-mv $@	../data/arm9/
-	-mv ${@:.bin=_twl.bin}	../data/arm9/
+	-mv $@	../arm9/data/
+	-mv ${@:.bin=_twl.bin}	../arm9/data/
 ################################################################################################
 	
 clean:

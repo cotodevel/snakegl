@@ -47,7 +47,13 @@ USA
 #include "arm7vram.h"
 #include "arm7vram_twl.h"
 
-u32 * getTGDSMBV3ARM7Bootloader(){
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
+u32 * getTGDSARM7VRAMCore(){
 	if(__dsimode == false){
 		return (u32*)&arm7vram[0];	
 	}
@@ -93,17 +99,11 @@ int main(int argc, char *argv[])
 	#ifdef ARM9
 	/*			TGDS 1.6 Standard ARM9 Init code start	*/
 	//Save Stage 1: IWRAM ARM7 payload: NTR/TWL (0x03800000)
-	memcpy((void *)TGDS_MB_V3_ARM7_STAGE1_ADDR, (const void *)0x02380000, (int)(96*1024));	//
-	coherent_user_range_by_size((uint32)TGDS_MB_V3_ARM7_STAGE1_ADDR, (int)(96*1024)); //		also for TWL binaries 
+	memcpy((void *)TGDS_MB_V3_ARM7_STAGE1_ADDR, (const void *)0x02380000, (int)(96*1024));
+	coherent_user_range_by_size((uint32)TGDS_MB_V3_ARM7_STAGE1_ADDR, (int)(96*1024));
 	
 	//Execute Stage 2: VRAM ARM7 payload: NTR/TWL (0x06000000)
-	u32 * payload = NULL;
-	if(__dsimode == false){
-		payload = (u32*)&arm7vram[0];	
-	}
-	else{
-		payload = (u32*)&arm7vram_twl[0];
-	}
+	u32 * payload = getTGDSARM7VRAMCore();
 	executeARM7Payload((u32)0x02380000, 96*1024, payload);
 	
 	bool isTGDSCustomConsole = true;	//set default console or custom console: custom console 
@@ -135,6 +135,8 @@ int main(int argc, char *argv[])
 		TWLSetTouchscreenTWLMode(); //guaranteed TSC on TWL Mode through Unlaunch
 	}
 	REG_IME = 1;
+	
+	setBacklight(POWMAN_BACKLIGHT_TOP_BIT | POWMAN_BACKLIGHT_BOTTOM_BIT); //Dual3D or debug session enabled screens
 	
 	/*
 	#ifdef NO_VIDEO_PLAYBACK
@@ -169,7 +171,7 @@ int main(int argc, char *argv[])
 		strcpy(&thisArgv[0][0], TGDSPROJECTNAME);	//Arg0:	This Binary loaded
 		strcpy(&thisArgv[1][0], curChosenBrowseFile);	//Arg1:	NDS Binary reloaded
 		strcpy(&thisArgv[2][0], tmpName);					//Arg2: NDS Binary ARG0
-		u32 * payload = getTGDSMBV3ARM7Bootloader();
+		u32 * payload = getTGDSARM7VRAMCore();
 		if(TGDSMultibootRunNDSPayload(curChosenBrowseFile, (u8*)payload, 3, (char*)&thisArgv) == false){ //should never reach here, nor even return true. Should fail it returns false
 			printf("Invalid NDS/TWL Binary >%d", TGDSPrintfColor_Yellow);
 			printf("or you are in NTR mode trying to load a TWL binary. >%d", TGDSPrintfColor_Yellow);

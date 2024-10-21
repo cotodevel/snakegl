@@ -5,6 +5,7 @@
 
 
 #include "Scene.h"
+#include "loader.h"
 
 #ifdef ARM9
 #include "Sphere008.h"
@@ -1055,6 +1056,32 @@ int startTGDSProject(int argc, char *argv[])
 
 		u32 keys = keysDown() & ~(KEY_L | KEY_R);
 		keyboardInput(keys, 0, 0);
+		
+		/*
+		//Go back to TGDS-multiboot
+		if(keysDown() & KEY_L){	
+			haltARM7(); //required
+			char thisArgv[3][MAX_TGDSFILENAME_LENGTH];
+			memset(thisArgv, 0, sizeof(thisArgv));
+			strcpy(&thisArgv[0][0], "");	//Arg0:	This Binary loaded
+			strcpy(&thisArgv[1][0], "");	//Arg1:	NDS Binary to chainload through TGDS-MB
+			strcpy(&thisArgv[2][0], "");	//Arg2: NDS Binary loaded from TGDS-MB	
+			char * TGDS_MB = NULL;
+			if(__dsimode == true){
+				TGDS_MB = "0:/ToolchainGenericDS-multiboot.srl";
+			}
+			else{
+				TGDS_MB = "0:/ToolchainGenericDS-multiboot.nds";
+			}
+			u32 * payload = getTGDSARM7VRAMCore();
+			if(TGDSMultibootRunNDSPayload(TGDS_MB, (u8*)payload, 0, (char*)&thisArgv) == false){ //should never reach here, nor even return true. Should fail it returns false
+				
+			}
+			while(keysDown() & KEY_L){
+				scanKeys();
+			}
+		}
+		*/
 		
 		//sound (ARM7)
 		
