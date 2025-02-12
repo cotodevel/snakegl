@@ -1,5 +1,11 @@
 #include "Sphere008.h"
 
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))  
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
 u32 Sphere008[] = {
 402,
 FIFO_COMMAND_PACK( FIFO_BEGIN , FIFO_TEX_COORD , FIFO_NORMAL , FIFO_VERTEX16 ),

@@ -24,7 +24,6 @@ USA
 //		struct sIPCSharedTGDS * TGDSIPC = TGDSIPCStartAddress; 														// Access to TGDS internal IPC FIFO structure. 		(ipcfifoTGDS.h)
 //		struct sIPCSharedTGDSSpecific * TGDSUSERIPC = (struct sIPCSharedTGDSSpecific *)TGDSIPCUserStartAddress;		// Access to TGDS Project (User) IPC FIFO structure	(ipcfifoTGDSUser.h)
 
-//inherits what is defined in: ipcfifoTGDS.h
 #ifndef __ipcfifoTGDSUser_h__
 #define __ipcfifoTGDSUser_h__
 
@@ -38,22 +37,37 @@ USA
 #include "pff.h"
 #include "ima_adpcm.h"
 #endif
+
+
+#define MAX_SOUNDS_BUFFERED ((int)16)
+#define ENTRIES_TO_COMPARE ((int)6)
+struct soundItem {
+	char soundFile[ENTRIES_TO_COMPARE * 4];
+	u32 cnt; 
+	int len; 
+	u16 freq;
+	u32 soundBuffer;
+	int soundLen;
+	int channel;
+} __attribute__((aligned (4)));
+
+
 //---------------------------------------------------------------------------------
 struct sIPCSharedTGDSSpecific {
 //---------------------------------------------------------------------------------
-	char filename[256];
+	char filename[64];
 };
 
 //TGDS Memory Layout ARM7/ARM9 Cores
 #define TGDS_ARM7_MALLOCSTART (u32)(0x06018000)
 #define TGDS_ARM7_MALLOCSIZE (int)(512)
 #define TGDSDLDI_ARM7_ADDRESS (u32)(TGDS_ARM7_MALLOCSTART + TGDS_ARM7_MALLOCSIZE) //ARM7DLDI: 16K
-#define TGDS_ARM7_AUDIOBUFFER_STREAM (u32)((int)TGDSDLDI_ARM7_ADDRESS + (16*1024))	//Unused: 15K
+#define TGDS_ARM7_AUDIOBUFFER_STREAM (u32)(0x06010000)	//Unused: 15K
 
 #define FIFO_PLAYSOUNDSTREAM_FILE (u32)(0xFFFFABCB)
 #define FIFO_STOPSOUNDSTREAM_FILE (u32)(0xFFFFABCC)
-#define FIFO_PLAYSOUNDEFFECT_FILE (u32)(0xFFFFABCD)
 #define FIFO_STOP_ARM7_VRAM_CORE (u32)(0xFFFFABCE)
+#define FIFO_WRITE_AUDIO_HARDWARE (u32)(0xFFFFABCF)
 
 #endif
 
@@ -62,10 +76,7 @@ struct sIPCSharedTGDSSpecific {
 #ifdef ARM7
 #if defined(ARM7VRAMCUSTOMCORE)
 	extern IMA_Adpcm_Player backgroundMusicPlayer;	//Sound stream Background music Instance
-	extern IMA_Adpcm_Player SoundEffect0Player;	//Sound stream Background music Instance
-
 	extern FATFS fileHandle; //Sound stream handle
-	extern FATFS FatfsFILESoundSample0; //Sound effect handle #0
 #endif
 #endif
 
@@ -98,6 +109,7 @@ extern void playerStopARM7();
 #endif
 
 #ifdef ARM9
+extern void initHardwareCustom(u8 DSHardware);
 extern u32 playSoundStreamFromFile(char * videoStructFDFilename, bool loop, u32 streamType);
 extern bool soundGameOverEmitted;
 extern void gameoverSound();
@@ -106,6 +118,13 @@ extern void BgMusic(char * filename);
 extern bool bgMusicEnabled;
 extern void BgMusicOff();
 extern void haltARM7();
+
+//TGDSProject3D .WAV -> NDS Sound hardware implementation
+#ifdef ARM9
+extern struct soundItem soundsCached[MAX_SOUNDS_BUFFERED];
+#endif
+extern void playStreamEffect(char * fname, bool loopStream);
+extern void writeARM7SoundChannelFromTGDSProject3D(struct soundItem * sndItem);
 #endif
 
 #ifdef __cplusplus

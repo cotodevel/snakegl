@@ -36,7 +36,7 @@ DRESULT disk_writep (const BYTE* buff, DWORD sc);
 #define STA_NODISK		0x02	/* No medium in the drive */
 
 //Coto- 18 Nov. 2024: Add cached sectors, to remove audio clicks!
-#define MAX_ENTRIES_BUFFERED ((int)7)
+#define MAX_ENTRIES_BUFFERED ((int)8)
 struct dldiCache {
 	unsigned char scratchPadSector[512];
 	DWORD sector;

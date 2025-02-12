@@ -1,26 +1,34 @@
-#ifndef SCENE_H
-#define SCENE_H
+#ifndef __SCENE_H
+#define __SCENE_H
+
+#ifdef _MSC_VER
+#include <GL\GLUT.h>
+#include "TGDSTypes.h"
+#include "..\..\..\..\..\toolchaingenericds\src\common\libutils\arm9\source\ndsDisplayListUtils.h"
+#endif
+
+#ifdef ARM9
+#include <math.h>
+#include "timerTGDS.h"
+#include "biosTGDS.h"
+#include "videoGL.h"
+#include "soundTGDS.h"
+#include "main.h"
+#include "ipcfifoTGDSUser.h"
+#endif
 
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <math.h>
 #include <time.h>
-#include <math.h>
 
-#ifdef ARM9
-#include <math.h>
-#include "timerTGDS.h"
-#include "videoGL.h"
-#include "soundTGDS.h"
-#include "biosTGDS.h"
-#include "main.h"
-#include "ndsDisplayListUtils.h"
-#endif
-
-#if defined(_MSC_VER)
-#include "..\..\..\..\..\toolchaingenericds\src\common\libutils\arm9\source\TGDSTypes.h"
-#include "..\..\..\..\..\toolchaingenericds\src\common\libutils\arm9\source\ndsDisplayListUtils.h"
+#if defined(_WIN32) || defined(WIN32)
+    #include <windows.h>
+    #include <GL/gl.h>
+    #include <GL/glut.h>
+	#include "SOIL.h"
 #endif
 
 #if defined(_MSC_VER) || defined(WIN32)
@@ -347,7 +355,7 @@ extern void keyboardSpecial(int key, int x, int y);
 #endif
 
 extern void keyboardInput(unsigned int key, int x, int y);	/// handles keyboard input
-
+extern void drawSphereCustom(float r, int lats, int longs);
 
 #ifdef __cplusplus
 }

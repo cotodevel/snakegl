@@ -52,8 +52,8 @@ __attribute__((optimize("O0")))
 __attribute__ ((optnone))
 #endif
 vramSetup * getProjectSpecificVRAMSetup(){
-	enableDual3DTGDS(); //disableDual3DTGDS(); //false to enable TGDS Single 3D Screen + Console; true to enable TGDS Dual 3D Screen mode
-	if(getDual3DTGDSStatus() == false){
+	TGDSProjectDual3DEnabled = true; //false to enable TGDS Single 3D Screen + Console; true to enable TGDS Dual 3D Screen mode
+	if(TGDSProjectDual3DEnabled == false){
 		return TGDSFOOBILLIARD_3DVRAM_SETUP();
 	}
 	//Dual 3D Mode
@@ -71,7 +71,7 @@ __attribute__((optimize("O0")))
 __attribute__ ((optnone))
 #endif
 bool InitProjectSpecificConsole(){
-	if(getDual3DTGDSStatus() == false){
+	if(TGDSProjectDual3DEnabled == false){
 		//TGDS Single 3D + Console layout
 		DefaultSessionConsole = (ConsoleInstance *)(&DefaultConsole);
 		

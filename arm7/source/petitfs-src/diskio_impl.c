@@ -24,7 +24,6 @@
 struct dldiCache dldiCached[MAX_ENTRIES_BUFFERED];
 static int sequentialCachedEntry = 0;
 
-
 /*-----------------------------------------------------------------------*/
 /* Initialize Disk Drive                                                 */
 /*-----------------------------------------------------------------------*/
@@ -37,13 +36,13 @@ DSTATUS disk_initialize (void){
 	#endif
 	#ifdef ARM7
 	if(1 == 1){
-	#endif
 		memset((u8*)&dldiCached, 0, sizeof(dldiCached));
 		int i = 0;
 		for(i = 0; i < MAX_ENTRIES_BUFFERED; i++){
 			dldiCached[i].sector = -1;
 		}
 		sequentialCachedEntry = 0;
+	#endif
 		return 0;
 	}
 	return FR_DISK_ERR;
@@ -52,6 +51,7 @@ DSTATUS disk_initialize (void){
 /*-----------------------------------------------------------------------*/
 /* Read Partial Sector                                                   */
 /*-----------------------------------------------------------------------*/
+
 #ifdef ARM7
 __attribute__ ((optnone))
 #endif

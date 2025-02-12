@@ -23,9 +23,22 @@
 #include "snakegfx.h"
 #endif
 
+//SnakeGL ARM9 timer setup:
+//-> Game timer: Timer 1
+//-> TGDSThreads: Timer 2
+//-> DSWIFI: Timer 3
+
 //
 // Scene implementation
 //
+
+#ifndef _MSC_VER
+					// //
+#define ARM9 1		// Enable only if not real GCC + NDS environment
+#undef _MSC_VER		// //
+#undef WIN32		// //
+#endif
+
 
 //Global because TGDSVideo initialization happens much earlier than game context creation
 bool TGDSProjectDual3DEnabled;
@@ -229,7 +242,7 @@ void draw_food(struct Scene * sceneInst)
 #ifdef ARM9
 		glScalef(0.3, 0.3, 0.3);
 #endif
-		drawSphere(3, 3, 3);
+		drawSphereCustom(3, 3, 3);
 	glPopMatrix(
         #ifdef ARM9
         1
@@ -506,7 +519,7 @@ void drawScene(){
 	#endif
 
 	#ifdef WIN32
-	// clear scene
+	// Clear The Scene And The Depth Buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 	#endif
 
@@ -632,9 +645,9 @@ void drawScene(){
 
 	#ifdef ARM9
     glFlush();
-	handleARM9SVC();	/* Do not remove, handles TGDS services */
-    IRQVBlankWait();
-    #endif
+	bool waitForVblank = true;	//TGDS threads + OpenGL frame
+	int threadsRan = runThreads(internalTGDSThreads, waitForVblank);
+	#endif
 }
 
 GLint DLEN2DTEX = -1;
@@ -926,37 +939,6 @@ void setupTGDSProjectOpenGLDisplayLists(){
 	}
 	glEndList();
 	
-	DLSPHERE = (GLint)glGenLists(1);
-	//drawSphere(); -> NDS GX Implementation
-	glNewList(DLSPHERE, GL_COMPILE); //recompile a light-based sphere as OpenGL DisplayList for rendering on upper screen later
-	{
-		float r=1; 
-		int lats=8; 
-		int longs=8;
-		int i, j;
-		for (i = 0; i <= lats; i++) {
-			float lat0 = PI * (-0.5 + (float)(i - 1) / lats);
-			float z0 = sin((float)lat0);
-			float zr0 = cos((float)lat0);
-
-			float lat1 = PI * (-0.5 + (float)i / lats);
-			float z1 = sin((float)lat1);
-			float zr1 = cos((float)lat1);
-			glBegin(GL_TRIANGLE_STRIP);
-			for (j = 0; j <= longs; j++) {
-				float lng = 2 * PI * (float)(j - 1) / longs;
-				float x = cos(lng);
-				float y = sin(lng);
-				glNormal3f(x * zr0, y * zr0, z0);
-				glVertex3f(r * x * zr0, r * y * zr0, r * z0);
-				glNormal3f(x * zr1, y * zr1, z1);
-				glVertex3f(r * x * zr1, r * y * zr1, r * z1);
-			}
-			glEnd();
-		}
-	}
-	glEndList();
-	
 }
 
 #ifdef ARM9
@@ -1039,7 +1021,7 @@ int startTGDSProject(int argc, char *argv[])
 #endif
 
 #if defined(ARM9)
-	startTimerCounter(tUnitsMilliseconds, 1);
+	startTimerCounter(tUnitsMilliseconds, 1, IRQ_TIMER1);
     glMaterialShinnyness();
 	TWLPrintf("-- game loop start\n");
 	
@@ -1179,4 +1161,23 @@ __attribute__ ((optnone))
 bool getDual3DTGDSStatus(){
 	return TGDSProjectDual3DEnabled;
 }
+
+#if (defined(__GNUC__) && !defined(__clang__))
+__attribute__((optimize("O0")))  
+#endif
+#if (!defined(__GNUC__) && defined(__clang__))
+__attribute__ ((optnone))
+#endif
+void drawSphereCustom(float r, int lats, int longs) {	
+	#ifdef ARM9
+	#include "Sphere008.h"
+	glScalef(r, r, r);
+	glCallListGX((u32*)&Sphere008); //comment out when running on NDSDisplayListUtils
+	#endif
+
+	#ifdef WIN32
+	glCallList(DLSPHERE);
+	#endif
+}
+
 #endif
