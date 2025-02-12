@@ -62,8 +62,9 @@ _start:
 	ldr r0,=0x04000208
 	mov r1,#0
 	str r1,[r0]
-	
+
 	#ifdef ARM7	
+	
 	@Copy ARM7i sections from VMA to LMA
 	mov r0, pc
 	lsr    r0, r0, #24
@@ -199,9 +200,12 @@ _start:
 	and r0,r0,#0xFF
 	#endif
 	
+	#ifdef ARM7
 	bl initHardware
+	#endif
 	
 	#ifdef ARM9
+	bl initHardwareCustom
 	ldr                 r1,=argvIntraTGDSMB                /* point our source register to the start of the .dtcm section (VMA)*/
 	ldr                 r2,=0x02FFFE70                 /* point our destination register to the D-TCM dedicated to our writable data (LMA)*/
 	add                 r3,r2,#(256)                  /* point r3 after the last byte we will be writing (LMA)*/

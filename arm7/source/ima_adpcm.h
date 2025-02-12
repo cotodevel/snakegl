@@ -147,7 +147,8 @@ extern bool player_loop;
 extern void soundPauseStart();
 extern void timerAudioCallback();
 extern void setupSoundTGDSVideoPlayerARM7();
-extern u8 adpcmWorkBuffer[ADPCM_SIZE*4];
+extern u8 adpcmWorkBuffer[ADPCM_SIZE*2];
+extern u8 streamBuffer[ADPCM_SIZE*2];
 
 #ifdef __cplusplus
 }

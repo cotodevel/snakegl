@@ -1,10 +1,7 @@
 {
+    "terminal.integrated.defaultProfile.windows": "msys2",
     "files.associations": {
-        "iostream": "cpp",
-        "charconv": "c",
-        "xlocmon": "c",
-        "xlocnum": "c",
-        "ios": "c",
-        "xiosbase": "c"
-    }
+        "typedefstgds.h": "c",
+        "main.h": "c"
+    },
 }

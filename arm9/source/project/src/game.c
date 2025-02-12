@@ -60,6 +60,9 @@ void initGame(struct Game * instGame, int argc, char *argv[]){
 
     instGame->tick = 30;
     instGame->tick2 = 10;
+	
+	//NDS sound effects
+	memset(&soundsCached, 0, sizeof(soundsCached));
 }
 
 #if (defined(__GNUC__) && !defined(__clang__))
