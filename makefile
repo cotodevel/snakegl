@@ -20,7 +20,7 @@
 
 #ToolchainGenericDS specific: Use Makefiles from either TGDS, or custom
 export SOURCE_MAKEFILE7 = custom
-export SOURCE_MAKEFILE9 = custom
+export SOURCE_MAKEFILE9 = default
 
 #Shared
 ifeq ($(TGDS_ENV),windows)
@@ -40,7 +40,7 @@ export EXECUTABLE_VERSION =	"$(EXECUTABLE_VERSION_HEADER)"
 export TGDSPKG_TARGET_PATH := '//'
 export TGDSREMOTEBOOTER_SERVER_IP_ADDR := '192.168.43.185'
 export TGDSREMOTEBOOTER_SERVER_PORT := 1040
-#The ndstool I use requires to have the elf section removed, so these rules create elf headerless- binaries.
+export TGDS_PROJECT_COMPILER := gcc
 export DIR_ARM7 = arm7
 export BUILD_ARM7	=	build
 export DIR_ARM9 = arm9
@@ -61,11 +61,11 @@ export BINSTRIP_RULE_COMPRESSED_9i :=	$(DECOMPRESSOR_BOOTCODE_9i).bin
 
 export TARGET_LIBRARY_CRT0_FILE_7 = nds_arm_ld_crt0
 export TARGET_LIBRARY_CRT0_FILE_9 = nds_arm_ld_crt0
-export TARGET_LIBRARY_CRT0_FILE_COMPRESSED_9 = nds_arm_ld_crt0
+export TARGET_LIBRARY_CRT0_FILE_COMPRESSED_9 = nds_arm_ld_crt0custom
 
-export TARGET_LIBRARY_LINKER_FILE_7 = ../$(TARGET_LIBRARY_CRT0_FILE_7).S
-export TARGET_LIBRARY_LINKER_FILE_9 = ../$(TARGET_LIBRARY_CRT0_FILE_9).S
-export TARGET_LIBRARY_LINKER_FILE_COMPRESSED_9 = ../$(DECOMPRESSOR_BOOTCODE_9)/$(TARGET_LIBRARY_CRT0_FILE_COMPRESSED_9).S
+export TARGET_LIBRARY_LINKER_FILE_7 = $(TARGET_LIBRARY_PATH)$(TARGET_LIBRARY_LINKER_SRC)/$(TARGET_LIBRARY_CRT0_FILE_7).S
+export TARGET_LIBRARY_LINKER_FILE_9 = $(TARGET_LIBRARY_PATH)$(TARGET_LIBRARY_LINKER_SRC)/$(TARGET_LIBRARY_CRT0_FILE_9).S
+export TARGET_LIBRARY_LINKER_FILE_COMPRESSED_9 = $(TARGET_LIBRARY_PATH)$(TARGET_LIBRARY_LINKER_SRC)/$(TARGET_LIBRARY_CRT0_FILE_COMPRESSED_9).S
 
 export TARGET_LIBRARY_TGDS_NTR_7 = toolchaingen7
 export TARGET_LIBRARY_TGDS_NTR_9 = toolchaingen9
@@ -141,15 +141,13 @@ compile	:
 	-cp	-r	$(TARGET_LIBRARY_MAKEFILES_SRC9_FPIC)	$(CURDIR)/$(PosIndCodeDIR_FILENAME)/$(DIR_ARM9)
 	-$(MAKE)	-R	-C	$(PosIndCodeDIR_FILENAME)/$(DIR_ARM9)/
 	-cp	-r	$(TARGET_LIBRARY_MAKEFILES_SRC7_NOFPIC)	$(CURDIR)/common/templateCode/stage1_7/
-	$(MAKE)	-R	-C	$(DIR_ARM7)/
-	$(MAKE)	-R	-C	$(CURDIR)/common/templateCode/arm7bootldr/
 	$(MAKE)	-R	-C	$(CURDIR)/common/templateCode/stage1_7/
-	
-	-mv $(DIR_ARM7)/arm7vram.bin	$(DIR_ARM9)/data/arm7vram.bin
-	-mv $(DIR_ARM7)/arm7vram_twl.bin	$(DIR_ARM9)/data/arm7vram_twl.bin
-	
-	-mv $(CURDIR)/common/templateCode/stage1_7/arm7.bin		$(DIR_ARM9)/data/arm7_stage1.bin
-	-mv $(CURDIR)/common/templateCode/stage1_7/arm7_twl.bin		$(DIR_ARM9)/data/arm7_stage1_twl.bin
+	$(MAKE)	-R	-C	$(CURDIR)/common/templateCode/arm7bootldr/
+	-mv $(CURDIR)/common/templateCode/arm7bootldr/arm7vram.bin	$(DIR_ARM9)/data/arm7bootldr.binlzss
+	-mv $(CURDIR)/common/templateCode/arm7bootldr/arm7vram_twl.bin	$(DIR_ARM9)/data/arm7bootldr_twl.binlzss
+	$(MAKE)	-R	-C	$(DIR_ARM7)/
+	-mv $(DIR_ARM7)/arm7.bin	$(DIR_ARM9)/data/arm7vram.binlzss
+	-mv $(DIR_ARM7)/arm7_twl.bin	$(DIR_ARM9)/data/arm7vram_twl.binlzss
 	
 ifeq ($(SOURCE_MAKEFILE9),default)
 	cp	-r	$(TARGET_LIBRARY_MAKEFILES_SRC9_NOFPIC)	$(CURDIR)/$(DIR_ARM9)
@@ -157,8 +155,8 @@ endif
 	$(MAKE)	-R	-C	$(DIR_ARM9)/
 $(EXECUTABLE_FNAME)	:	compile
 	-@echo 'ndstool begin'
-	$(NDSTOOL)	-v	-c $@	-7  $(CURDIR)/arm7/arm7.bin	-e7  0x02380000	-9 $(CURDIR)/arm9/$(BINSTRIP_RULE_9) -e9  0x02000800	-r9 0x02000000	-b	icon.bmp "ToolchainGenericDS SDK;$(TGDSPROJECTNAME) NDS Binary; "
-	$(NDSTOOL)	-c 	${@:.nds=.srl} -7  $(CURDIR)/arm7/arm7_twl.bin	-e7  0x02380000	-9 $(CURDIR)/arm9/arm9_twl.bin -e9  0x02000800	-r9 0x02000000	\
+	$(NDSTOOL)	-v	-c $@	-7  $(CURDIR)/common/templateCode/stage1_7/$(BINSTRIP_RULE_7)	-e7  0x02380000	-9 $(CURDIR)/arm9/$(BINSTRIP_RULE_9) -e9  0x02000800	-r9 0x02000000	-g "TGDS" "NN" "NDS.TinyFB"	-b	icon.bmp "ToolchainGenericDS SDK;$(TGDSPROJECTNAME) NDS Binary; "
+	$(NDSTOOL)	-c 	${@:.nds=.srl} -7  $(CURDIR)/common/templateCode/stage1_7/arm7_twl.bin	-e7  0x02380000	-9 $(CURDIR)/arm9/arm9_twl.bin -e9  0x02000800	-r9 0x02000000	\
 	-g "TGDS" "NN" "NDS.TinyFB"	\
 	-z 80040000 -u 00030004 -a 00000138 \
 	-b icon.bmp "$(TGDSPROJECTNAME);$(TGDSPROJECTNAME) TWL Binary;" \
@@ -184,7 +182,7 @@ endif
 	-@rm -rf $(CURDIR)/$(PosIndCodeDIR_FILENAME)/$(DIR_ARM7)/Makefile
 	-@rm -rf $(CURDIR)/$(PosIndCodeDIR_FILENAME)/$(DIR_ARM9)/Makefile
 	-@rm -fr $(EXECUTABLE_FNAME)	$(TGDSPROJECTNAME).srl	$(CURDIR)/common/templateCode/
-	-@rm -rf $(DIR_ARM9)/data/arm7vram.bin	$(DIR_ARM9)/data/arm7vram_twl.bin	$(DIR_ARM9)/data/arm7_stage1.bin	$(DIR_ARM9)/data/arm7_stage1_twl.bin
+	-@rm -rf $(DIR_ARM9)/data/arm7vram.binlzss	$(DIR_ARM9)/data/arm7vram_twl.binlzss	$(DIR_ARM9)/data/arm7bootldr.binlzss	$(DIR_ARM9)/data/arm7bootldr.binlzss
 
 rebase:
 	git reset --hard HEAD
