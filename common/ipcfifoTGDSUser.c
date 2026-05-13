@@ -87,6 +87,7 @@ void HandleFifoNotEmptyWeakRef(u32 cmd1, uint32 cmd2){
 		
 			#if defined(ARM7VRAMCUSTOMCORE)
 			case(FIFO_STOP_ARM7_VRAM_CORE):{
+				stopBGMusic7();
 				playerStopARM7();
 				uint32 * fifomsg = (uint32 *)NDS_UNCACHED_SCRATCHPAD;
 				setValueSafe(&fifomsg[34], (uint32)0);
@@ -95,6 +96,7 @@ void HandleFifoNotEmptyWeakRef(u32 cmd1, uint32 cmd2){
 			
 			case(FIFO_STOPSOUNDSTREAM_FILE):{
 				stopBGMusic7();
+				playerStopARM7();
 			}
 			break;
 			

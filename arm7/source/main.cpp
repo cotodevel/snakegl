@@ -45,6 +45,9 @@ IMA_Adpcm_Player backgroundMusicPlayer;	//Actual PLAYER Instance. See ima_adpcm.
 __attribute__((section(".iwram64K")))
 FATFS fileHandle;					// bootloader / / Sound stream handle
 
+__attribute__((section(".iwram64K")))
+FATFS FatfsFILESoundSample0; //Sound effect handle #0
+
 struct soundPlayerContext soundData;
 char fname[256];
 
@@ -65,10 +68,7 @@ void playSoundStreamARM7(){
 	char * filename = (char*)&sharedIPC->filename[0];
 	strcpy((char*)fname, filename);
 	
-	if(streamType == FIFO_PLAYSOUNDSTREAM_FILE){
-		currentFH = &fileHandle;
-	}
-	
+	currentFH = &fileHandle;
 	fresult = pf_mount(currentFH);
 	if (fresult != FR_OK) { 
 		
@@ -94,7 +94,6 @@ void playSoundStreamARM7(){
 			//ADPCM Playback!
 		}
 	}
-	
 	fifomsg[33] = (u32)fresult;
 }
 
@@ -127,7 +126,6 @@ void playerStopARM7(){
 
 void stopBGMusic7(){
 	backgroundMusicPlayer.stop();
-	playerStopARM7();
 }
 
 bool stopSoundStreamUser(){

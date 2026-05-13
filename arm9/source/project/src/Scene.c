@@ -1039,31 +1039,35 @@ int startTGDSProject(int argc, char *argv[])
 		u32 keys = keysDown() & ~(KEY_L | KEY_R);
 		keyboardInput(keys, 0, 0);
 		
-		/*
 		//Go back to TGDS-multiboot
 		if(keysDown() & KEY_L){	
 			haltARM7(); //required
+			
+			//Execute Stage 1: IWRAM ARM7 payload: NTR/TWL (0x03800000)
+			u32 * payload = (u32 *)TGDS_MB_V3_ARM7_STAGE1_ADDR;
+			executeARM7Payload((u32)0x02380000, 96*1024, payload);
+			
 			char thisArgv[3][MAX_TGDSFILENAME_LENGTH];
 			memset(thisArgv, 0, sizeof(thisArgv));
 			strcpy(&thisArgv[0][0], "");	//Arg0:	This Binary loaded
 			strcpy(&thisArgv[1][0], "");	//Arg1:	NDS Binary to chainload through TGDS-MB
 			strcpy(&thisArgv[2][0], "");	//Arg2: NDS Binary loaded from TGDS-MB	
-			char * TGDS_MB = NULL;
+			char * bootldr = NULL;
 			if(__dsimode == true){
-				TGDS_MB = "0:/ToolchainGenericDS-multiboot.srl";
+				bootldr = "0:/ToolchainGenericDS-multiboot.srl";
 			}
 			else{
-				TGDS_MB = "0:/ToolchainGenericDS-multiboot.nds";
+				bootldr = "0:/ToolchainGenericDS-multiboot.nds";
 			}
-			u32 * payload = getTGDSARM7VRAMCore();
-			if(TGDSMultibootRunNDSPayload(TGDS_MB, (u8*)payload, 0, (char*)&thisArgv) == false){ //should never reach here, nor even return true. Should fail it returns false
+			
+			payload = getTGDSMBV3ARM7Bootloader();
+			if(TGDSMultibootRunNDSPayload(bootldr, (u8*)payload, 0, (char*)&thisArgv) == false){ //should never reach here, nor even return true. Should fail it returns false
 				
 			}
 			while(keysDown() & KEY_L){
 				scanKeys();
 			}
 		}
-		*/
 		
 		//sound (ARM7)
 		

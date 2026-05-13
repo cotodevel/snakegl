@@ -12,9 +12,10 @@
 #include <string.h>
 #include "typedefsTGDS.h"
 #include "xmem.h"
-#include "utilsTGDS.h"
+#include "posixHandleTGDS.h"
+#include "InterruptsARMCores_h.h"
 
-// default use 1.5 MB
+// default use 128K (ARM9 Mapped), may be overriden.
 unsigned int XMEMTOTALSIZE = (128*1024);
 
 // how many bytes will each of our blocks be?
@@ -30,6 +31,7 @@ unsigned int XMEM_TABLESIZE = 0;
 #define XMEM_ENDBLOCK 0x02
 #define XMEM_USEDBLOCK 0x04
 
+
 unsigned char *xmem_table;
 //XMEM_BLOCK *xmem_blocks;
 unsigned char *xmem_blocks;
@@ -42,8 +44,10 @@ __attribute__((optimize("O0")))
 __attribute__ ((optnone))
 #endif
 void XmemSetup(unsigned int size, unsigned short blocks) {
+
 	XMEMTOTALSIZE = size;
 	XMEM_BLOCKSIZE = blocks;
+	
 }
 
 #if (defined(__GNUC__) && !defined(__clang__))
@@ -191,11 +195,11 @@ void Xfree(const void *ptr) {
 	int block,sblock;
 	
 	while (1) {
-		if (ptr < xmem_blocks) {
+		if ((int)ptr < (int)xmem_blocks) {
 			//printf("XM: Free: NXML %8.8X ",(unsigned int)ptr);
 			break;
 		}
-		if (ptr > (xmem_blocks+(XMEM_BLOCKCOUNT*XMEM_BLOCKSIZE))) {
+		if ((int)ptr > ((int)(xmem_blocks+(XMEM_BLOCKCOUNT*XMEM_BLOCKSIZE))) ) {
 			//printf("XM: Free: NXMG %8.8X ",(u32)ptr);
 			break;
 		}

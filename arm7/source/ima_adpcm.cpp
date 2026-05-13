@@ -552,10 +552,10 @@ int IMA_Adpcm_Player::play(
 		
 		//ARM7 sound code
 		setupSoundTGDSVideoPlayerARM7();
-		strpcmL0 = (s16*)TGDS_ARM7_AUDIOBUFFER_STREAM;
-		strpcmL1 = (strpcmL0 + (sampleLen * 2));
-		strpcmR0 = (strpcmL1 + (sampleLen * 2));
-		strpcmR1 = (strpcmR0 + (sampleLen * 2));		
+		strpcmL0 = (s16*)TGDS_ARM7_MALLOCSTART;
+		strpcmL1 = (strpcmL0 + (sampleLen ));
+		strpcmR0 = (strpcmL1 + (sampleLen ));
+		strpcmR1 = (strpcmR0 + (sampleLen ));		
 	}
 
 	paused = false;

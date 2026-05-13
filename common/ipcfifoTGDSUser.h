@@ -55,14 +55,14 @@ struct soundItem {
 //---------------------------------------------------------------------------------
 struct sIPCSharedTGDSSpecific {
 //---------------------------------------------------------------------------------
-	char filename[64];
+	char filename[256];
 };
 
 //TGDS Memory Layout ARM7/ARM9 Cores
 #define TGDS_ARM7_MALLOCSTART (u32)(0x06018000)
-#define TGDS_ARM7_MALLOCSIZE (int)(512)
-#define TGDSDLDI_ARM7_ADDRESS (u32)(TGDS_ARM7_MALLOCSTART + TGDS_ARM7_MALLOCSIZE) //ARM7DLDI: 16K
-#define TGDS_ARM7_AUDIOBUFFER_STREAM (u32)(0x06010000)	//Unused: 15K
+#define TGDS_ARM7_MALLOCSIZE (int)(16*1024)
+#define TGDSDLDI_ARM7_ADDRESS (u32)(TGDS_ARM7_MALLOCSTART + TGDS_ARM7_MALLOCSIZE)	//0x0601C000
+#define TGDS_ARM7_AUDIOBUFFER_STREAM (u32)(0x03800000)
 
 #define FIFO_PLAYSOUNDSTREAM_FILE (u32)(0xFFFFABCB)
 #define FIFO_STOPSOUNDSTREAM_FILE (u32)(0xFFFFABCC)
